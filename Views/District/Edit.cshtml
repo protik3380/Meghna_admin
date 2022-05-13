@@ -1,0 +1,62 @@
+﻿@using System.Web.Mvc.Html
+
+@model EFreshStore.Models.Context.District
+
+@{
+    ViewBag.Title = "Edit";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<head>
+    <link rel="stylesheet" type="text/css" href="~/Content/css/form-design.css"/>
+</head>
+<body>
+<div class="container">
+    <div class="form-horizontal" id="div1">
+        @using (Html.BeginForm(null, null, FormMethod.Post, new {id = "AddDistrictForm"}))
+        {
+            @Html.AntiForgeryToken()
+
+            <div class="form-horizontal">
+                <h4>District</h4>
+                <hr/>
+                @Html.ValidationSummary(true)
+                <div class='@TempData["Class"]' id="flashMessage" role="alert">@TempData["Message"]</div>
+                @Html.HiddenFor(model => model.Id)
+                @Html.HiddenFor(model => model.CreatedOn)
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.Name, htmlAttributes: new {@class = "control-label col-md-2"})
+                    <div class="col-md-10">
+                        @Html.EditorFor(model => model.Name)
+                        <br/>
+                        @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-offset-2 col-md-10">
+                        <input type="submit" value="Update" class="btn btn-default"/>
+                    </div>
+                </div>
+            </div>
+        }
+
+        <div>
+            @Html.ActionLink("Back to List", "Views", "", htmlAttributes: new { @class = "backLink" })
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+    <script>
+        $(document).ready(function() {
+            $(function() {
+                setTimeout(function() {
+                    $("#flashMessage").hide('blind', {}, 500);
+                }, 5000);
+            });
+        });
+    </script>
+    }
+</body>

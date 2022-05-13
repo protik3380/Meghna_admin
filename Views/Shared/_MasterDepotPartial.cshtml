@@ -1,0 +1,123 @@
+﻿@using EFreshAdmin.Controllers
+@using EFreshAdmin.Models
+@using EFreshAdmin.Utility
+@using EFreshAdmin.Utility.Enums
+@using EFreshStore.Models.Context
+@*@using EFreshStoreCore.Model.Context*@
+@{
+    //User user = (User) Session["UserInfoSession"];
+
+    long totalPendingOrders = 0;
+    long totalConfirmedOrders = 0;
+    long totalOnProcessingOrders = 0;
+    long totalShippedOrders = 0;
+    long totalDeliveredOrders =0;
+    long totalReceivedOrders = 0;
+    long totalRejectedOrders = 0;
+    long userTypeId = Convert.ToInt64(Session["UserTypeId"]);
+    long userId = Convert.ToInt64(Session["UserId"]);
+    if (userTypeId == (long)UserTypeEnum.MasterDepotUser) {
+        totalPendingOrders = ApiUtility.CountTotalOrdersByOrderStatus(userId,(long)OrderStatusEnum.Pending);
+        totalConfirmedOrders = ApiUtility.CountTotalOrdersByOrderStatus(userId, (long)OrderStatusEnum.Confirm);
+        totalOnProcessingOrders = ApiUtility.CountTotalOrdersByOrderStatus(userId, (long)OrderStatusEnum.OnProcessing);
+        totalShippedOrders = ApiUtility.CountTotalOrdersByOrderStatus(userId, (long)OrderStatusEnum.Shipped);
+        totalDeliveredOrders = ApiUtility.CountTotalOrdersByOrderStatus(userId, (long)OrderStatusEnum.Delivered);
+        totalReceivedOrders = ApiUtility.CountTotalOrdersByOrderStatus(userId, (long)OrderStatusEnum.Received);
+        totalRejectedOrders = ApiUtility.CountTotalOrdersByOrderStatus(userId, (long)OrderStatusEnum.Rejected);
+        ViewBag.ShowDiv = true;
+    }
+    else
+    {
+        ViewBag.ShowDiv = false;
+    }
+}
+<aside id="left-panel" >
+    <!-- User info -->
+    <div class="login-info">
+        <span>
+            <!-- User image size is adjusted inside CSS, it should stay as is -->
+
+            <a href="javascript:void(0);" id="show-shortcut" data-action="toggleShortcut">
+
+                @*<span style="text-transform: none">
+                        @userInfor.Email
+                    </span>*@   
+
+            </a>
+
+        </span>
+    </div>
+    <nav>
+
+        <ul>
+            <li class="@Html.RouteIf("Home", "active")">
+                <a href="@Url.Action("Index", "Home")" title="Home"><i class="fa fa-lg fa-fw fa-home"></i> <span class="menu-item-parent">Dashboard</span></a>
+            </li>
+            <li class="active">
+                <a href="@Url.Action("PendingOrders", "MasterDepot")" title="Pending Orders"><i class="fa fa-lg fa-fw fa-tasks"></i> <span class="menu-item-parent">Pending Orders</span><span class="badge pull-right inbox-badge margin-right-13">@totalPendingOrders</span></a>
+            </li>
+            <li class="active">
+                <a href="@Url.Action("ConfirmedOrders", "MasterDepot")" title="Confirmed Orders"><i class="fa fa-lg fa-fw fa-tasks"></i> <span class="menu-item-parent">Confirmed Orders</span><span class="badge pull-right inbox-badge margin-right-13">@totalConfirmedOrders</span></a>
+            </li>
+            <li class="active">
+                <a href="@Url.Action("OnProcessingOrders", "MasterDepot")" title="On Processing Orders"><i class="fa fa-lg fa-fw fa-tasks"></i> <span class="menu-item-parent">On Processing Orders</span><span class="badge pull-right inbox-badge margin-right-13">@totalOnProcessingOrders</span></a>
+            </li>
+            <li class="active">
+                <a href="@Url.Action("ShippedOrders", "MasterDepot")" title="Shipped Orders"><i class="fa fa-lg fa-fw fa-tasks"></i> <span class="menu-item-parent">Shipped Orders</span><span class="badge pull-right inbox-badge margin-right-13">@totalShippedOrders</span></a>
+            </li>
+            <li class="active">
+                <a href="@Url.Action("DeliveredOrders", "MasterDepot")" title="Delivered Orders"><i class="fa fa-lg fa-fw fa-tasks"></i> <span class="menu-item-parent">Delivered Orders</span><span class="badge pull-right inbox-badge margin-right-13">@totalDeliveredOrders</span></a>
+            </li>
+            <li class="active">
+                <a href="@Url.Action("ReceivedOrders", "MasterDepot")" title="Received Orders"><i class="fa fa-lg fa-fw fa-tasks"></i> <span class="menu-item-parent">Received Orders</span><span class="badge pull-right inbox-badge margin-right-13">@totalReceivedOrders</span></a>
+            </li>
+            <li class="active">
+                <a href="@Url.Action("RejectedOrders", "MasterDepot")" title="Rejected Orders"><i class="fa fa-lg fa-fw fa-tasks"></i> <span class="menu-item-parent">Rejected Orders</span><span class="badge pull-right inbox-badge margin-right-13">@totalRejectedOrders</span></a>
+            </li>
+            <li class="active">
+                <a href="@Url.Action("AssignDeliveryMan", "MasterDepot")" title="Rejected Orders"><i class="fa fa-lg fa-fw fa-male"></i> <span class="menu-item-parent">Assign Deliveryman</span></a>
+            </li> 
+            <li class="active">
+                <a href="@Url.Action("ViewAssignedOrders", "MasterDepot")" title="Rejected Orders"><i class="fa fa-lg fa-fw fa-tasks"></i> <span class="menu-item-parent">View Assigned Orders</span></a>
+            </li>
+            <li class="@Html.RouteIf("DeliveryMan", "active")">
+                <a href="#" title="DeliveryMan"><i class="fa fa-lg fa-fw fa-tasks"></i> <span class="menu-item-parent">Delivery Man</span></a>
+                <ul>
+                    <li class="@Html.RouteIf("DeliveryMan", "active")">
+                        <a href="@Url.Action("Index", "DeliveryMan")" title="Delivery Man List"><span class="menu-item-parent">Delivery Man List</span></a>
+                    </li>
+                </ul>
+            </li>
+            <li>
+                <a href="#" title="Meghna User"><i class="fa fa-lg fa-fw fa-file-archive-o"></i> <span class="menu-item-parent">Report</span></a>
+                <ul>
+                    <li class="@Html.RouteIf("Report", "active")">
+                        <a href="@Url.Action("Analysis", "Report")" title="Analysis Report"><span class="menu-item-parent">Analysis Report</span></a>
+                    </li>
+                    <li class="@Html.RouteIf("Report", "active")">
+                        <a href="@Url.Action("SalesByProduct", "Report")" title="Sales by Product Report"><span class="menu-item-parent">Sales by Product Report</span></a>
+                    </li>
+                    <li class="@Html.RouteIf("Report", "active")">
+                        <a href="@Url.Action("TotalOrders", "Report")" title="Total Orders Report"><span class="menu-item-parent">Total Orders Report</span></a>
+                    </li>
+                    <li class="@Html.RouteIf("Report", "active")">
+                        <a href="@Url.Action("SalesByLocation", "Report")" title="Sales by Location"><span class="menu-item-parent">Sales by Location</span></a>
+                    </li>
+                    <li class="@Html.RouteIf("Report", "active")">
+                        <a href="@Url.Action("OrdersByStatus", "Report")" title="Orders by Status"><span class="menu-item-parent">Orders by Status</span></a>
+                    </li>
+                    <li class="@Html.RouteIf("Report", "active")">
+                        <a href="@Url.Action("OrderRateOverTime", "Report")" title="Orders by Status"><span class="menu-item-parent">Order Rate Over Time</span></a>
+                    </li>
+                    <li class="@Html.RouteIf("Report", "active")">
+                        <a href="@Url.Action("OrderGrowthRate", "Report")" title="Order Growth Rate"><span class="menu-item-parent">Order Growth Rate</span></a>
+                    </li>
+                </ul>
+            </li>
+        </ul>
+    </nav>
+
+    <span class="minifyme" data-action="minifyMenu"> <i class="fa fa-arrow-circle-left hit"></i> </span>
+
+</aside>
+

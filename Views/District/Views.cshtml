@@ -1,0 +1,248 @@
+﻿@using EFreshAdmin.Utility
+@using EFreshStore.Models.Context
+@model District
+@{
+    ViewBag.Title = "Views";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    List<District> districts = ViewBag.Districts;
+    Session["BreadCrum"] = "District";
+
+}
+ <head>
+    <style>
+        .error {
+            color: red;
+        }
+    </style>
+</head>
+<div id="content" style="margin-bottom: 3%">
+    <section id="widget-grid" class="">
+        <div class="row" style="height: 100%">
+            <article class="col-sm-12 col-md-12 col-lg-12">
+                <div class="jarviswidget" id="wid-id-4" data-widget-editbutton="false" data-widget-custombutton="false">
+                    <header>
+                        <span class="widget-icon"> <i class="fa fa-edit"></i> </span>
+                        <h2 id="addDistrictFormHeading">Add District</h2>
+
+                    </header>
+                    <div>
+
+                        <div class="widget-body no-padding">
+                            @using (Html.BeginForm("Create", "District", FormMethod.Post, new { id = "AddDistrictForm", @class = "smart-form" }))
+                            {
+                                @Html.AntiForgeryToken()
+                                <div class='@TempData["Class"]' id="flashMessage" role="alert">@TempData["Message"]</div>
+                                <fieldset>
+                                    <input type="hidden" id="districtId" name="Id" />
+                                    <input type="hidden" id="districtCreatedBy" name="CreatedBy" />
+                                    <input type="hidden" id="districtCreatedOn" name="CreatedOn" />
+                                    <div class="row">
+                                        <section class="col col-6">
+                                            <section class="col col-3">
+                                                <label class="label">Name<span style="color: red"> *</span></label>
+                                            </section>
+                                            <section class="col col-9">
+                                                <label class="input">
+                                                    <input type="text" name="Name" id="Name" placeholder="District name">
+                                                </label>
+                                            </section>
+                                        </section>
+                                        <section class="col col-6">
+                                            <section class="col col-3"></section>
+                                            <section class="col col-9">
+                                                <label class="checkbox">
+                                                    @Html.CheckBoxFor(model => model.IsActive, new { id = "districtIsActive" })
+                                                    <i></i>Is Active?
+                                                </label>
+                                            </section>
+                                        </section>
+
+
+                                    </div>
+                                    <div class="row" style="margin-bottom: 5%">
+
+                                    </div>
+                                </fieldset>
+                                <footer style="bottom: 0">
+                                    <input type="button" value="Reset" id="districtResetButton" class="btn btn-primary" />
+                                    <button type="submit" id="districtAddButton" class="btn btn-primary">Add</button>
+                                </footer>
+
+                            }
+                        </div>
+
+                    </div>
+
+                </div>
+            </article>
+            <!-- END COL -->
+
+        </div>
+
+        <!-- row -->
+        <div class="row">
+            <!-- NEW WIDGET START -->
+            <article class="col-sm-12 col-md-12 col-lg-12">
+
+                <!-- Widget ID (each widget will need unique ID)-->
+                <div class="jarviswidget jarviswidget-color-darken" id="wid-id-3" data-widget-editbutton="false">
+                    <header>
+                        <span class="widget-icon"> <i class="fa fa-table"></i> </span>
+                        <h2>District List</h2>
+                    </header>
+
+                    <!-- widget div-->
+                    <div>
+                        <!-- widget edit box -->
+                        <div class="jarviswidget-editbox">
+                            <!-- This area used as dropdown edit box -->
+                        </div>
+                        <!-- end widget edit box -->
+                        <!-- widget content -->
+                        <div class="widget-body no-padding">
+                            <div class="table-responsive">
+
+                                <table class="table" id="dt_basic">
+                                    <thead>
+                                        <tr>
+                                            <th>SL</th>
+                                            <th>Name</th>
+                                            <th>Is Active?</th>
+                                            <th>Edit</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @if (districts != null)
+                                        {
+                                            var count = 1;
+                                            foreach (District data in districts)
+                                            {
+                                                <tr>
+                                                    <td>@(count++)</td>
+                                                    <td>@data.Name</td>
+                                                    @{
+                                                        var status = (bool)data.IsActive ? "Yes" : "No";
+                                                        var color = (bool)data.IsActive ? "green" : "red";
+                                                        <td style="color: @color">@status</td>
+                                                    }
+
+
+                                                    <td>
+                                                        <input type="button" class="btn btn-success" onclick="changeAddDistrictFormStateToEdit(@data.Id)" value="Edit" />
+                                                    </td>
+                                                </tr>
+                                                            }
+                                                        }
+                                    </tbody>
+                                </table>
+
+                            </div>
+                        </div>
+                        <!-- end widget content -->
+
+                    </div>
+                    <!-- end widget div -->
+
+                </div>
+                <!-- end widget -->
+
+            </article>
+            <!-- WIDGET END -->
+
+        </div>
+        <!-- end row -->
+        <!-- END ROW -->
+
+    </section>
+</div>
+
+@section scripts{
+@Scripts.Render("~/bundles/jqueryval")
+<script>
+    $(document).ready(function() {
+
+        $(function() {
+            setTimeout(function() {
+                $("#flashMessage").hide('blind', {}, 500);
+            }, 5000);
+        });
+        $('#districtIsActive').attr('checked', true);
+    });
+    $("#AddDistrictForm").validate({
+
+        rules: {
+            Name: "required"
+
+        },
+        messages: {
+            Name: "Please enter district name"
+        }
+    });
+
+    function changeAddDistrictFormStateToEdit(districtId) {
+        $("#AddDistrictForm").validate().resetForm();
+        $("#preloader").css('display', 'block');
+
+        // Scroll to the top of the form
+        $('html, body').animate({
+            scrollTop: $("#addDistrictFormHeading").offset().top
+        },
+            500);
+
+        // Change form state to editaddDistrictFormHeading
+        $("#addDistrictFormHeading").text("Update District");
+        $("#districtAddButton").text("Update");
+        $("#AddDistrictForm").attr("action", "@BaseUrl.subDirectory/District/Edit");
+        $("#districtId").val(districtId);
+
+        var data = { districtId: districtId };
+        $.ajax({
+            method: 'POST',
+            url: "@Url.Action("GetDistrictDetailsById", "District")",
+            dataType: "json",
+        contentType: 'application/json',
+        data: JSON.stringify(data),
+        crossDomain: true,
+        success: function (data) {
+            toastr.clear();
+            if (data.Status == "Ok") {
+                var createdOnFormatedDate = "";
+                var createdOn = "";
+                if (data.District.CreatedOn == null) {
+                    createdOnFormatedDate = null;
+                } else {
+                    createdOn = new Date(parseInt(data.District.CreatedOn.substr(6)));
+                    createdOnFormatedDate = createdOn.getFullYear() + '-' + ('0' + (createdOn.getMonth() + 1)).slice(-2) + '-' + ('0' + createdOn.getDate()).slice(-2) + ' ' + ('0' + createdOn.getHours()).slice(-2) + ':' + ('0' + (createdOn.getMinutes())).slice(-2) + ':' + ('0' + createdOn.getSeconds()).slice(-2);
+                }                
+                $("#Name").val($.trim(data.District.Name));
+                $("#districtCreatedOn").val(createdOnFormatedDate);
+                $("#districtCreatedBy").val(data.District.CreatedBy);
+                if (data.District.IsActive === true) {
+                    $("#districtIsActive").prop('checked', true);
+                } else {
+                    $("#districtIsActive").prop('checked', false);
+                }
+            } else {
+                toastr.error("Something went wrong");
+            }
+
+        },
+        error: function () {
+            toastr.error("Something went wrong");
+        }
+    });
+    $("#preloader").css('display', 'none');
+    }
+
+    $("#districtResetButton").click(function () {
+        $("#addDistrictFormHeading").text("Add District");
+        $("#districtAddButton").text("Add");
+        $("#AddDistrictForm").attr("action", "@BaseUrl.subDirectory/District/Create");
+        $("#Name").val("");
+        $("#districtId").val("");
+        $("#districtCreatedBy").val("");
+        $("#districtIsActive").prop('checked', true);
+        $("#AddDistrictForm").validate().resetForm();
+    });
+</script>
+}

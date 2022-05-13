@@ -1,0 +1,268 @@
+﻿@model EFreshStore.Models.Context.ProductUnit
+@using EFreshAdmin.Models
+@using EFreshStore.Models
+@using EFreshStore.Models.Context
+@{
+    List<CartView> cartData = ViewBag.cart;
+    decimal discount = 0m;
+    var isLogin = false;
+    if (Session["email"] != null)
+    {
+        var userId = Convert.ToInt64(Session["UserId"]);
+        long userTypeId = (long)Session["userTypeId"];
+        isLogin = true;
+        if (userTypeId == (long)UserTypeEnum.Corporate)
+        {
+            CorporateUser corporateUsers = (CorporateUser)Session["corporateUser"];
+            discount = Convert.ToDecimal(corporateUsers.CorporateContract.DiscountPercentage);
+        }
+    }
+    decimal discountPrice = discount / 100;
+}
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<br />
+<br />
+<div class="container">
+    <script src="~/Content/js/cart.js"></script>
+<div class="row">
+    <div class="col-md-5 col-sm-5">
+        <div class="product-item-tab">
+            <!-- Tab panes -->
+            <div class="single-tab-content">
+                <div class="tab-content">
+                    <div role="tabpanel" class="tab-pane active" id="img-one"><img src="~/@Model.ProductImages.FirstOrDefault().ImageLocation" width="100%" style="border-radius: 5px; border: 1px solid #efefef" alt="tab-img">
+                    </div>
+                    <div role="tabpanel" class="tab-pane" id="img-two"><img src="~/@Model.ProductImages.FirstOrDefault().ImageLocation" width="100%" style="border-radius: 5px; border: 1px solid #efefef" alt="tab-img">
+                    </div>
+                    <div role="tabpanel" class="tab-pane" id="img-three"><img src="~/@Model.ProductImages.FirstOrDefault().ImageLocation" width="100%" style="border-radius: 5px; border: 1px solid #efefef" alt="tab-img">
+                    </div>
+                </div>
+            </div>
+            <!-- Nav tabs -->
+            <div class="single-tab-img">
+
+                <ul class="nav nav-tabs" role="tablist">
+                    @foreach (var image in Model.ProductImages)
+                    {
+                        if (image.ImageLocation != null)
+                        {
+                            <li role="presentation" class="active">
+                                <a href="#img-one" role="tab" data-toggle="tab"><img src="~/@image.ImageLocation" width="100px" height="100px" style="border-radius: 5px; border: 1px solid #efefef" alt="tab-img"></a>
+                            </li>
+                        }
+                    }
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-7 col-sm-7">
+        <div class="product-tab-content">
+            <div class="product-tab-header">
+                <h1 name="title">@Model.Product.Name - @Model.StockKeepingUnit</h1>
+                <h4>(@Model.Product.Category.Name)</h4>
+                <h4>(@Model.Product.Brand.Name)</h4>
+
+                @if (isLogin)
+                {
+                    var maximumRetailprice = (@Model.MaximumRetailPrice - (@discountPrice * @Model.MaximumRetailPrice));
+                    string price = string.Format("{0:0.00}", @maximumRetailprice);
+
+                    <h3> ৳ @*@product.MaximumRetailPrice*@@price</h3>
+                    <input type="hidden" id="unitPrice" value="@maximumRetailprice" />
+                }
+                else
+                {
+                    <h3>৳ @Model.MaximumRetailPrice</h3>
+                    <input type="hidden" id="unitPrice" value="@Model.MaximumRetailPrice" />
+                }
+                
+            </div>
+
+            <div class="product-item-details">
+                <p>@Model.Product.Description </p>
+            </div>
+
+            <div class="available-option">
+
+                <div>
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-sm-2">
+                                <h3>Quantity</h3>
+                                <div class="input-group">                                   
+                                    <span class="input-group-btn">
+                                        <button type="button" class="btn btn-default btn-number" disabled="disabled" data-type="minus" data-field="quant[1]">
+                                            <span class="glyphicon glyphicon-minus"></span>
+                                        </button>
+                                    </span>
+                                    <input type="text" name="quant[1]" id="quantity" class="form-control input-number" value="1" min="1" max="1000">
+                                    <span class="input-group-btn">
+                                        <button type="button" class="btn btn-default btn-number" data-type="plus" data-field="quant[1]">
+                                            <span class="glyphicon glyphicon-plus"></span>
+                                        </button>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="cart-button"><button type="button" class="btn" id="addToCart">ADD TO CART</button></div>
+                    </div>
+                </div>
+                <div class="wishlist-icon">
+                    <div class="cart-button">
+                        <input type="hidden" id="productUnitId" value="@Model.Id" />
+                        <input type="hidden" id="productId" value="@Model.ProductId"/>
+                        <input type="hidden" id="productName" value="@Model.Product.Name"/>
+                        <input type="hidden" id="Image" value="@Model.ProductImages.FirstOrDefault().ImageLocation"/>  
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+
+@section scripts{
+    <script>
+        $(document).ready(function () {
+            //Update Quantity from cart
+            $("#pQuantity").change(function () {
+                var qty = $('#pQuantity').val();
+                alert(qty);
+                $.ajax({
+                    type: "POST",
+                    url: "../Product/UpdateQuantity",
+                    data: {
+                        quantity: qty
+                    },
+                    contentType: "application/json;charset=UTF-8",
+                    dataType: "json",
+                    crossDomain: true,
+                    success: function() {
+                        var url = '../Product/Details?ProductId=' + @Model.ProductId;
+                        window.location.href = url;
+                    }
+                });
+            });
+
+
+            function addItemToCart(productUnitId, productName, quantity, unitPrice, image) {
+                var getProduct = {};
+                var productUnit = {};
+
+                getProduct.Name = productName;
+                getProduct.unitPrice = unitPrice;
+                productUnit.Product = getProduct;
+                var product = {};
+                product.ProductUnit = productUnit;
+                product.ProductUnitId = productUnitId;
+                product.Quantity = parseInt(quantity);
+                product.Price = parseFloat(unitPrice) * parseInt(quantity); 
+
+                var postData = { details: product, image: image }
+                $.ajax({
+                    type: "POST",
+                    url: "../Product/GetCartData",
+                    data: JSON.stringify(postData),
+                    contentType: "application/json;charset=UTF-8",
+                    dataType: "json",
+                    crossDomain: true,
+                    success: function() {
+                            //$("#pName").append('<h2 class="shopItemTitle"><a>' + product.ProductUnit.Product.Name + '</a></h2><h3>Qty: ' + product.Quantity + '</h3><h4>৳ ' + product.Price + '</h4>');
+                            //$("#pImage").append('<a href="#"><img src="http://localhost:28011/' + image + '" width="60px" height="60px"alt="cart"></a>');
+                        var url = '../Product/Details?ProductId=' + @Model.ProductId;
+                        window.location.href = url;
+                    }
+                });
+            }
+
+
+            $("#addToCart").click(function() {
+                var productUnitId = $('#productUnitId').val();
+                var productName = $('#productName').val();
+                var unitPrice = $('#unitPrice').val();
+                var quantity = $('#quantity').val();
+                var image = $('#Image').val();
+                addItemToCart(productUnitId, productName, quantity, unitPrice, image);
+            });
+        });
+    </script>
+    <script>
+        $('.btn-number').click(function(e) {
+            e.preventDefault();
+
+            fieldName = $(this).attr('data-field');
+            type = $(this).attr('data-type');
+            var input = $("input[name='" + fieldName + "']");
+            var currentVal = parseInt(input.val());
+            if (!isNaN(currentVal)) {
+                if (type == 'minus') {
+
+                    if (currentVal > input.attr('min')) {
+                        input.val(currentVal - 1).change();
+                    }
+                    if (parseInt(input.val()) == input.attr('min')) {
+                        $(this).attr('disabled', true);
+                    }
+
+                } else if (type == 'plus') {
+
+                    if (currentVal < input.attr('max')) {
+                        input.val(currentVal + 1).change();
+                    }
+                    if (parseInt(input.val()) == input.attr('max')) {
+                        $(this).attr('disabled', true);
+                    }
+
+                }
+            } else {
+                input.val(0);
+            }
+        });
+        $('.input-number').focusin(function() {
+            $(this).data('oldValue', $(this).val());
+        });
+        $('.input-number').change(function() {
+
+            minValue = parseInt($(this).attr('min'));
+            maxValue = parseInt($(this).attr('max'));
+            valueCurrent = parseInt($(this).val());
+
+            name = $(this).attr('name');
+            if (valueCurrent >= minValue) {
+                $(".btn-number[data-type='minus'][data-field='" + name + "']").removeAttr('disabled')
+            } else {
+                alert('Sorry, the minimum value was reached');
+                $(this).val($(this).data('oldValue'));
+            }
+            if (valueCurrent <= maxValue) {
+                $(".btn-number[data-type='plus'][data-field='" + name + "']").removeAttr('disabled')
+            } else {
+                alert('Sorry, the maximum value was reached');
+                $(this).val($(this).data('oldValue'));
+            }
+
+
+        });
+        $(".input-number").keydown(function(e) {
+            // Allow: backspace, delete, tab, escape, enter and .
+            if ($.inArray(e.keyCode, [46, 8, 9, 27, 13, 190]) !== -1 ||
+                // Allow: Ctrl+A
+                (e.keyCode == 65 && e.ctrlKey === true) ||
+                // Allow: home, end, left, right
+                (e.keyCode >= 35 && e.keyCode <= 39)) {
+                // let it happen, don't do anything
+                return;
+            }
+            // Ensure that it is a number and stop the keypress
+            if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
+                e.preventDefault();
+            }
+        });
+    </script>
+}
+   
+
+

@@ -1,0 +1,143 @@
+﻿@using EFreshStore.Models.Context
+@model CorporateUser
+﻿@using EFreshStore.Models.Context
+@{
+    //ICorporateUserManager _corporateUserManager = new CorporateUserManager();
+    //IMeghnaUserManager _meghnaUserManger = new MeghnaUserManager();
+    //ICustomerManager _customerManger = new CustomerManager();
+    //IDistributorManager _distributorManager = new DistributorManager();
+    CorporateUser corporateUsers = (CorporateUser)Session["corporateUser"];
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    long userId = (long)Session["UserId"];
+    long userTypeId = (long)Session["userTypeId"];
+
+    ViewBag.Title = "View User";
+    var Name = "";
+    var Mobile_No = "";
+    var Email_Address = "";
+    var Designation = "";
+    var userName = "";
+    var password = "";
+    long id = 0;
+    //if (Session["email"] != null)
+    //{
+
+    //    Name = corporateUsers.Name;
+    //    Mobile_No = corporateUsers.MobileNo;
+    //    Email_Address = corporateUsers.Email;
+    //    Designation = corporateUsers.Designation;
+    //    id = corporateUsers.Id;
+    //}
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+        }
+        /* Style the content */
+        .content {
+            margin-left: 200px;
+            padding-left: 20px;
+            
+        }
+
+        .hide {
+            display: none;
+        }
+
+        .show {
+            display: block;
+        }
+        /* Full-width input fields */
+        input[type=password] {
+            width: 90%;
+            padding: 13px;
+            margin: 5px 0 22px 0;
+            display: inline-block;
+            border: none;
+            background: #f1f1f1;
+            border: 0.5px solid navy;
+        }
+
+            input[type=password]:focus {
+                background-color: #ddd;
+                outline: none;
+            }
+        /* Overwrite default styles of hr */
+        hr {
+            border: 1px solid #f1f1f1;
+            margin-bottom: 10px;
+        }
+
+        input[type=submit] {
+            background: #ffa726;
+            color: white;
+            padding: 16px 20px;
+            margin: 20px 0;
+            border: none;
+            cursor: pointer;
+            width: 90%;
+            opacity: 0.8;
+        }
+
+            input[type=submit]:hover {
+                background-color: rgb(60, 125, 201);
+            }
+
+        #left, #right {
+            display: inline-block;
+            width: 25%;
+            height: 100%;
+        }
+
+        #changePasswordLink:hover {
+            text-decoration: underline;
+        }
+
+        #changePasswordLink {
+            text-decoration: underline;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    @*<div class="content">
+            <h1>Profile</h1>
+            <hr />
+            <input type="hidden" value="@id" name="id"/>
+            <div id="left">
+                <p><strong>Name : </strong></p>
+                <p><strong>Mobile No : </strong></p>
+                <p><strong>Email : </strong></p>
+                <p><strong>Designation :</strong></p>
+            </div>
+            <div id="right">
+                <p> @Name</p>
+                <p> @Mobile_No</p>
+                <p> @Email_Address</p>
+                <p> @Designation</p>
+            </div><br />
+          <div class='@TempData["Class"]' id="flashMessage" role="alert">@TempData["Message"]</div><br/>
+            <a href="@Url.Action("ChangePassword", "Contract", new {id = @id })" id="changePasswordLink"><strong> Click to change password</strong></a>
+        </div>*@
+    </body>
+</html>
+@section scripts{
+<script>
+        $(document).ready(function() {
+            $(function() {
+                setTimeout(function() {
+                    $("#flashMessage").hide('blind', {}, 500);
+                }, 5000);
+            });
+        });
+</script>
+}

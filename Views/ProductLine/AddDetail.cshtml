@@ -1,0 +1,79 @@
+﻿@model EFreshStore.Models.Context.ProductLineDetail
+
+@{
+    ViewBag.Title = "Edit";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        #dropdown, #Description, input[type=text] {
+            width: 80%;
+            padding: 12px 15px;
+            margin-bottom: 5px;
+            border: none;
+            background-color: #f1f1f1;
+            /*background-color: #d2d8e0;*/
+        }
+    </style>
+    <link href="~/Content/css/form-design.css" rel="stylesheet" type="text/css" />
+</head>
+
+<body>
+    <div class="container">
+        <div class="form-horizontal" id="div1">
+            @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "productLineDetailform" }))
+            {
+                @Html.AntiForgeryToken()
+            <div class='@TempData["Class"]' id="flashMessage" role="alert">@TempData["Message"]</div>
+                <div class="form-horizontal">
+                    <h2>Add Product Line Detail</h2>
+                    <hr />
+
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.ProductId, "Product", htmlAttributes: new { @class = "control-label col-md-4" })
+                        <div class="col-md-8">
+                            @Html.DropDownListFor(model => model.ProductId,new SelectList(ViewBag.product, "Id","Name"),"---Select---", new { @id = "" })
+                            <br />@Html.ValidationMessageFor(model => model.ProductId, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+
+
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.ProductLineId, "Product Line", htmlAttributes: new { @class = "control-label col-md-4" })
+                        <div class="col-md-8">
+                            @Html.DropDownListFor(model => model.ProductLineId,new SelectList(ViewBag.productLine, "Id","Name"),"---Select---", new { @id = "" })
+                            <br/>
+                            @Html.ValidationMessageFor(model => model.ProductId, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="col-md-offset-4 col-md-8">
+                            <input type="submit" value="Add" class="btn btn-default" />
+                        </div>
+                    </div>
+                </div>
+            }
+
+            <div style="margin-left: 50px; color: red">
+                @Html.ActionLink("Back to List", "Detail", "", htmlAttributes: new { @class = "backLink" })
+            </div>
+        </div>
+    </div>
+    @section scripts{
+    @Scripts.Render("~/bundles/jqueryval")
+    <script>
+        $(document).ready(function () {
+
+            $(function() {
+                setTimeout(function() {
+                    $("#flashMessage").hide('blind', {}, 500);
+                }, 5000);
+            });
+        });
+    </script>
+    }
+</body>
+</html>

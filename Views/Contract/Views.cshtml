@@ -1,0 +1,77 @@
+﻿@using EFreshStore.Models.Context
+@model IEnumerable<EFreshStore.Models.Context.CorporateContract>
+
+@{
+    ViewBag.Title = "View";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+                      <div class='@TempData["Class"]' id="flashMessage" role="alert">@TempData["Message"]</div>
+<section id="widget-grid" class="">
+    <!-- row -->
+    <div class="row">
+        <article class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+            <!-- Widget ID (each widget will need unique ID)-->
+            <div class="jarviswidget jarviswidget-color-darken" id="wid-id-0" data-widget-editbutton="false">
+                <header>
+                    <span class="widget-icon"> <i class="fa fa-table"></i> </span>
+                    <h2>Corporate Contract List </h2>
+                </header>
+                <!-- widget div-->
+                <div>
+                    <!-- widget content -->
+                    <div class="widget-body no-padding">
+                        <table id="dt_basic" class="table table-striped table-bordered table-hover" width="100%">
+                            <thead>
+                            <tr>
+                                <th>SL</th>
+                                <th>Company Name</th>
+                                <th>Description</th>
+                                <th>FMCG Discount</th>
+                                <th>LPG Discount</th>
+                                <th>Validity</th>
+                                <th>Edit</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                                @if (Model != null)
+                                {
+                                    var count = 1;
+                                    foreach (CorporateContract data in Model)
+                                    {
+                                        string validity =  data.Validity == null ? "" : ((DateTime)data.Validity).ToString("dd/MM/yyyy");
+                                        <tr>
+                                            <td>@(count++)</td>
+                                            <td>@data.CompanyName</td>
+                                            <td>@data.Description</td>
+                                            <td>@data.FMCGDiscountPercentage</td>
+                                            <td>@data.LPGDiscountPercentage</td>
+                                            <td>@validity</td>
+                                            <td>
+                                                <input type="button" class="btn btn-success" onclick="location.href='../contract/edit/@data.Id'" value="Edit" />
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                    <!-- end widget content -->
+                </div>
+                <!-- end widget div -->
+            </div>
+            <!-- end widget -->
+        </article>
+    </div>
+    <!-- end row -->
+</section>
+@section scripts{
+    <script>
+        $(document).ready(function() {
+            $(function() {
+                setTimeout(function() {
+                    $("#flashMessage").hide('blind', {}, 500);
+                }, 5000);
+            });
+        });
+    </script>
+}

@@ -1,0 +1,230 @@
+﻿@using EFreshAdmin.Models.EntityModels
+@using EFreshAdmin.Utility
+@model CorporateDepartment
+
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    List<CorporateDepartment> corporateDepartments = ViewBag.CorporateDepartments;
+    Session["BreadCrum"] = "Corporate Department";
+}
+
+<head>
+    <link href="~/Content/css/jquery-ui.min.css" rel="stylesheet" />
+    <link rel="stylesheet" type="text/css" href="~/Content/css/form-design.css" />
+    @*<link href="~/Content/SmartAdmin/css/your_style.css" rel="stylesheet" />*@
+
+    <style>
+        .error {
+            color: red;
+        }
+    </style>
+
+</head>
+<section id="widget-grid" class="">
+    <div class="row" style="height: 100%">
+        <article class="col-sm-12 col-md-12 col-lg-12">
+            <div class="jarviswidget" id="wid-id-4" data-widget-editbutton="false" data-widget-custombutton="false">
+                <header>
+                    <span class="widget-icon"> <i class="fa fa-edit"></i> </span>
+                    <h2 id="corporateDepartmentFormHeading">Add Corporate Department</h2>
+
+                </header>
+                <div>
+
+                    <div class="widget-body no-padding">
+                        @using (Html.BeginForm("Create", "CorporateDepartment", FormMethod.Post, new { id = "addCorporateDepartmentForm", @class = "smart-form" }))
+                        {
+                            @Html.AntiForgeryToken()
+                            <div class='@TempData["Class"]' id="flashMessage" role="alert">@TempData["Message"]</div>
+                            <fieldset>
+                                <input type="hidden" id="corporateDepartmentIdHiddenField" name="Id" />
+                                <input type="hidden" id="corporateDepartmentCreatedOn" name="CreatedOn" />
+                                <input type="hidden" id="corporateDepartmentCreatedBy" name="CreatedBy" />
+                                <div class="row">
+                                    <section class="col col-6" style="padding-bottom: 5px; margin-bottom: 5px">
+                                        <section class="col col-3">
+                                            <label class="label">Name <span style="color: red"> *</span></label>
+                                        </section>
+                                        <section class="col col-9">
+                                            <label class="input">
+                                                <label class="input">
+                                                    @Html.TextBoxFor(model => model.Name, new { id = "corporateDepartmentName", placeholder = "Department name" })
+                                                    @Html.ValidationMessageFor(model => model.Name, "", new { @class = "error" })
+                                                </label>
+                                            </label>
+                                        </section>
+                                    </section>
+                                    <section class="col col-6" style="padding-bottom: 5px; margin-bottom: 5px">
+                                        <label class="checkbox">
+                                            @Html.CheckBoxFor(model => model.IsActive, new { id = "corporateDepartmentIsActive" })
+                                            <i></i>Is Active?
+                                        </label>
+                                    </section>
+                                </div>
+                            </fieldset>
+                            <footer style="bottom: 0">
+                                <input type="button" value="Reset" id="corporateDepartmentResetButton" class="btn btn-primary" />
+                                <button type="submit" id="corporateDepartmentAddButton" class="btn btn-primary">Add</button>
+                            </footer>
+                        }
+                    </div>
+                </div>
+            </div>
+        </article>
+        <!-- END COL -->
+    </div>
+    <!-- END ROW -->
+</section>
+
+<section id="widget-grid" class="" style="margin-bottom: 20px">
+    <!-- row -->
+    <div class="row">
+        <article class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+            <!-- Widget ID (each widget will need unique ID)-->
+            <div class="jarviswidget jarviswidget-color-darken" id="wid-id-0" data-widget-editbutton="false">
+                <header>
+                    <span class="widget-icon"> <i class="fa fa-table"></i> </span>
+                    <h2>Corporate Department Details </h2>
+                </header>
+                <!-- widget div-->
+                <div>
+                    <!-- widget content -->
+                    <div class="widget-body no-padding">
+                        <table id="dt_basic" class="table table-striped table-bordered table-hover" width="100%">
+                            <thead>
+                                <tr>
+                                    <th>SL</th>
+                                    <th>Id</th>
+                                    <th>Name</th>
+                                    <th>Is Active?</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (corporateDepartments.Count > 0)
+                                {
+                                    var count = 1;
+                                    foreach (var corporateDepartment in corporateDepartments)
+                                    {
+                                        var status = corporateDepartment.IsActive ? "Yes" : "No";
+                                        var color = corporateDepartment.IsActive ? "green" : "red";
+                                        <tr>
+                                            <td>@(count++)</td>
+                                            <td>@corporateDepartment.Id</td>
+                                            <td id="corporateDepartmentName_@corporateDepartment.Id">@corporateDepartment.Name</td>
+                                            <td id="corporateDepartmentStatus_@corporateDepartment.Id" data-is-active="@corporateDepartment.IsActive" style="color:@color">
+                                                @status
+                                            <input type="hidden" id="corporateDepartmentCreatedOn_@corporateDepartment.Id" value="@corporateDepartment.CreatedOn" />
+                                            <input type="hidden" id="corporateDepartmentCreatedBy_@corporateDepartment.Id" value="@corporateDepartment.CreatedBy" />
+                                        </td>
+                                        <td>
+                                            <input type="button" class="btn btn-success" id="editCorporateDepartmentButton_@corporateDepartment.Id" onclick="changeFormStateSaveToEdit(@corporateDepartment.Id)" value="Edit" />
+                                            <input type="button" class="btn btn-danger" id="deleteCorporateDepartmentButton_@corporateDepartment.Id" onclick="deleteCorporateDepartment(@corporateDepartment.Id)" value="Delete" />
+
+                                        </td>
+                                    </tr>
+                                    }
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                    <!-- end widget content -->
+                </div>
+                <!-- end widget div -->
+            </div>
+            <!-- end widget -->
+        </article>
+    </div>
+    <!-- end row -->
+</section>
+@section scripts{
+    @Scripts.Render("~/bundles/jqueryval")
+
+    <script>
+        $(document).ready(function () {
+            $(function () {
+                setTimeout(function () {
+                    $("#flashMessage").hide('blind', {}, 500);
+                },
+                    5000);
+                $('#corporateDepartmentIsActive').attr('checked', true);
+            });
+        });
+
+        function changeFormStateSaveToEdit(corporateDepartmentId) {
+            $(".field-validation-error").empty();
+            $('#preloader').css("display", "block");
+            $('html, body').animate({
+                scrollTop: $("#corporateDepartmentFormHeading").offset().top
+            },
+                500);
+            $("#corporateDepartmentFormHeading").text("Update Corporate Department");
+            $("#corporateDepartmentAddButton").text("Update");
+            $("#addCorporateDepartmentForm").attr("action", "@BaseUrl.subDirectory/CorporateDepartment/Edit");
+            $("#corporateDepartmentIdHiddenField").val(corporateDepartmentId);
+
+            var data = { departmentId: corporateDepartmentId };
+            $.ajax({
+                method: 'POST',
+                url: "@Url.Action("GetDepartmentDetailsById", "CorporateDepartment")",
+                dataType: "json",
+                contentType: 'application/json',
+                data: JSON.stringify(data),
+                crossDomain: true,
+                success: function (data) {
+                    toastr.clear();
+                    if (data.Status == "Ok") {
+                        var createdOn = new Date(parseInt(data.CorporateDepartment.CreatedOn.substr(6)));
+                        var createdOnFormatedDate = createdOn.getFullYear() + '-' + ('0' + (createdOn.getMonth() + 1)).slice(-2) + '-' + ('0' + createdOn.getDate()).slice(-2) + ' ' + ('0' + createdOn.getHours()).slice(-2) + ':' + ('0' + (createdOn.getMinutes())).slice(-2) + ':' + ('0' + createdOn.getSeconds()).slice(-2);
+
+                        $("#corporateDepartmentCreatedOn").val(createdOnFormatedDate);
+                        $("#corporateDepartmentCreatedBy").val(data.CorporateDepartment.CreatedBy);
+                        $("#corporateDepartmentName").val(data.CorporateDepartment.Name);
+                        if (data.CorporateDepartment.IsActive === true) {
+                            $("#corporateDepartmentIsActive").prop('checked', true);
+                        } else {
+                            $("#corporateDepartmentIsActive").prop('checked', false);
+                        }
+
+                    } else {
+                        toastr.error("Something went wrong");
+                    }
+
+                },
+                error: function () {
+                    toastr.error("Something went wrong");
+                }
+            });
+            $('#preloader').css("display", "none");
+        }
+
+        function deleteCorporateDepartment(corporateDepartmentId) {
+            Swal.fire({
+                title: 'Do you want to delete this department ?',
+                type: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#739e73',
+                cancelButtonColor: '#A90329',
+                cancelButtonText: 'No',
+                confirmButtonText: 'Yes',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.value) {
+                    location.href = '/corporateDepartment/delete/' + corporateDepartmentId;
+                }
+            });
+        }
+
+        $('#corporateDepartmentResetButton').click(function () {
+            $("#corporateDepartmentFormHeading").text("Add Corporate Department");
+            $("#corporateDepartmentAddButton").text("Add");
+            $("#addCorporateDepartmentForm").attr("action", "@BaseUrl.subDirectory/CorporateDepartment/Create");
+            $("#corporateDepartmentName").val("");
+            $("#corporateDepartmentIsActive").prop('checked', true);
+            $(".field-validation-error").empty();
+        });
+    </script>
+
+}
+

@@ -1,0 +1,432 @@
+﻿@using EFreshStore.Models.Context
+@model EFreshStore.Models.Context.CorporateUser
+
+@{
+    ViewBag.Title = "Add Bulk User";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+    <style type="text/css">
+        .error {
+            color: red;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        /* Zebra striping */
+        tr:nth-of-type(odd) {
+            background: #eee;
+        }
+
+        th {
+            background: #333;
+            color: white;
+            font-weight: bold;
+        }
+
+        td, th {
+            padding: 6px;
+            border: 1px solid #ccc;
+            text-align: left;
+        }
+
+        td, tr {
+            text-align: left;
+            color: black;
+        }
+
+        @@media only screen and (max-width: 760px), (min-device-width: 768px) and (max-device-width: 1024px) {
+
+            /* Force table to not be like tables anymore */
+            table, thead, tbody, th, td, tr {
+                display: block;
+            }
+
+                /* Hide table headers (but not display: none;, for accessibility) */
+                thead tr {
+                    position: absolute;
+                    top: -9999px;
+                    left: -9999px;
+                }
+
+            tr {
+                border: 1px solid #ccc;
+            }
+
+            td {
+                /* Behave  like a "row" */
+                border: none;
+                border-bottom: 1px solid #eee;
+                position: relative;
+                padding-left: 50%;
+            }
+
+                td:before {
+                    /* Now like a table header */
+                    position: absolute;
+                    /* Top/left values mimic padding */
+                    top: 6px;
+                    left: 6px;
+                    width: 45%;
+                    padding-right: 10px;
+                    white-space: nowrap;
+                }
+
+                /*
+        Label the data
+        */
+                td:before {
+                    content: attr(data-title);
+                }
+        }
+        input[type=submit] {
+            width: 25%;
+            padding: 10px;
+            color: white;
+            display: inline-block;
+            border: none;
+            background: #ffa726;
+        }
+
+            input[type=submit]:hover {
+                background-color: rgb(60, 125, 201);
+            }
+
+        .content {
+            margin-bottom: 200px;
+        }
+    </style>
+    <section id="widget-grid" class="" style="margin-bottom: 2%">
+        <div class='@TempData["Class"]' id="flashMessage" role="alert">@TempData["Message"]</div>
+        <div class="row">
+            <article class="col-sm-12 col-md-12 col-lg-12">
+                <div class="jarviswidget" id="wid-id-3" data-widget-editbutton="false" data-widget-custombutton="false">
+                    <header>
+                        <span class="widget-icon"> <i class="fa fa-edit"></i> </span>
+                        <h2>Add Corporate Bulk Users</h2>
+
+                    </header>
+                    <div>
+                        <div class="widget-body no-padding">
+                            @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "addBulkUserform", @enctype = "multipart/form-data", @class = "smart-form" }))
+                            {
+
+                                @Html.AntiForgeryToken()
+                                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+                                <fieldset>
+                                    <div class="row" style="padding-bottom: 0px; margin-bottom: 0px">
+                                        <section class="col col-6">
+                                            <section class="col col-3">
+                                                <label class="label">Company Name</label>
+                                            </section>
+                                            <section class="col col-9">
+                                                <div class="select error">
+                                                    @Html.DropDownListFor(x => x.CorporateContractId, new SelectList(ViewBag.Contracts, "Id", "CompanyName"), "----Select company----")
+                                                    @Html.ValidationMessageFor(model => model.CorporateContractId)
+                                                </div>
+                                            </section>
+                                        </section> 
+                                        <section class="col col-6">
+                                            <section class="col col-3">
+                                                <label class="label">Choose .xls/ .xlsx/ .csv file</label>
+                                            </section>
+                                            <section class="col col-9">
+                                                <div class="input input-file error">
+                                                    <input type="file" id="ecxelFile" name="ecxelFile" />
+                                                </div>
+                                            </section>
+
+                                        </section>
+                                       
+                                    </div>
+                                </fieldset>
+                                <footer>
+                                    <button type="submit" id="Submit" class="btn btn-primary">Add</button>
+                                </footer>
+                            }
+
+                        </div>
+                    </div>
+                </div>
+            </article>
+        </div>
+    </section>
+<div class="content">
+@*@using (Html.BeginForm("AddBulkUser", "Contract", FormMethod.Post, new {enctype = "multipart/form-data", id = "addBulkUserform"}))
+{
+    <div class="container">
+        <div>
+            <h2 style="margin-left: 40%">Add Bulk User</h2>
+            <div class='@TempData["Class"]' id="flashMessage" role="alert">@TempData["Message"]</div>
+            <hr/>
+            <div class="col-md-5">
+                @Html.DropDownListFor(x => x.CorporateContractId, new SelectList(ViewBag.Contracts, "Id", "CompanyName"), "Select company")
+                @Html.ValidationMessageFor(model => model.CorporateContractId)
+            </div>
+        </div>
+
+        <table>
+            <tr><td>.xlsx/.xls/.csv</td><td><input type="file" id="ecxelFile" name="ecxelFile"/></td></tr>
+            <tr><td></td><td><input type="submit" id="Submit" name="Submit" value="Upload"/></td></tr>
+        </table>
+    </div>
+    <br/>
+}*@
+
+@if (ViewBag.SavedUser != null)
+{
+    <div class="container">
+        <div class="bulk-users saved-users">
+            <h3>Saved Users:</h3>
+            <table>
+                @if (ViewBag.Count >= 1)
+                {
+                    List<CorporateUser> corporateUsers = ViewBag.SavedUser;
+                    <thead>
+                    <tr>
+                        <th>Employee ID</th>
+                        <th>Employee Name</th>
+                        <th>Mobile No</th>
+                        <th>Email</th>
+                        <th>Department ID</th>
+                        <th>Designation ID</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    @foreach (var employee in corporateUsers)
+                    {
+                        <tr>
+                            <td>@employee.EmployeeId</td>
+                            <td>@employee.Name</td>
+                            <td>@employee.MobileNo</td>
+                            <td>@employee.Email</td>
+                            <td>@employee.CorporateDepartmentId</td>
+                            <td>@employee.CorporateDesignationId</td>
+                        </tr>
+                    }
+                    </tbody>
+                }
+                else
+                {
+                    <tr>
+                        <td style="color: red;">
+                            Sorry! No user...
+                        </td>
+                    </tr>
+                }
+            </table>
+        </div>
+    </div>
+}
+
+@if (ViewBag.InvalidMobileNos != null)
+{
+    List<CorporateUser> corporateUsers = ViewBag.InvalidMobileNos;
+    <div class="container">
+        <div class="bulk-users invalid-mobileno-users">
+            <h3>Users with Invalid Mobile No:</h3>
+            <table>
+                @if (corporateUsers.Count >= 1)
+                {
+
+                    <thead>
+                        <tr>
+                            <th>Employee ID</th>
+                            <th>Employee Name</th>
+                            <th>Mobile No</th>
+                            <th>Email</th>
+                            <th>Department ID</th>
+                            <th>Designation ID</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    @foreach (var employee in corporateUsers)
+                    {
+                        <tr>
+                            <td>@employee.EmployeeId</td>
+                            <td>@employee.Name</td>
+                            <td>@employee.MobileNo</td>
+                            <td>@employee.Email</td>
+                            <td>@employee.CorporateDepartmentId</td>
+                            <td>@employee.CorporateDesignationId</td>
+                        </tr>
+                    }
+                    </tbody>
+                }
+                else
+                {
+                    <tr>
+                        <td style="color: red;">
+                            No user found with invalid mobile no.
+                        </td>
+                    </tr>
+                }
+            </table>
+        </div>
+    </div>
+}
+
+@if (ViewBag.DuplicateEmails != null)
+{
+    List<CorporateUser> corporateUsers = ViewBag.DuplicateEmails;
+    <div class="container">
+        <div class="bulk-users duplicate-email-users">
+            <h3>Users with Duplicate Email:</h3>
+            <table>
+                @if (corporateUsers.Count >= 1)
+                {
+                    <thead>
+                        <tr>
+                            <th>Employee ID</th>
+                            <th>Employee Name</th>
+                            <th>Mobile No</th>
+                            <th>Email</th>
+                            <th>Department ID</th>
+                            <th>Designation ID</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    @foreach (var employee in corporateUsers)
+                    {
+                        <tr>
+                            <td>@employee.EmployeeId</td>
+                            <td>@employee.Name</td>
+                            <td>@employee.MobileNo</td>
+                            <td>@employee.Email</td>
+                            <td>@employee.CorporateDepartmentId</td>
+                            <td>@employee.CorporateDesignationId</td>
+                        </tr>
+                    }
+                    </tbody>
+                }
+                else
+                {
+                    <tr>
+                        <td style="color: red;">
+                            No user found with duplicate email.
+                        </td>
+                    </tr>
+                }
+            </table>
+        </div>
+    </div>
+}
+
+@if (ViewBag.InvalidDepartments != null)
+{
+    List<CorporateUser> corporateUsers = ViewBag.InvalidDepartments;
+    <div class="container">
+        <div>
+            <h3>Users with Invalid Department:</h3>
+            <table>
+                @if (corporateUsers.Count >= 1)
+                {
+                    <thead>
+                    <tr>
+                        <th>Employee ID</th>
+                        <th>Employee Name</th>
+                        <th>Mobile No</th>
+                        <th>Email</th>
+                        <th>Department ID</th>
+                        <th>Designation ID</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    @foreach (var employee in corporateUsers)
+                    {
+                        <tr>
+                            <td>@employee.EmployeeId</td>
+                            <td>@employee.Name</td>
+                            <td>@employee.MobileNo</td>
+                            <td>@employee.Email</td>
+                            <td>@employee.CorporateDepartmentId</td>
+                            <td>@employee.CorporateDesignationId</td>
+                        </tr>
+                    }
+                    </tbody>
+                }
+                else
+                {
+                    <tr>
+                        <td style="color: red;">
+                            No user found with Invalid Department.
+                        </td>
+                    </tr>
+                }
+            </table>
+        </div>
+    </div>
+}
+
+
+@if (ViewBag.InvalidDesignations != null)
+{
+    List<CorporateUser> corporateUsers = ViewBag.InvalidDesignations;
+    <div class="container">
+        <div>
+            <h3>Users with Invalid Designation:</h3>
+            <table>
+                @if (corporateUsers.Count >= 1)
+                {
+                    <thead>
+                        <tr>
+                            <th>Employee ID</th>
+                            <th>Employee Name</th>
+                            <th>Mobile No</th>
+                            <th>Email</th>
+                            <th>Department ID</th>
+                            <th>Designation ID</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    @foreach (var employee in corporateUsers)
+                    {
+                        <tr>
+                            <td>@employee.EmployeeId</td>
+                            <td>@employee.Name</td>
+                            <td>@employee.MobileNo</td>
+                            <td>@employee.Email</td>
+                            <td>@employee.CorporateDepartmentId</td>
+                            <td>@employee.CorporateDesignationId</td>
+                        </tr>
+                    }
+                    </tbody>
+                }
+                else
+                {
+                    <tr>
+                        <td style="color: red;">
+                            No user found with Invalid Designation.
+                        </td>
+                    </tr>
+                }
+            </table>
+        </div>
+    </div>
+}
+</div>
+@section scripts{
+    <script src="~/Scripts/jquery.validate.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $("#addBulkUserform").validate({
+                rules: {
+                    CorporateContractId: "required",
+                    ecxelFile: "required"
+                },
+                messages: {
+                    CorporateContractId: "Please select a company",
+                    ecxelFile: "Please upload an excel file"
+                }
+            });
+
+            $(function() {
+                setTimeout(function() {
+                    $("#flashMessage").hide('blind', {}, 500);
+                }, 5000);
+            });
+        });
+    </script>
+}

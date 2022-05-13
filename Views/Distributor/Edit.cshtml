@@ -1,0 +1,138 @@
+﻿@model EFreshAdmin.Models.EntityModels.Distributor
+
+@{
+    ViewBag.Title = "Edit";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<head>
+    <link rel="stylesheet" type="text/css" href="~/Content/css/form-design.css"/>
+</head>
+<div class="container">
+    <div class="form-horizontal" id="div1">
+        @using (Html.BeginForm(null, null, FormMethod.Post, new {id = "AddDistributorForm"}))
+        {
+        @Html.AntiForgeryToken()
+
+        <div class="form-horizontal">
+            <h2>Update Distributor</h2>
+            <hr />
+            @Html.ValidationSummary(true)
+            <div class='@TempData["Class"]' id="flashMessage" role="alert">@TempData["Message"]</div>
+            <div class="form-group">
+                @Html.LabelFor(model => model.Name, "Name", htmlAttributes: new {@class = "control-label col-md-3"})
+                <div class="col-md-9">
+                    @Html.TextBoxFor(model => model.Name, new { placeholder = "Enter name" })
+                    <br />
+                    @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.Address, "Address", htmlAttributes: new {@class = "control-label col-md-3"})
+                <div class="col-md-9">
+                    @Html.TextBoxFor(model => model.Address, new { placeholder = "Enter address" })
+                    <br />
+                    @Html.ValidationMessageFor(model => model.Address, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.ContactPerson, "Contact Person", htmlAttributes: new {@class = "control-label col-md-3"})
+                <div class="col-md-9">
+                    @Html.TextBoxFor(model => model.ContactPerson, new { placeholder = "Enter contact person" })
+                    <br />
+                    @Html.ValidationMessageFor(model => model.ContactPerson, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.Phone, "Phone", htmlAttributes: new {@class = "control-label col-md-3"})
+                <div class="col-md-9">
+                    @Html.TextBoxFor(model => model.Phone, new { placeholder = "Enter phone number", maxlength="11" })
+                    <br />
+                    @Html.ValidationMessageFor(model => model.Phone, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.Email, "Email", htmlAttributes: new {@class = "control-label col-md-3"})
+                <div class="col-md-9">
+                    @Html.TextBoxFor(model => model.Email, new {placeholder = "Enter email"})
+                    <br />
+                    @Html.ValidationMessageFor(model => model.Email, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.MasterDepotId, "Master Depot", htmlAttributes: new {@class = "control-label col-md-3"})
+                <div class="col-md-9">
+                    @Html.DropDownListFor(model => model.MasterDepotId, new SelectList(ViewBag.masterDepot, "Id", "Name"), "---Select---")
+                    <br />
+                    @Html.ValidationMessageFor(model => model.MasterDepotId, "", new { @class = "text-danger" })
+                </div>
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(model => model.ThanaId, "Thana", htmlAttributes: new { @class = "control-label col-md-3" })
+                <div class="col-md-9">
+                    @Html.DropDownListFor(model => model.ThanaId, new SelectList(ViewBag.thana, "Id", "Name"), "---Select---")
+                        <br />
+                        @Html.ValidationMessageFor(model => model.ThanaId, "", new { @class = "text-danger" })
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-md-offset-3 col-md-9">
+                    <input type="submit" value="Update" class="btn btn-default" />
+                </div>
+            </div>
+        </div>
+        }
+        <div>
+            @Html.ActionLink("Back to List", "Index", "", htmlAttributes: new { @class = "backLink" })
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+@Scripts.Render("~/bundles/jqueryval")
+<script>
+    $(document).ready(function() {
+        $("#MasterDepotId").change(function () {
+            var masterDepotId = $("#MasterDepotId").val();
+            var masterDepot = { id: masterDepotId };
+            $("#ThanaId").empty();
+            $("#ThanaId").append('<option value="" selected>-- Select --</option>');
+            $.ajax({
+                url: '@Url.Action("GetAllThanaByMasterDepot","Distributor")',
+                type: "GET",
+                dataType: 'JSON',
+                contentType: "application/json; charset=utf-8",
+                data: masterDepot,
+                success: function (data) {
+                    $.each(data, function (index, value) {
+                        $("#ThanaId").append('<option value="' + value.Thana.Id + '">' + value.Thana.Name + '</option>');
+                    });
+                },
+                error: function () {
+                    alert("Something went wrong");
+                }
+
+            });
+        });
+
+    $(function() {
+        setTimeout(function() {
+            $("#flashMessage").hide('blind', {}, 500);
+        }, 5000);
+    });
+    /*----- Mobile Validation -----*/
+    //$.validator.addMethod(
+    //        "mobileRegex",
+    //        function (value, element, temp) {
+    //            var re = new RegExp("^(?:\\+?88|0088)?01[15-9]\\d{8}$");
+    //            return this.optional(element) || re.test(value);
+    //        },
+    //        "Invalid mobile number format"
+    //    );
+    });
+</script>
+}

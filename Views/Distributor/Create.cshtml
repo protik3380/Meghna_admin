@@ -1,0 +1,238 @@
+﻿@using EFreshStore.Models.Context
+@model EFreshAdmin.Models.EntityModels.Distributor
+
+@{
+    ViewBag.Title = "Create";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<head>
+    <style>
+        .error {
+            color: red;
+        }
+    </style>
+</head>
+<section id="widget-grid" class="">
+    <div class="row">
+        <article class="col-sm-12 col-md-12 col-lg-12">
+            <!-- Widget ID (each widget will need unique ID)-->
+            <div class="jarviswidget" id="wid-id-8" data-widget-editbutton="false" data-widget-custombutton="false">
+                <header>
+                    <span class="widget-icon"> <i class="fa fa-edit"></i> </span>
+                    <h2>Add Distributor </h2>
+                </header>
+                <!-- widget div-->
+                <div>
+                    <!-- widget content -->
+                    <div class="widget-body no-padding">
+                        @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "AddDistributorForm", @class = "smart-form" }))
+                        {
+
+                            @Html.ValidationSummary(true)
+                            <div class='@TempData["Class"]' id="flashMessage" role="alert">@TempData["Message"]</div>
+
+                            <fieldset>
+                                <div class="row" style="padding-bottom: 0; margin-bottom: 0">
+                                    <section class="col col-6" style="padding-bottom: 0; margin-bottom: 0">
+                                        <section class="col col-3">
+                                            <label class="label">Distributor Name<span style="color: red"> *</span></label>
+                                        </section>
+                                        <section class="col col-9">
+                                            <label class="input">
+                                                <input type="text" name="Name" id="Name">
+                                            </label>
+                                        </section>
+                                    </section>
+                                    <section class="col col-6" style="padding-bottom: 0; margin-bottom: 0">
+                                        <section class="col col-3">
+                                            <label class="label">Contact Person <span style="color: red"> *</span></label>
+                                        </section>
+                                        <section class="col col-9">
+                                            <label class="input">
+                                                <input type="text" name="ContactPerson" id="ContactPerson">
+                                            </label>
+                                        </section>
+                                    </section>
+                                </div>
+                                <div class="row" style="padding-bottom: 0; margin-bottom: 0">
+                                    <section class="col col-6" style="padding-bottom: 0px; margin-bottom: 0px">
+                                        <section class="col col-3">
+                                            <label class="label">Mobile No <span style="color: red"> *</span></label>
+                                        </section>
+                                        <section class="col col-9">
+                                            <label class="input">
+                                                <input type="text" name="Phone" id="Phone" maxlength="11">
+                                            </label>
+                                        </section>
+                                    </section>
+                                    <section class="col col-6" style="padding-bottom: 0px; margin-bottom: 0px">
+                                        <section class="col col-3">
+                                            <label class="label">Master Depot<span style="color: red"> *</span></label>
+                                        </section>
+                                        <section class="col col-9">
+                                            <label class="select">
+                                                @Html.DropDownListFor(model => model.MasterDepotId, new SelectList(ViewBag.masterDepot, "Id", "Name"), "---Select Master Depot---")
+                                            </label>
+                                        </section>
+                                    </section>
+
+                                   
+                                </div>
+
+                                <div class="row" style="padding-bottom: 0; margin-bottom: 0">
+                                    <section class="col col-6" style="padding-bottom: 0px; margin-bottom:0px">
+                                        <section class="col col-3">
+                                            <label class="label">E-Mail <span style="color: red"> *</span></label>
+                                        </section>
+                                        <section class="col col-9">
+                                            <label class="input">
+                                                <input type="text" name="Email" id="Email">
+                                            </label>
+                                        </section>
+                                    </section>
+                                   
+                                    <section class="col col-6" style="padding-bottom: 0px; margin-bottom: 0px">
+                                        <section class="col col-3">
+                                            <label class="label">Thana <span style="color: red"> *</span></label>
+                                        </section>
+                                        <section class="col col-9">
+                                            <label class="select">
+                                                @Html.DropDownListFor(model => model.ThanaId, new SelectList(Enumerable.Empty<Thana>()), "---Select---")
+                                            </label>
+                                        </section>
+                                    </section>
+                                    
+                                </div>
+                                <div class="row" style="padding-bottom: 0; margin-bottom: 0">
+                                    <section class="col col-6" style="padding-bottom: 0px; margin-bottom: 0px">
+                                        <section class="col col-3">
+                                            <label class="label">Address</label>
+                                        </section>
+                                        <section class="col col-9">
+                                            <label class="textarea">
+                                                <textarea rows="4" id="Address" name="Address"></textarea>
+                                            </label>
+                                        </section>
+                                    </section>
+                                    <section class="col col-6" style="padding-bottom: 5px; margin-bottom: 5px">
+                                        <footer style="background-color: transparent; border: 0px solid #ffffff;padding-top: 5%">
+                                            <button type="submit" id="submit" class="btn btn-primary" style="width: 30%; height: 40px">Add</button>
+                                        </footer>
+                                    </section>
+                                </div>
+
+                            </fieldset>
+                        }
+                    </div>
+                    <!-- end widget content -->
+                </div>
+                <!-- end widget div -->
+            </div>
+            <!-- end widget -->
+        </article>
+    </div>
+
+</section>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+    <script>
+    $(document).ready(function() {
+        $("#MasterDepotId").change(function () {
+            var masterDepotId = $("#MasterDepotId").val();
+            var masterDepot = { id: masterDepotId };
+            $("#ThanaId").empty();
+            $("#ThanaId").append('<option value="" selected>-- Select --</option>');
+            $.ajax({
+                url: '@Url.Action("GetAllThanaByMasterDepot","Distributor")',
+                type: "GET",
+                dataType: 'JSON',
+                contentType: "application/json; charset=utf-8",
+                data: masterDepot,
+                success: function (data) {
+                    $.each(data, function (index, value) {
+                        $("#ThanaId").append('<option value="' + value.Thana.Id + '">' + value.Thana.Name + '</option>');
+                    });
+                },
+                error: function () {
+                    alert("Something went wrong");
+                }
+
+            });
+        });
+
+    $(function() {
+        setTimeout(function() {
+            $("#flashMessage").hide('blind', {}, 500);
+        }, 5000);
+    });
+
+
+    /*----- Mobile Validation -----*/
+    //$.validator.addMethod(
+    //        "mobileRegex",
+    //        function (value, element, temp) {
+    //            var re = new RegExp("^(?:\\+?88|0088)?01[15-9]\\d{8}$");
+    //            return this.optional(element) || re.test(value);
+    //        },
+    //        "Invalid mobile number format"
+    //    );
+    });
+
+        jQuery.validator.addMethod("phone", function (phone_number, element) {
+            phone_number = phone_number.replace(/\s+/g, "");
+            return this.optional(element) || phone_number.length > 10 &&
+                phone_number.match(/\+?(88)?01[567893][0-9]{8}\b/);
+        }, "Invalid phone number");
+        $("#AddDistributorForm").validate({
+
+            rules: {
+                Name: "required",
+                ContactPerson: "required",
+                Phone: {
+                    required: true,
+                    phone: true,
+                    number: true
+                },
+                Email: {
+                    required: true,
+                    email: true
+                },
+                Address: "required",
+                MasterDepotId: "required",
+                ThanaId: "required"
+            },
+            messages: {
+                Name: "Please enter name",
+                ContactPerson: "Please enter contact person",
+                Phone: {
+                    required: "Please enter a mobile no",
+                    phone: "Please enter a valid mobile no. Example - 01xxxxxxxxx",
+                    number: "please enter digits"
+                },
+                Email: {
+                    required: "Please enter a email",
+                    email: "Please enter a valid email. Example - abc@gmail.com"
+                },
+                Address: "Please add a address",
+                MasterDepotId: "Please add a master depot",
+                ThanaId: "Please add a thana"
+            }
+        });
+        $("#Phone").keydown(function (e) {
+            // Allow: backspace, delete, tab, escape, enter and .
+            if ($.inArray(e.keyCode, [46, 8, 9, 27, 13, 190]) !== -1 ||
+                // Allow: Ctrl+A
+                (e.keyCode === 65 && e.ctrlKey === true) ||
+                // Allow: home, end, left, right
+                (e.keyCode >= 35 && e.keyCode <= 39)) {
+                // let it happen, don't do anything
+                return;
+            }
+            // Ensure that it is a number and stop the keypress
+            if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
+                e.preventDefault();
+            }
+        });
+    </script>
+}

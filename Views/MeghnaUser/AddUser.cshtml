@@ -1,0 +1,208 @@
+﻿@model EFreshStore.Models.Context.MeghnaUser
+@{
+    ViewBag.Title = "AddUser";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<head>
+    <style>
+          .error {
+      color: red;
+     
+   }
+    </style>
+</head>
+<section id="widget-grid" class="">
+
+    <div class="row">
+        <article class="col-sm-12 col-md-12 col-lg-12">
+
+            <!-- Widget ID (each widget will need unique ID)-->
+            <div class="jarviswidget" id="wid-id-8" data-widget-editbutton="false" data-widget-custombutton="false">
+                <!-- widget options:
+                usage: <div class="jarviswidget" id="wid-id-0" data-widget-editbutton="false">
+
+                data-widget-colorbutton="false"
+                data-widget-editbutton="false"
+                data-widget-togglebutton="false"
+                data-widget-deletebutton="false"
+                data-widget-fullscreenbutton="false"
+                data-widget-custombutton="false"
+                data-widget-collapsed="true"
+                data-widget-sortable="false"
+
+                -->
+                <header>
+                    <span class="widget-icon"> <i class="fa fa-edit"></i> </span>
+                    <h2>Add User </h2>
+
+                </header>
+
+                <!-- widget div-->
+                <div>
+                    <!-- widget content -->
+                    <div class="widget-body no-padding">
+                        @using (Html.BeginForm(null, null, FormMethod.Post, new {id = "addMeghnaUserForm", @class = "smart-form"}))
+                        {
+                           
+                                @Html.ValidationSummary(true)
+                                <div class='@TempData["Class"]' id="flashMessage" role="alert">@TempData["Message"]</div>
+                         
+                            <fieldset>
+                                <div class="row" style="padding-bottom: 0;margin-bottom: 0">
+                                    <section class="col col-6" style="padding-bottom: 5px;margin-bottom: 5px">
+                                        <section class="col col-3">
+                                            <label class="label">Employee Id <span style="color: red"> *</span></label>
+                                        </section>
+                                        <section class="col col-9">
+                                            <label class="input">
+                                                <input type="text" name="EmployeeId" id="EmployeeId" placeholder="Employee Id">
+                                            </label>
+                                        </section>
+                                    </section>
+                                    <section class="col col-6" style="padding-bottom: 5px;margin-bottom: 5px">
+                                        <section class="col col-3">
+                                            <label class="label">Name <span style="color: red"> *</span></label>
+                                        </section>
+                                        <section class="col col-9">
+                                            <label class="input">
+                                                <input type="text" name="Name" id="Name" placeholder="Name">
+                                            </label>
+                                        </section>
+                                    </section>
+                                </div>
+                                <div class="row" style="padding-bottom: 0;margin-bottom: 0">
+                                    <section class="col col-6" style="padding-bottom: 5px;margin-bottom: 5px">
+                                        <section class="col col-3">
+                                            <label class="label">Mobile No <span style="color: red"> *</span></label>
+                                        </section>
+                                        <section class="col col-9">
+                                            <label class="input">
+                                                <input type="text" name="MobileNo" id="MobileNo" maxlength="11" placeholder="Mobile no">
+                                            </label>
+                                        </section>
+                                    </section>
+                                    <section class="col col-6" style="padding-bottom: 5px;margin-bottom: 5px">
+                                        <section class="col col-3">
+                                            <label class="label">E-Mail <span style="color: red"> *</span></label>
+                                        </section>
+                                        <section class="col col-9">
+                                            <label class="input">
+                                                <input type="text" name="Email" id="Email" placeholder="Email">
+                                            </label>
+                                        </section>
+                                    </section>
+                                </div>
+                                <div class="row" style="padding-bottom: 0;margin-bottom: 0">
+                                    <section class="col col-6" style="padding-bottom: 5px;margin-bottom: 5px">
+                                        <section class="col col-3">
+                                            <label class="label">Department</label>
+                                        </section>
+                                        <section class="col col-9">
+                                            <label class="select">
+                                                @Html.DropDownListFor(x => x.MeghnaDepartmentId, new SelectList(ViewBag.Departments, "Id", "Name"), "----Select department----")<i></i>
+                                            </label>
+                                        </section>
+                                    </section>
+                                    <section class="col col-6" style="padding-bottom: 5px;margin-bottom: 5px">
+                                        <section class="col col-3">
+                                            <label class="label">Designation</label>
+                                        </section>
+                                        <section class="col col-9">
+                                            <label class="select">
+                                                @Html.DropDownListFor(x => x.MeghnaDesignationId, new SelectList(ViewBag.Deisgnations, "Id", "Name"), "----Select designation----")<i></i>
+                                            </label>
+                                        </section>
+                                    </section>
+
+                                </div>
+                                <div class="row" style="padding-bottom: 0;margin-bottom: 0">
+                                    <section class="col col-6" style="padding-bottom: 5px;margin-bottom: 5px">
+                                        <section class="col col-3">
+                                            <label class="label">Address</label>
+                                        </section>
+                                        <section class="col col-9">
+                                            <label class="textarea">
+                                                <textarea rows="4" id="DeliveryAddress1" name="DeliveryAddress1" placeholder="Address"></textarea>
+                                            </label>
+                                        </section>
+                                    </section>                                    
+                                </div>
+                            </fieldset>
+                            <footer style="bottom: 0">
+                                <button type="submit" id="submit" class="btn btn-primary">Add</button>
+                            </footer>
+                        }
+                    </div>
+                    <!-- end widget content -->
+                </div>
+                <!-- end widget div -->
+            </div>
+            <!-- end widget -->
+        </article>
+    </div>
+</section>
+@section Scripts{
+    <script src="~/Scripts/jquery.validate.min.js"></script>
+@Scripts.Render("~/bundles/jqueryval")
+<script>
+
+            $(function () {
+                setTimeout(function () {
+                    $("#flashMessage").hide('blind', {}, 500);
+                }, 5000);
+            });
+           
+            jQuery.validator.addMethod("phone", function (phone_number, element) {
+                phone_number = phone_number.replace(/\s+/g, "");
+                return this.optional(element) || phone_number.length > 10 &&
+                    phone_number.match(/\+?(88)?01[567893][0-9]{8}\b/);
+            }, "Invalid phone number");
+            $("#addMeghnaUserForm").validate({
+
+                rules: {
+                    Name: "required",
+                    EmployeeId: "required",
+                    MobileNo:{
+                        required: true,
+                        phone: true,
+                        number:true
+                    },
+                    Email: {
+                        required: true,
+                        email: true
+                    },
+                    Designation: "required"
+                },
+                messages: {
+                    Name: "Please enter name",
+                    EmployeeId: "Please enter an employee id",
+                    MobileNo: {
+                        required: "Please enter a mobile no",
+                        phone: "Please enter a valid mobile no. Example - 01xxxxxxxxx",
+                        number: "please enter digits"
+                    },
+                    Email: {
+                        required: "Please enter an email",
+                        email: "Please enter a valid email. Example - abc@gmail.com"
+                    },
+                    Designation: "Please add a designation"
+                }
+            });
+            $("#MobileNo").keydown(function (e) {
+                // Allow: backspace, delete, tab, escape, enter and .
+                if ($.inArray(e.keyCode, [46, 8, 9, 27, 13, 190]) !== -1 ||
+                    // Allow: Ctrl+A
+                    (e.keyCode === 65 && e.ctrlKey === true) ||
+                    // Allow: home, end, left, right
+                    (e.keyCode >= 35 && e.keyCode <= 39)) {
+                    // let it happen, don't do anything
+                    return;
+                }
+                // Ensure that it is a number and stop the keypress
+                if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
+                    e.preventDefault();
+                }
+            });
+
+</script>
+}

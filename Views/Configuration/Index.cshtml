@@ -1,0 +1,149 @@
+
+﻿@using EFreshAdmin.Models.EntityModels
+@using EFreshAdmin.Models.EntityModels
+@using EFreshAdmin.Utility
+@model EFreshAdmin.Models.EntityModels.Configuration
+
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    Session["BreadCrum"] = "Configuration";
+    List<Configuration> configurations = ViewBag.Configurations;
+}
+<head>
+    <style>
+        .error {
+            color: red;
+        }
+    </style>
+</head>
+
+<div id="content" style="margin-bottom: 3%">
+    <section id="widget-grid" class="">
+        <!-- row -->
+        <div class="row">
+            <!-- NEW WIDGET START -->
+            <article class="col-sm-12 col-md-12 col-lg-12">
+                <!-- Widget ID (each widget will need unique ID)-->
+                <div class="jarviswidget jarviswidget-color-darken" id="wid-id-3" data-widget-editbutton="false">
+                    <header>
+                        <span class="widget-icon"> <i class="fa fa-table"></i> </span>
+                        <h2>Configuration List</h2>
+                    </header>
+                    <!-- widget div-->
+                    <div>
+                        <!-- widget edit box -->
+                        <div class="jarviswidget-editbox">
+                            <!-- This area used as dropdown edit box -->
+                        </div>
+                        <!-- end widget edit box -->
+                        <!-- widget content -->
+                        <div class="widget-body no-padding">
+                            <div class="table-responsive">
+                                <table class="table" id="dt_basic">
+                                    <thead>
+                                        <tr>
+                                            <th>SL</th>
+                                            <th>Name</th>
+                                            <th>Is Active?</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @if (configurations != null)
+                                        {
+                                            var count = 1;
+                                            foreach (Configuration configuration in configurations)
+                                            {
+                                                var buttonName = configuration.IsActive ? "Deactivate" : "Activate";
+                                                var status = (bool)configuration.IsActive ? "Yes" : "No";
+                                                var color = (bool)configuration.IsActive ? "green" : "red";
+                                                <tr>
+                                                    <td>@(count++)</td>
+                                                    <td>@configuration.Name</td>
+                                                    <td style="color: @color">@status</td>
+                                                    <td>
+                                                        <input type="button" class="btn btn-success" onclick="activateOrDeactivateConfiguration(@configuration.Id,@configuration.IsActive)" value="@buttonName" />
+
+                                                       
+                                                        @if (configuration.Id == (long)ConfigurationEnum.DeliveryCharge && configuration.IsActive)
+                                                        {
+                                                            <a class="btn btn-success" href="@Url.Action("Create", "DeliveryCharge")">Add Delivery Charge</a>
+                                                        }
+
+
+                                                        @if (configuration.Id == (long)ConfigurationEnum.LPGCombo && configuration.IsActive)
+                                                        {
+                                                            <a class="btn btn-success" href="@Url.Action("Create", "LPGComboDiscount")">Add LPG Combo Discount</a>
+                                                        }
+
+                                                    </td>
+                                                </tr>
+                                            }
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <!-- end widget content -->
+                    </div>
+                    <!-- end widget div -->
+                </div>
+                <!-- end widget -->
+            </article>
+            <!-- WIDGET END -->
+        </div>
+        <!-- end row -->
+        <!-- END ROW -->
+    </section>
+</div>
+
+@section scripts{
+    <script>
+
+        function activateOrDeactivateConfiguration(configurationId, isActive) {
+            var status = isActive ? 'deactivate' : 'activate';
+            Swal.fire({
+                title: 'Do you want to ' + status + ' this configuration ?',
+                type: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#739e73',
+                cancelButtonColor: '#A90329',
+                cancelButtonText: 'No',
+                confirmButtonText: 'Yes',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.value) {
+                    $("#preloader").css('display', 'block');
+
+
+                    var data = { configId: configurationId };
+                    $.ajax({
+                        method: 'POST',
+                        url: "@Url.Action("ActivateOrDeactivate", "Configuration")",
+                        dataType: "json",
+                        contentType: 'application/json',
+                        data: JSON.stringify(data),
+                        crossDomain: true,
+                        success: function (data) {
+                            toastr.clear();
+                            if (data.Status === "Unauthorized") {
+                                window.location = "@Url.Action("Login","Home")";
+                            } else if (data.Status === "Ok") {
+                                window.location.reload();
+                            } else {
+                                toastr.error("Something went wrong");
+                            }
+
+                        },
+                        error: function () {
+                            toastr.error("Something went wrong");
+                        }
+                    });
+                    $("#preloader").css('display', 'none');
+                }
+            });
+        }
+
+    </script>
+}

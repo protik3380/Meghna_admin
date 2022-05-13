@@ -1,0 +1,266 @@
+﻿@using EFreshStore.Models.Context
+@model EFreshStore.Models.Context.Product
+
+@{
+    ViewBag.Title = "View";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    Session["BreadCrum"] = "Product List";
+}
+@section style{
+    <style>
+        .error {
+            color: red;
+        }
+    </style>
+    <link href="~/Content/css/jquery-ui.min.css" rel="stylesheet" />
+    <link rel="stylesheet" type="text/css" href="~/Content/css/form-design.css" />
+}
+<div id="content" style="margin-bottom: 3%">
+    <section id="widget-grid" class="">
+        <div class="row" style="height: 100%">
+            <article class="col-sm-12 col-md-12 col-lg-12">
+                <div class="jarviswidget" id="wid-id-4" data-widget-editbutton="false" data-widget-custombutton="false">
+                    <header>
+                        <span class="widget-icon"> <i class="fa fa-edit"></i> </span>
+                        <h2>Add Product</h2>
+                    </header>
+                    <div>
+                        <div class="widget-body no-padding">
+                            @using (Html.BeginForm("Create", "Brand", FormMethod.Post, new { id = "productform", @class = "smart-form" }))
+                            {
+                                @Html.AntiForgeryToken()
+                                <div class='@TempData["Class"]' id="flashMessage" role="alert">@TempData["Message"]</div>
+                                <fieldset>
+                                    <input type="hidden" id="Id" name="Id" />
+                                    <input type="hidden" id="CreatedBy" name="CreatedBy" />
+                                    <input type="hidden" id="CreatedOn" name="CreatedOn" />
+                                    <div class="row">
+                                        <section class="col col-6" style="padding-bottom: 5px; margin-bottom: 5px">
+                                            <section class="col col-3">
+                                                <label class="label">Name <span style="color: red"> *</span></label>
+                                            </section>
+                                            <section class="col col-9">
+                                                <label class="input">
+                                                    <input type="text" name="Name" id="Name">
+                                                </label>
+                                            </section>
+                                        </section>
+                                        <section class="col col-6" style="padding-bottom: 5px; margin-bottom: 5px">
+                                            <section class="col col-3">
+                                                <label class="label">Brand <span style="color: red"> *</span></label>
+                                            </section>
+                                            <section class="col col-9">
+                                                <label class="select">
+                                                    @Html.DropDownListFor(model => model.BrandId, new SelectList(ViewBag.brand, "Id", "Name"), "---Select Brand---")
+                                                </label>
+                                            </section>
+                                        </section>
+                                    </div>
+                                    <div class="row">
+                                        <section class="col col-6" style="padding-bottom: 5px; margin-bottom: 5px">
+                                            <section class="col col-3">
+                                                <label class="label">Category <span style="color: red"> *</span></label>
+                                            </section>
+                                            <section class="col col-9">
+                                                <label class="select">
+                                                    @Html.DropDownListFor(model => model.CategoryId, new SelectList(ViewBag.category, "Id", "Name"), "---Select Category---")
+                                                </label>
+                                            </section>
+                                        </section>
+                                        <section class="col col-6" style="padding-bottom: 5px; margin-bottom: 5px">
+                                            <section class="col col-3"></section>
+                                            <section class="col col-9">
+                                                <label class="checkbox">
+                                                    @Html.CheckBoxFor(model => model.IsActive, new { id = "brandIsActive" })
+                                                    <i></i>Is Active?
+                                                </label>
+                                            </section>
+                                        </section>
+                                    </div>
+                                    <div class="row" id="formDescriptionRow">
+                                        <section class="col col-6" style="padding-bottom: 5px; margin-bottom: 5px">
+                                            <section class="col col-3">
+                                                <label class="label">Description</label>
+                                            </section>
+                                            <section class="col col-9">
+                                                <label class="textarea">
+                                                    <textarea rows="4" id="Description" name="Description"></textarea>
+                                                </label>
+                                            </section>
+                                        </section>
+                                    </div>
+                                </fieldset>
+                                <footer style="bottom: 0">
+                                    <input type="button" value="Reset" id="productResetButton" class="btn btn-primary" />
+                                    <button type="submit" id="productAddButton" class="btn btn-primary">Add</button>
+                                </footer>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </article>
+        </div>
+        @*<div class="row">
+            <article class="col-sm-12 col-md-12 col-lg-12">
+                <div class="jarviswidget jarviswidget-color-darken" id="wid-id-3" data-widget-editbutton="false">
+                    <header>
+                        <span class="widget-icon"> <i class="fa fa-table"></i> </span>
+                        <h2>Brand Details </h2>
+                    </header>
+                    <div>
+                        <div class="jarviswidget-editbox">
+                        </div>
+                        <div class="widget-body no-padding">
+                            <div class="table-responsive">
+                                <table class="table" id="dt_basic">
+                                    <thead>
+                                        <tr>
+                                            <th>SL</th>
+                                            <th>Name</th>
+                                            <th>Description</th>
+                                            <th>Is Active ?</th>
+                                            <th>Edit</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @if (brands != null)
+                                        {
+                                            var count = 1;
+                                            foreach (Brand brand in brands)
+                                            {
+                                                <tr>
+                                                    <td>@(count++)</td>
+                                                    <td id="brandName_@brand.Id">@brand.Name</td>
+                                                    <td id="brandDescription_@brand.Id">
+                                                        @brand.Description
+                                                        <input type="hidden" id="brandImageLocation_@brand.Id" value="@brand.ImageLocation" />
+                                                        <input type="hidden" id="brandCreatedBy_@brand.Id" value="@brand.CreatedBy" />
+                                                        <input type="hidden" id="brandCreatedOn_@brand.Id" value="@brand.CreatedOn" />
+                                                        <input type="hidden" id="brandImage_@brand.Id" value="@brand.BrandImage" />
+                                                    </td>
+                                                    @{
+
+                                                        var color = brand.IsActive ? "green" : "red";
+                                                        var activeStatus = brand.IsActive ? "Yes" : "No";
+                                                        <td style="color: @color">
+                                                            @activeStatus
+                                                        </td>
+                                                    }
+                                                    <td>
+                                                        <input type="button" class="btn btn-success" onclick="changeAddBrandFormStateToEdit(@brand.Id)" value="Edit" />
+                                                    </td>
+                                                </tr>
+                                            }
+                                         }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </article>
+        </div>*@
+    </section>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+@*<div class='@TempData["Class"]' id="flashMessage" role="alert">@TempData["Message"]</div>*@
+
+@*<section id="widget-grid" class=""style="margin-bottom: 20px">
+        <!-- row -->
+        <div class="row">
+            <article class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                <!-- Widget ID (each widget will need unique ID)-->
+                <div class="jarviswidget jarviswidget-color-darken" id="wid-id-0" data-widget-editbutton="false">
+                    <header>
+                        <span class="widget-icon"> <i class="fa fa-table"></i> </span>
+                        <h2>Product List</h2>
+                    </header>
+                    <!-- widget div-->
+                    <div>
+                        <!-- widget content -->
+                        <div class="widget-body no-padding">
+                            <table id="dt_basic" class="table table-striped table-bordered table-hover" style="width: 100%">
+                                <thead>
+                                    <tr>
+                                        <th>SL</th>
+                                        <th>Name</th>
+                                        <th>Description</th>
+                                        <th>Category</th>
+                                        <th>Brand</th>
+                                        <th style="text-align: center">Edit</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if (Model != null)
+                                    {
+                                        var count = 1;
+                                        foreach (Product data in Model)
+                                        {
+                                            <tr>
+                                                <td style="width: 5%">@(count++)</td>
+                                                <td style="width: 18%">@data.Name</td>
+                                                <td style="width: 43%">@data.Description</td>
+                                                <td style="width: 12%">@data.Category.Name</td>
+                                                <td style="width: 12%">@data.Brand.Name</td>
+                                                <td  style="width: 10%;text-align: center">
+                                                    <input type="button" class="btn btn-success" onclick="location.href='../product/edit/@data.Id'" value="Edit" />
+                                                </td>
+                                            </tr>
+                                        }
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                        <!-- end widget content -->
+                    </div>
+                    <!-- end widget div -->
+                </div>
+                <!-- end widget -->
+            </article>
+        </div>
+        <!-- end row -->
+    </section>*@
+@section scripts{
+    <script>
+        $(document).ready(function () {
+            $(function () {
+                setTimeout(function () {
+                    $("#flashMessage").hide('blind', {}, 500);
+                }, 5000);
+            });
+        });
+    </script>
+}

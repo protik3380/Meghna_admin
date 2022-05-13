@@ -1,0 +1,326 @@
+﻿@using EFreshAdmin.Utility
+@using EFreshStore.Models.Context
+@model MasterDepot
+
+@{
+    ViewBag.Title = "View";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    List<MasterDepot> masterDepots = ViewBag.MasterDepots;
+    Session["BreadCrum"] = "Master Depot List";
+}
+<head>
+    <style>
+        .error {
+            color: red;
+        }
+    </style>
+</head>
+<div id="content" style="margin-bottom: 3%">
+    <section id="widget-grid" class="">
+        <div class="row">
+            <article class="col-sm-12 col-md-12 col-lg-12">
+                <!-- Widget ID (each widget will need unique ID)-->
+                <div class="jarviswidget" id="wid-id-8" data-widget-editbutton="false" data-widget-custombutton="false">
+                    <header>
+                        <span class="widget-icon"> <i class="fa fa-edit"></i> </span>
+                        <h2 id="masterDepotFormHeading">Add Master Depot </h2>
+                    </header>
+                    <!-- widget div-->
+                    <div>
+                        <!-- widget content -->
+                        <div class="widget-body no-padding">
+                            @using (Html.BeginForm("Create", "MasterDepot", FormMethod.Post, new { id = "masterDepotform", @class = "smart-form" }))
+                            {
+
+                                @Html.ValidationSummary(true)
+                                <div class='@TempData["Class"]' id="flashMessage" role="alert">@TempData["Message"]</div>
+
+                                <fieldset>
+                                    <input type="hidden" id="masterDepotIdHiddenField" name="Id" />
+                                    <div class="row" style="padding-bottom: 0; margin-bottom: 0">
+                                        <section class="col col-6" style="padding-bottom: 5px; margin-bottom: 5px">
+                                            <section class="col col-3">
+                                                <label class="label">Name<span style="color: red"> *</span></label>
+                                            </section>
+                                            <section class="col col-9">
+                                                <label class="input">
+                                                    <input type="text" name="Name" id="Name" placeholder="Master depot name">
+                                                </label>
+                                            </section>
+                                        </section>
+                                        <section class="col col-6" style="padding-bottom: 5px; margin-bottom: 5px">
+                                            <section class="col col-3">
+                                                <label class="label">Contact Person <span style="color: red"> *</span></label>
+                                            </section>
+                                            <section class="col col-9">
+                                                <label class="input">
+                                                    <input type="text" name="ContactPerson" id="ContactPerson" placeholder="Contact person">
+                                                </label>
+                                            </section>
+                                        </section>
+                                    </div>
+                                    <div class="row" style="padding-bottom: 0; margin-bottom: 0">
+                                        <section class="col col-6" style="padding-bottom: 5px; margin-bottom: 5px">
+                                            <section class="col col-3">
+                                                <label class="label">Mobile No <span style="color: red"> *</span></label>
+                                            </section>
+                                            <section class="col col-9">
+                                                <label class="input">
+                                                    <input type="text" name="Phone" id="Phone" maxlength="11" placeholder="Mobile no">
+                                                </label>
+                                            </section>
+                                        </section>
+                                        <section class="col col-6" style="padding-bottom: 5px; margin-bottom: 5px">
+                                            <section class="col col-3">
+                                                <label class="label">E-Mail <span style="color: red"> *</span></label>
+                                            </section>
+                                            <section class="col col-9">
+                                                <label class="input">
+                                                    <input type="text" name="Email" id="Email" placeholder="Email">
+                                                </label>
+                                            </section>
+                                        </section>
+                                    </div>
+                                    <div class="row" style="padding-bottom: 0; margin-bottom: 0">
+                                        <section class="col col-6" style="padding-bottom: 5px; margin-bottom: 5px">
+                                            <section class="col col-3">
+                                                <label class="label">Address <span style="color: red"> *</span></label>
+                                            </section>
+                                            <section class="col col-9">
+                                                <label class="textarea">
+                                                    <textarea rows="4" id="Address" name="Address" placeholder="Address"></textarea>
+                                                </label>
+                                            </section>
+                                        </section>
+                                        <section class="col col-6" style="padding-bottom: 5px; margin-bottom: 5px">
+                                            <section class="col col-3"></section>
+                                            <section class="col col-9">
+                                                <label class="checkbox">
+                                                    @Html.CheckBoxFor(model => model.IsActive, new { id = "masterDepotIsActive" })
+                                                    <i></i>Is Active?
+                                                </label>
+                                            </section>
+                                        </section>
+
+                                    </div>
+                                </fieldset>
+                                <footer>
+                                    <input type="button" value="Reset" id="masterDepotResetButton" class="btn btn-primary" />
+                                    <button type="submit" id="masterDepotAddButton" class="btn btn-primary">Add</button>
+                                </footer>
+                            }
+                        </div>
+                        <!-- end widget content -->
+                    </div>
+                    <!-- end widget div -->
+                </div>
+                <!-- end widget -->
+            </article>
+        </div>
+        <!-- row -->
+        <div class="row">
+            <!-- NEW WIDGET START -->
+            <article class="col-sm-12 col-md-12 col-lg-12">
+
+                <!-- Widget ID (each widget will need unique ID)-->
+                <div class="jarviswidget jarviswidget-color-darken" id="wid-id-3" data-widget-editbutton="false">
+                    <header>
+                        <span class="widget-icon"> <i class="fa fa-table"></i> </span>
+                        <h2>Master Depot Details </h2>
+                    </header>
+
+                    <!-- widget div-->
+                    <div>
+                        <!-- widget edit box -->
+                        <div class="jarviswidget-editbox">
+                            <!-- This area used as dropdown edit box -->
+                        </div>
+                        <!-- end widget edit box -->
+                        <!-- widget content -->
+                        <div class="widget-body no-padding">
+                            <div class="table-responsive">
+
+                                <table class="table" id="dt_basic">
+                                    <thead>
+                                        <tr>
+                                            <th style="width: 5%">SL</th>
+                                            <th style="width: 10%">Name</th>
+                                            <th style="width: 25%">Address</th>
+                                            <th style="width: 15%">Contact Person</th>
+                                            <th style="width: 15%">Phone</th>
+                                            <th style="width: 10%">Email</th>
+                                            <th style="width: 10%">Is Active?</th>
+                                            <th style="width: 10%">Edit</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+
+                                        @if (masterDepots != null)
+                                        {
+                                            var count = 1;
+                                            foreach (MasterDepot data in masterDepots)
+                                            {
+                                                <tr>
+                                                    <td>@(count++)</td>
+                                                    <td>@data.Name</td>
+                                                    <td>@data.Address</td>
+                                                    <td>@data.ContactPerson</td>
+                                                    <td>@data.Phone</td>
+                                                    <td>@data.Email</td>
+                                                    @{
+                                                        var status = data.IsActive ? "Yes" : "No";
+                                                        var color = data.IsActive ? "green" : "red";
+                                                        <td style="color: @color;">@status</td>
+                                                    }
+
+                                                    <td>
+                                                        <input type="button" class="btn btn-success" id="editMasterDepotButton_@data.Id" onclick="changeFormStateSaveToEdit(@data.Id)" value="Edit" />
+                                                    </td>
+                                                </tr>
+                                            }
+                                        }
+                                    </tbody>
+                                </table>
+
+                            </div>
+                        </div>
+                        <!-- end widget content -->
+
+                    </div>
+                    <!-- end widget div -->
+
+                </div>
+                <!-- end widget -->
+
+            </article>
+            <!-- WIDGET END -->
+
+        </div>
+        <!-- end row -->
+        <!-- END ROW -->
+
+    </section>
+</div>
+@section scripts{
+@Scripts.Render("~/bundles/jqueryval")
+    <script>
+        $(document).ready(function() {
+            $(function() {
+                setTimeout(function() {
+                    $("#flashMessage").hide('blind', {}, 500);
+                }, 5000);
+            });
+            $('#masterDepotIsActive').attr('checked', true);                                            
+        });
+        jQuery.validator.addMethod("phone", function (phone_number, element) {
+            phone_number = phone_number.replace(/\s+/g, "");
+            return this.optional(element) || phone_number.length > 10 &&
+                phone_number.match(/\+?(88)?01[567893][0-9]{8}\b/);
+        }, "Invalid phone number");
+        $("#masterDepotform").validate({
+
+            rules: {
+                Name: "required",
+                ContactPerson: "required",
+                Phone: {
+                    required: true,
+                    phone: true,
+                    number: true
+                },
+                Email: {
+                    required: true,
+                    email: true
+                },
+                Address: "required"
+            },
+            messages: {
+                Name: "Please enter name",
+                ContactPerson: "Please enter contact person",
+                Phone: {
+                    required: "Please enter a mobile no",
+                    phone: "Please enter a valid mobile no. Example - 01xxxxxxxxx",
+                    number: "please enter digits"
+                },
+                Email: {
+                    required: "Please enter email address",
+                    email: "Please enter a valid email address. Example - abc@gmail.com"
+                },
+                Address: "Please enter address"
+            }
+        });
+        $("#Phone").keydown(function (e) {
+            // Allow: backspace, delete, tab, escape, enter and .
+            if ($.inArray(e.keyCode, [46, 8, 9, 27, 13, 190]) !== -1 ||
+                // Allow: Ctrl+A
+                (e.keyCode === 65 && e.ctrlKey === true) ||
+                // Allow: home, end, left, right
+                (e.keyCode >= 35 && e.keyCode <= 39)) {
+                // let it happen, don't do anything
+                return;
+            }
+            // Ensure that it is a number and stop the keypress
+            if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
+                e.preventDefault();
+            }
+        });
+        function changeFormStateSaveToEdit(masterDepotId) {
+            $("#masterDepotform").validate().resetForm();
+            $("#preloader").css('display', 'block');
+            $('html, body').animate({
+                scrollTop: $("#masterDepotFormHeading").offset().top
+            },
+                500);
+            $("#masterDepotFormHeading").text("Update Master Depot");
+            $("#masterDepotAddButton").text("Update");
+            $("#masterDepotform").attr("action", "@BaseUrl.subDirectory/MasterDepot/Edit");
+            $("#masterDepotIdHiddenField").val(masterDepotId);
+
+            var data = { masterDepotId: masterDepotId };
+            $.ajax({
+                method: 'POST',
+                url: "@Url.Action("GetMasterDepotDetailsById", "MasterDepot")",
+                dataType: "json",
+            contentType: 'application/json',
+            data: JSON.stringify(data),
+            crossDomain: true,
+            success: function (data) {
+                toastr.clear();
+                if (data.Status === "Ok") {
+                    $("#Name").val(data.MasterDepot.Name);
+                    $("#ContactPerson").val(data.MasterDepot.ContactPerson);
+                    $("#Phone").val(data.MasterDepot.Phone);
+                    $("#Email").val(data.MasterDepot.Email);
+                    $("#Address").val(data.MasterDepot.Address);
+                    if (data.MasterDepot.IsActive === true) {
+                        $("#masterDepotIsActive").prop('checked', true);
+                    } else {
+                        $("#masterDepotIsActive").prop('checked', false);
+                    }
+                        
+                } else {
+                    toastr.error("Something went wrong");
+                }
+
+            },
+            error: function () {
+                toastr.error("Something went wrong");
+            }
+        });
+        $("#preloader").css('display', 'none');
+        }
+
+        $('#masterDepotResetButton').click(function() {
+            $("#masterDepotFormHeading").text("Add Master Depot");
+            $("#masterDepotAddButton").text("Add");
+            $("#masterDepotform").attr("action", "@BaseUrl.subDirectory/MasterDepot/Create");
+            $("#Name").val("");
+            $("#ContactPerson").val("");
+            $("#Phone").val("");
+            $("#Email").val("");
+            $("#Address").val("");
+            $("#masterDepotIsActive").prop('checked', true);
+            $("#masterDepotform").validate().resetForm();
+        });
+</script>
+
+}

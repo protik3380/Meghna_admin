@@ -1,0 +1,306 @@
+﻿@using System.Web.UI.WebControls
+@using System.Globalization
+@using EFreshAdmin.Models
+@using EFreshAdmin.Models.EntityModels
+@using EFreshStore.Models.Context
+@model EFreshAdmin.Models.TotalOrdersVM
+@{
+    ViewBag.Title = "Analysis";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var totalRevenue = Session["Revenue"];
+    var averageOrderValue = Convert.ToDouble(Session["AverageOrderValue"]);
+    if (Double.IsInfinity((double)averageOrderValue) || Double.IsNaN((double)averageOrderValue))
+    {
+        averageOrderValue = 0;
+    }
+    var returningCustomerRate = Convert.ToInt64(Session["ReturnCustomerRate"]);
+    List<TotalOrdersVM> orders = ViewBag.Orders;
+    long userTypeId = Convert.ToInt64(Session["UserTypeId"]);
+}
+@section style{
+    <link href="~/Content/css/jquery-ui.min.css" rel="stylesheet" />
+    <link rel="stylesheet" type="text/css" href="~/Content/css/form-design.css" />
+    <link href="~/Content/css/CircleProgressBar.css" rel="stylesheet" />
+    <style>
+        .error {
+            color: red;
+        }
+
+        .ui-datepicker-header {
+            color: #3e9aba !important;
+            background-image: none !important;
+            border-radius: 0;
+        }
+
+        .ui-datepicker {
+            width: 280px;
+            padding: 2px;
+        }
+
+        .ui-datepicker-prev, .ui-datepicker-next {
+            color: #3e9aba !important;
+        }
+
+        .ui-datepicker .ui-datepicker-next span {
+            width: 60px;
+            top: 10px;
+            left: -10px;
+        }
+
+        .ui-datepicker .ui-datepicker-prev span {
+            width: 60px;
+            top: 10px;
+            left: 6px;
+        }
+
+        .select2-container--default .select2-selection--multiple {
+            -ms-border-radius: 0px;
+            border-radius: 0px;
+        }
+    </style>
+}
+<div id="content" style="margin-bottom: 3%">
+    <section id="widget-grid" class="">
+        <div class="row" style="height: 100%" align="center">
+            <article class="col-sm-12 col-md-12 col-lg-12">
+                <div class="jarviswidget" id="wid-id-4" data-widget-editbutton="false" data-widget-custombutton="false">
+                    <header>
+                        <span class="widget-icon"> <i class="fa fa-list-alt"></i> </span>
+                        <h2>Analysis Report</h2>
+                    </header>
+                    <div>
+                        <div class="widget-body no-padding">
+                            @using (Html.BeginForm("GetAnalysisReport", "Report", FormMethod.Get, new { @class = "smart-form" }))
+                            {
+
+                                <div class='@TempData["Class"]' id="flashMessage" role="alert">@TempData["Message"]</div>
+
+                                <fieldset>
+                                    <div class="row">
+                                        
+                                        <section class="col col-6" style="padding-bottom: 5px; margin-bottom: 5px">
+                                            <section class="col col-3">
+                                                <label class="label">From Date</label>
+                                            </section>
+                                            <section class="col col-9">
+                                                <label class="input">
+                                                    @Html.TextBoxFor(m => m.FromDate, new {@class = "datepicker", @readonly = "readonly", placeholder = "From date"})
+                                                </label>
+                                            </section>
+                                        </section>
+                                        <section class="col col-6" style="padding-bottom: 5px; margin-bottom: 5px">
+                                            <section class="col col-3">
+                                                <label class="label">To Date</label>
+                                            </section>
+                                            <section class="col col-9">
+                                                <label class="input">
+                                                    @Html.TextBoxFor(m => m.ToDate, new {@class = "datepicker", @readonly = "readonly", placeholder = "To date"})
+                                                </label>
+                                            </section>
+                                        </section>
+                                    </div>
+                                    <div class="row">
+                                        <section class="col col-6" style="padding-bottom: 5px; margin-bottom: 5px">
+                                            <section class="col col-3">
+                                                <label class="label">Brands</label>
+                                            </section>
+                                            <section class="col col-9">
+                                                <label class="select">
+                                                    @Html.ListBoxFor(m => m.BrandIds, new MultiSelectList(Model.Brands, "Id", "Name"), new {@class = "form-control select-multiple", multiple = "multiple"})
+                                                </label>
+                                            </section>
+                                        </section>
+                                        <section class="col col-6" style="padding-bottom: 5px; margin-bottom: 5px">
+                                            <section class="col col-3">
+                                                <label class="label">Categories</label>
+                                            </section>
+                                            <section class="col col-9">
+                                                <label class="select">
+                                                    @Html.ListBoxFor(m => m.CategoryIds, new MultiSelectList(Model.Categories, "Id", "Name"), new {@class = "js-example-basic-multiple form-control select-multiple", multiple = "multiple"})
+                                                </label>
+                                            </section>
+                                        </section>
+                                    </div>
+
+                                    <div class="row">
+                                        <section class="col col-6" style="padding-bottom: 5px; margin-bottom: 5px">
+                                            <section class="col col-3">
+                                                <label class="label">Product Types</label>
+                                            </section>
+                                            <section class="col col-9">
+                                                <label class="select">
+                                                    @Html.ListBoxFor(m => m.ProductTypeIds, new MultiSelectList(Model.ProductTypes, "Id", "Name"), new {@class = "js-example-basic-multiple form-control select-multiple", multiple = "multiple"})
+                                                </label>
+                                            </section>
+                                        </section>
+                                        @if (userTypeId != (long) UserTypeEnum.MasterDepotUser)
+                                        {
+                                            <section class="col col-6" style="padding-bottom: 5px; margin-bottom: 5px">
+                                                <section class="col col-3">
+                                                    <label class="label">Master Depots</label>
+                                                </section>
+                                                <section class="col col-9">
+                                                    <label class="select">
+                                                        @Html.ListBoxFor(m => m.MasterDepotIds, new MultiSelectList(Model.MasterDepots, "Id", "Name"), new {@class = "js-example-basic-multiple form-control select-multiple", multiple = "multiple"})
+                                                    </label>
+                                                </section>
+                                            </section>
+                                        }
+
+                                    </div>
+
+                                </fieldset>
+                                <footer style="bottom: 0">
+                                    @*<a class="btn btn-primary" href="@Url.Action("ExportToExcel","Report")">Export Data</a>*@
+                                    <button type="submit" class="btn btn-primary">Show</button>
+                                </footer>
+                            }
+                        </div>
+                    </div>
+                    <div class="widget-body">
+                            <div class="container-fluid">
+                                <div class="row" align="center">
+                                    <div class="col-xs-12 col-sm-4 col-md-4 col-lg-4">
+                                        <div class="wrimagecard wrimagecard-topimage">
+                                            <a href="#">
+                                                <div class="wrimagecard-topimage_header" style="height:165px;background-color: rgba(255, 188, 113, 0.1)">
+                                                    <center><i class="fa" style="color:#f78707; font-size: 30px; padding: 60px;">&#2547; @Convert.ToDecimal(@totalRevenue).ToString("N", CultureInfo.CreateSpecificCulture("bn-BD"))</i></center>
+                                                </div>
+                                                <div class="wrimagecard-topimage_title" style="height: 50px">
+                                                    <center>
+                                                        <p style="font-size: 13px">
+                                                            <strong>Total Revenue</strong>
+                                                        </p>
+                                                    </center>
+                                                </div>
+                                            </a>
+                                        </div>
+                                    </div>
+                                    <div class="col-xs-12 col-sm-4 col-md-4 col-lg-4">
+                                        <div class="wrimagecard wrimagecard-topimage">
+                                            <a href="#">
+                                                <div class="wrimagecard-topimage_header" style="height:165px; padding: 60px;background-color: rgba(255, 188, 113, 0.1)">
+                                                    <center><i id="totalCanceledRequest" class="fa" style="color: #f78707; font-size: 30px">&#2547; @Convert.ToDecimal(averageOrderValue).ToString("N", CultureInfo.CreateSpecificCulture("bn-BD")) </i></center>
+                                                </div>
+                                                <div class="wrimagecard-topimage_title" style="height: 50px">
+                                                    <center>
+                                                        <p style="font-size: 13px">
+                                                            <strong>Average Order Value</strong>
+                                                        </p>
+                                                    </center>
+                                                </div>
+                                            </a>
+                                        </div>
+                                    </div>
+                                    <div class="col-xs-12 col-sm-4 col-md-4 col-lg-4">
+                                        <div class="wrimagecard wrimagecard-topimage">
+                                            <a href="#">
+                                                <div class="bg-white rounded-lg shadow">
+                                                    <!-- Progress bar 1 -->
+                                                    <div class="progress mx-auto" data-value="@returningCustomerRate">
+                                                        <span class="progress-left">
+                                                            <span class="progress-bar border-primary"></span>
+                                                        </span>
+                                                        <span class="progress-right">
+                                                            <span class="progress-bar border-primary"></span>
+                                                        </span>
+                                                        <div class="progress-value w-100 h-100 rounded-circle d-flex align-items-center justify-content-center">
+                                                            <div class="h2 font-weight-bold">
+                                                                @returningCustomerRate<sup class="small" style="color: #fff;">%</sup>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                </div>
+                                                <div class="wrimagecard-topimage_title">
+                                                    <center>
+                                                        <p style="font-size: 13px">
+                                                            <strong>Returning Customer Rate</strong>
+                                                        </p>
+                                                    </center>
+                                                </div>
+                                            </a>
+                                        </div>
+                                    </div>
+                                   
+                                </div>
+                            </div>
+                        </div>
+                </div>
+            </article>
+        </div>
+    </section>
+</div>
+
+@section scripts
+{
+    <script src="~/Content/js/select2.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('select').select2({
+                placeholder: {
+                    id: '-1', // the value of the option
+                    text: 'Select an option'
+                }
+            });
+            $('#BrandIds').select2({
+                placeholder: {
+                    id: '-1', // the value of the option
+                    text: 'Select brand(s)'
+                }
+            });
+            $('#CategoryIds').select2({
+                placeholder: {
+                    id: '-1', // the value of the option
+                    text: 'Select categories'
+                }
+            });
+            $('#ProductTypeIds').select2({
+                placeholder: {
+                    id: '-1', // the value of the option
+                    text: 'Select product type(s)'
+                }
+            });
+
+
+            $(".datepicker").datepicker({
+                changeMonth: true,
+                changeYear: true,
+                yearRange: "2019:2050",
+                showAnim: "slide",
+                //nextText: '<span class="glyphicon glyphicon-chevron-right"></span>',
+                dateFormat: 'dd MM,yy'
+            });
+            $(function () {
+
+                $(".progress").each(function () {
+
+                    var value = $(this).attr('data-value');
+                    var left = $(this).find('.progress-left .progress-bar');
+                    var right = $(this).find('.progress-right .progress-bar');
+
+                    if (value > 0) {
+                        if (value <= 50) {
+                            right.css('transform', 'rotate(' + percentageToDegrees(value) + 'deg)');
+                        } else {
+                            right.css('transform', 'rotate(180deg)')
+                            left.css('transform', 'rotate(' + percentageToDegrees(value - 50) + 'deg)');
+                        }
+                    }
+
+                });
+
+                function percentageToDegrees(percentage) {
+
+                    return percentage / 100 * 360;
+
+                }
+
+            });
+
+
+        });
+    </script>
+}
+
+

@@ -1,0 +1,122 @@
+﻿﻿@using EFreshAdmin.Utility
+@model EFreshAdmin.Models.EntityModels.DeliveryCharge
+
+@{
+    ViewBag.Title = "Create";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div id="content" style="margin-bottom: 3%">
+    <section id="widget-grid" class="">
+        <div class="row" style="height: 100%">
+            <article class="col-sm-12 col-md-12 col-lg-12">
+                <div class="jarviswidget" id="wid-id-4" data-widget-editbutton="false" data-widget-custombutton="false">
+                    <header>
+                        <span class="widget-icon"> <i class="fa fa-edit"></i> </span>
+                        <h2>Add Delivery Charge</h2>
+                    </header>
+                    <div>
+                        <div class="widget-body no-padding">
+                            @using (Html.BeginForm("Create", "DeliveryCharge", FormMethod.Post, new { id = "AddDeliveryCharge", @class = "smart-form" }))
+                            {
+                                @Html.AntiForgeryToken()
+                                <div class='@TempData["Class"]' id="flashMessage" role="alert">@TempData["Message"]</div>
+                                <fieldset>
+                                    <div class="row" style="padding-bottom: 0px;margin-bottom: 0px">
+                                        <section class="col col-6" style="padding-bottom: 5px; margin-bottom: 5px">
+                                            <section class="col col-3">
+                                                <label class="label">LPG Delivery Charge</label>
+                                            </section>
+                                            <section class="col col-9">
+                                                <label class="input">
+                                                    @Html.TextBoxFor(model => model.LPGDeliveryCharge, new { placeholder = "LPG Delivery Charge" })
+                                                </label>
+                                            </section>
+                                        </section>
+                                        <section class="col col-6" style="padding-bottom: 5px; margin-bottom: 5px">
+                                            <section class="col col-3">
+                                                <label class="label">FMCG Delivery Charge</label>
+                                            </section>
+                                            <section class="col col-9">
+                                                <label class="input">
+                                                    @Html.TextBoxFor(model => model.FMCGDeliveryCharge, new { placeholder = "FMCG Delivery Charge" })
+                                                </label>
+                                            </section>
+                                        </section>
+                                    </div>
+                                </fieldset>
+                                <footer style="bottom: 0">
+                                    <button type="submit" class="btn btn-primary">Add</button>
+                                </footer>
+
+                            }
+                        </div>
+                    </div>
+                </div>
+            </article>
+        </div>
+    </section>
+</div>
+@section scripts{
+    <script src="~/Scripts/jquery.validate.min.js"></script>
+    <script type="text/javascript">
+
+
+        $("#AddDeliveryCharge").validate({
+            rules: {
+                LPGDeliveryCharge: {
+                    min: 0,
+                    number: true
+                },
+                FMCGDeliveryCharge: {
+                    min: 0,
+                    number: true
+                }
+            },
+            messages: {
+                LPGDeliveryCharge: {
+                    min: 'Delivery charge must be greater than 0',
+                    number: 'Please enter a valid number'
+                },
+                FMCGDeliveryCharge: {
+                    min: 'Delivery charge must be greater than 0',
+                    number: 'Please enter a valid number'
+                }
+            }
+        });
+
+        $("#LPGDeliveryCharge").keydown(function (e) {
+            if ($.inArray(e.keyCode, [46, 8, 9, 27, 13, 190]) !== -1 ||
+                (e.keyCode === 65 && e.ctrlKey === true) ||
+                (e.keyCode >= 35 && e.keyCode <= 39)) {
+                return;
+            }
+            if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
+                e.preventDefault();
+            }
+        });
+
+        $("#FMCGDeliveryCharge").keydown(function (e) {
+            if ($.inArray(e.keyCode, [46, 8, 9, 27, 13, 190]) !== -1 ||
+                (e.keyCode === 65 && e.ctrlKey === true) ||
+                (e.keyCode >= 35 && e.keyCode <= 39)) {
+                return;
+            }
+            if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
+                e.preventDefault();
+            }
+        });
+
+        $(function () {
+            setTimeout(function () {
+                    $("#flashMessage").hide('blind', {}, 500);
+                },
+                5000);
+        });
+
+    </script>
+}
+
+
+
+

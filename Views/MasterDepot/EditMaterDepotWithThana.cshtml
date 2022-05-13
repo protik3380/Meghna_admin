@@ -1,0 +1,104 @@
+﻿
+@using EFreshStore.Models.Context
+@model EFreshStore.Models.Context.ThanaWiseMasterDepot
+
+@{
+    ViewBag.Title = "Edit master depot with thana";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <link href="~/Content/css/form-design.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div class="container">
+    <div class="form-horizontal" id="div1">
+        @using (Html.BeginForm(null, null, FormMethod.Post, new {id = "masterDepotThanaform"}))
+        {
+            @Html.AntiForgeryToken()
+            <div class="form-horizontal">
+                <h2>Update Link Master Depot With Thana</h2>
+                <hr/>
+                @Html.ValidationSummary(true)
+                <div class='@TempData["Class"]' id="flashMessage" role="alert">@TempData["Message"]</div>
+                @Html.HiddenFor(c => c.Id);
+                <div class="form-group">
+                    @Html.LabelFor(model => model.MasterDepotId, "Master Depot", htmlAttributes: new {@class = "control-label col-md-4"})
+                    <div class="col-md-8">
+                        @Html.DropDownListFor(model => model.MasterDepotId, null, "Select Master Depot", new {id = "", @required = "required"})
+                        <br/>
+                        @Html.ValidationMessageFor(model => model.MasterDepotId, "", new {@class = "text-danger"})
+                    </div>
+                </div>
+
+
+                <div class="form-group">
+                    @Html.Label("District", htmlAttributes: new {@class = "control-label col-md-4"})
+                    <div class="col-md-8">
+                        @Html.DropDownList("District", new SelectList(ViewBag.DistrictId, "Id", "Name"), "Select District", new {@required = "required"})
+                        <br/>
+                        @Html.ValidationMessage("District", "", new {@class = "text-danger"})
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.ThanaId, "Thana", htmlAttributes: new {@class = "control-label col-md-4"})
+                    <div class="col-md-8">
+                        @Html.DropDownListFor(model => model.ThanaId, new SelectList(Enumerable.Empty<Thana>()), "--Select--")
+                        <br />
+                        @Html.ValidationMessageFor(model => model.ThanaId, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="col-md-offset-4 col-md-8">
+                        <input type="submit" value="Create" class="btn btn-default"/>
+                    </div>
+                </div>
+            </div>
+        }
+
+        <div>
+            @Html.ActionLink("Back to List", "Views", "", htmlAttributes: new { @class = "backLink" })
+        </div>
+    </div>
+</div>
+
+@section scripts{
+    @Scripts.Render("~/bundles/jqueryval")
+    <script>
+        $(document).ready(function() {
+            $("#District").change(function() {
+                var vDistrictId = $("#District").val();
+                var district = { districtId: vDistrictId };
+                $("#ThanaId").empty();
+                $("#ThanaId").append('<option value="" selected>Select Thana</option>');
+
+                $.ajax({
+                    url: '../MasterDepot/GetThanaByDistrictId',
+                    type: "GET",
+                    dataType: 'JSON',
+                    contentType: "application/json; charset=utf-8",
+                    data: district,
+                    success: function(data) {
+                        $.each(data, function(index, value) {
+                            $("#ThanaId").append('<option value="' + value.Id + '">' + value.Name + '</option>');
+                        });
+                    },
+                    error: function() {
+                        alert("Something went wrong");
+                    }
+                });
+            });
+
+            $(function() {
+                setTimeout(function() {
+                    $("#flashMessage").hide('blind', {}, 500);
+                }, 5000);
+            });
+        });
+    </script>
+}
+</body>
+</html>

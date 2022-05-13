@@ -1,0 +1,119 @@
+﻿
+@model EFreshAdmin.Models.EntityModels.Customer
+
+@{
+    ViewBag.Title = "Create";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <link href="~/Content/css/jquery-ui.min.css" rel="stylesheet" />
+    <link href="~/Content/css/form-design.css" type="text/css" rel="stylesheet" />
+</head>
+<body>
+    <div class="container">
+        <div class="form-horizontal" id="div1">
+            @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "customerform" }))
+            {
+                @Html.AntiForgeryToken()
+                <div class="form-horizontal">
+                    <h2>Register</h2>
+                    <hr />
+                    @Html.ValidationSummary(true)
+                    <div class='@TempData["Class"]' id="flashMessage" role="alert">@TempData["Message"]</div>
+
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.Name, "Name : ", htmlAttributes: new { @class = "control-label col-md-3" })
+                        <div class="col-md-9">
+                            @Html.TextBoxFor(model => model.Name, new { placeholder = "Enter name" })
+                            @Html.ValidationMessageFor(model => model.Name)
+
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.MobileNo, "Mobile No : ", htmlAttributes: new { @class = "control-label col-md-3" })
+                        <div class="col-md-9">
+                            @Html.TextBoxFor(model => model.MobileNo, new { placeholder = "Enter mobile no." })
+                            @Html.ValidationMessageFor(model => model.MobileNo)
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.Email, "Email : ", htmlAttributes: new { @class = "control-label col-md-3" })
+                        <div class="col-md-9">
+                            @Html.TextBoxFor(model => model.Email, new { placeholder = "Enter email" })
+                            @Html.ValidationMessageFor(model => model.Email)
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.DeliveryAddress1, "Delivery Address1 : ", htmlAttributes: new { @class = "control-label col-md-3" })
+                        <div class="col-md-9">
+                            @Html.TextAreaFor(model => model.DeliveryAddress1, new { placeholder = "Enter address" })
+                            @Html.ValidationMessageFor(model => model.DeliveryAddress1)
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.DeliveryAddress2, "Delivery Address 2 : ", htmlAttributes: new { @class = "control-label col-md-3" })
+                        <div class="col-md-9">
+                            @Html.TextAreaFor(model => model.DeliveryAddress2, new { placeholder = "Enter address 2" })
+                            @Html.ValidationMessageFor(model => model.DeliveryAddress2)
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.User.Password, "Password : ", htmlAttributes: new { @class = "control-label col-md-3" })
+                        <div class="col-md-9">
+                            @Html.PasswordFor(model => model.User.Password, new { placeholder = "Password", @class = "pas" })
+                            @Html.ValidationMessageFor(model => model.User.Password)
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+
+                    <div class="col-md-offset-3 col-md-9">
+                        <input type="submit" id="submit" value="Add" class="btn btn-default" />
+                        <br />
+                    </div>
+                </div>
+            }
+
+            <div style="margin-left: 50px; color: red">
+                @Html.ActionLink("Back to List", "Index", "", htmlAttributes: new { @style = "color: red" })
+            </div>
+        </div>
+    </div>
+
+    @section scripts{
+        <script src="~/Scripts/jquery.validate.min.js"></script>
+        <script>
+        $(document).ready(function() {
+            $("#customerform").validate({
+                rules: {
+                    Name: "required",
+                    MobileNo: "required",
+                    Email: {
+                        required: true,
+                        email: true
+                    },
+                    "User.Password": "required"
+                },
+                messages: {
+                    Name: "Please enter company name",
+                    MobileNo: "Please enter a mobile no",
+                    Email: {
+                        required: "Please enter a email",
+                        email: "Please enter a valid email"
+                    },
+                    "User.Password": "Please enter password"
+
+                }
+            });
+        });
+        </script>
+    }
+</body>
+</html>

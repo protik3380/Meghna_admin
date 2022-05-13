@@ -1,0 +1,64 @@
+﻿@using EFreshAdmin.Models.EntityModels
+@model IEnumerable<EFreshAdmin.Models.EntityModels.UserDiscount>
+    @{
+    ViewBag.Title = "GetAllDiscounts";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    }
+
+                      <div class='@TempData["Class"]' id="flashMessage" role="alert">@TempData["Message"]</div>
+    <section id="widget-grid" class="">
+        <!-- row -->
+        <div class="row">
+            <article class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                <div class="jarviswidget jarviswidget-color-darken" id="wid-id-0" data-widget-editbutton="false">
+                    <header>
+                        <span class="widget-icon"> <i class="fa fa-table"></i> </span>
+                        <h2>Meghna User Discount List</h2>
+                    </header>
+                    <div>
+                        <div class="widget-body no-padding">
+                            <table id="dt_basic" class="table table-striped table-bordered table-hover" width="100%">
+                                <thead>
+                                    <tr>
+                                        <th>SL</th>
+                                        <th>Discount Percentage</th>
+                                        <th>Created On</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if (Model != null)
+                                    {
+                                        var count = 1;
+                                        foreach (UserDiscount data in Model)
+                                        {
+                                            DateTime createdOn = data.CreatedOn;
+                                            string status = data.IsActive == true ? "Active" : "Inactive";
+                                            <tr>
+                                                <td>@(count++)</td>
+                                                <td>@data.DiscountPercentage</td>
+                                                <td>@createdOn.ToString("dd/MM/yy")</td>
+                                                <td>@status</td>
+                                            </tr>
+                                        }
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </article>
+        </div>
+    </section>
+
+@section scripts{
+    <script>
+        $(document).ready(function() {
+            $(function() {
+                setTimeout(function() {
+                    $("#flashMessage").hide('blind', {}, 500);
+                }, 5000);
+            });
+        });
+    </script>
+}

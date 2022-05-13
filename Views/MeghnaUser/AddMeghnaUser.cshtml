@@ -1,0 +1,404 @@
+﻿@using EFreshStore.Models.Context
+@model EFreshStore.Models.Context.MeghnaUser
+
+@{
+    ViewBag.Title = "Add Bulk Meghna Users";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style type="text/css">
+    .error {
+        color: red;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    /* Zebra striping */
+    tr:nth-of-type(odd) {
+        background: #eee;
+    }
+
+    th {
+        background: #333;
+        color: white;
+        font-weight: bold;
+    }
+
+    td, th {
+        padding: 6px;
+        border: 1px solid #ccc;
+        text-align: left;
+    }
+
+    td, tr {
+        text-align: left;
+        color: black;
+    }
+
+    @@media only screen and (max-width: 760px), (min-device-width: 768px) and (max-device-width: 1024px) {
+
+        /* Force table to not be like tables anymore */
+        table, thead, tbody, th, td, tr {
+            display: block;
+        }
+
+            /* Hide table headers (but not display: none;, for accessibility) */
+            thead tr {
+                position: absolute;
+                top: -9999px;
+                left: -9999px;
+            }
+
+        tr {
+            border: 1px solid #ccc;
+        }
+
+        td {
+            /* Behave  like a "row" */
+            border: none;
+            border-bottom: 1px solid #eee;
+            position: relative;
+            padding-left: 50%;
+        }
+
+            td:before {
+                /* Now like a table header */
+                position: absolute;
+                /* Top/left values mimic padding */
+                top: 6px;
+                left: 6px;
+                width: 45%;
+                padding-right: 10px;
+                white-space: nowrap;
+            }
+
+            /*
+    Label the data
+    */
+            td:before {
+                content: attr(data-title);
+            }
+    }
+
+    input[type=submit] {
+        width: 25%;
+        padding: 10px;
+        color: white;
+        display: inline-block;
+        border: none;
+        background: #ffa726;
+    }
+
+        input[type=submit]:hover {
+            background-color: rgb(60, 125, 201);
+        }
+
+    .content {
+        margin-bottom: 200px;
+    }
+</style>
+
+<link href="~/Content/css/jquery-ui.min.css" rel="stylesheet" />
+<link rel="stylesheet" type="text/css" href="~/Content/css/form-design.css" />
+@*@using (Html.BeginForm(null, null, FormMethod.Post, new {enctype = "multipart/form-data", id = "addBulkMeghnaform"}))
+{
+    <div class="container">
+        <div>
+            <h2 style="margin-left: 40%">Add Meghna Users</h2>
+            <div class='@TempData["Class"]' id="flashMessage" role="alert">@TempData["Message"]</div>
+            <hr/>
+        </div>
+        <table>
+            <tr><td>.xlsx/.xls/.csv</td><td><input type="file" id="ecxelFile" name="ecxelFile"/></td></tr>
+            <tr><td></td><td><input type="submit" id="Submit" name="Submit" value="Upload"/></td></tr>
+        </table>
+    </div>
+    <br/>
+}*@
+<section id="widget-grid" class="" style="margin-bottom: 5%">
+    <div class='@TempData["Class"]' id="flashMessage" role="alert">@TempData["Message"]</div>
+    <div class="row">
+        <article class="col-sm-12 col-md-12 col-lg-12">
+            <div class="jarviswidget" id="wid-id-3" data-widget-editbutton="false" data-widget-custombutton="false">
+                <header>
+                    <span class="widget-icon"> <i class="fa fa-edit"></i> </span>
+                    <h2>Add MGI Bulk Users</h2>
+
+                </header>
+                <div>
+                    <div class="widget-body no-padding">
+                        @using (Html.BeginForm(null, null, FormMethod.Post, new {id = "addBulkMeghnaform", @enctype = "multipart/form-data", @class = "smart-form"}))
+                        {
+
+                            @Html.AntiForgeryToken()
+                            @Html.ValidationSummary(true, "", new {@class = "text-danger"})
+
+                            <fieldset>
+                                <div class="row" style="padding-bottom: 0px; margin-bottom: 0px">
+                                    <section class="col col-3">
+                                        <label class="label">Choose .xls/ .xlsx/ .csv file</label>
+                                    </section>
+                                    <section class="col col-9">
+                                        @*<div class="input input-file">
+                                            <span class="button"><input name="ecxelFile" id="ecxelFile" type="file" onchange="this.parentNode.nextSibling.value = this.value">Browse</span><input type="text" placeholder="No file choosen" readonly="">
+                                        </div>*@
+
+                                        <div class="input input-file error">
+                                            <input type="file" id="ecxelFile" name="ecxelFile"/>
+                                        </div>
+                                    </section>
+
+
+                                </div>
+                            </fieldset>
+                            <footer>
+                                <button type="submit" id="Submit" class="btn btn-primary">Add</button>
+                            </footer>
+                        }
+
+                    </div>
+                </div>
+            </div>
+        </article>
+    </div>
+    @if (ViewBag.SavedUser != null)
+    {
+        <div>
+            <h3>Saved Users:</h3>
+            <table>
+                @if (ViewBag.Count >= 1)
+                {
+                    List<MeghnaUser> savedMeghnaUsers = ViewBag.SavedUser;
+                    <thead>
+                        <tr>
+                            <th>Employee Name</th>
+                            <th>Mobile No</th>
+                            <th>Email</th>
+                            <th>Designation</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var meghnaUser in savedMeghnaUsers)
+                        {
+                            <tr>
+                                <td>@meghnaUser.Name</td>
+                                <td>@meghnaUser.MobileNo</td>
+                                <td>@meghnaUser.Email</td>
+                                <td>@meghnaUser.Designation</td>
+                            </tr>
+                        }
+                    </tbody>
+                }
+                else
+                {
+                    <tr>
+                        <td style="color: red;">
+                            Sorry! No users were added.
+                        </td>
+                    </tr>
+                }
+            </table>
+        </div>
+    }
+
+    @if (ViewBag.InvalidMobileNos != null)
+    {
+        List<MeghnaUser> meghnaUsers = ViewBag.InvalidMobileNos;
+        <div>
+            <div>
+                <h3>Users with Invalid Mobile No:</h3>
+                <table>
+                    @if (meghnaUsers.Count >= 1)
+                {
+
+                        <thead>
+                            <tr>
+                                <th>Employee Name</th>
+                                <th>Mobile No</th>
+                                <th>Email</th>
+                                <th>Designation</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var employee in meghnaUsers)
+                    {
+                                <tr>
+                                    <td>@employee.Name</td>
+                                    <td>@employee.MobileNo</td>
+                                    <td>@employee.Email</td>
+                                    <td>@employee.Designation</td>
+                                </tr>
+                            }
+                        </tbody>
+                    }
+                    else
+                    {
+                        <tr>
+                            <td style="color: red;">
+                                No users found with invalid mobile no.
+                            </td>
+                        </tr>
+                    }
+                </table>
+            </div>
+        </div>
+    }
+
+    @if (ViewBag.DuplicateEmails != null)
+    {
+        List<MeghnaUser> meghnaUsers = ViewBag.DuplicateEmails;
+        <div>
+            <div class="bulk-users duplicate-email-users">
+                <h3>Users with Duplicate Email:</h3>
+                <table>
+                    @if (meghnaUsers.Count >= 1)
+                {
+                        <thead>
+                            <tr>
+                                <th>Employee Name</th>
+                                <th>Mobile No</th>
+                                <th>Email</th>
+                                <th>Designation</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var employee in meghnaUsers)
+                    {
+                                <tr>
+                                    <td>@employee.Name</td>
+                                    <td>@employee.MobileNo</td>
+                                    <td>@employee.Email</td>
+                                    <td>@employee.Designation</td>
+                                </tr>
+                            }
+                        </tbody>
+                    }
+                    else
+                    {
+                        <tr>
+                            <td style="color: red;">
+                                No users found with duplicate email.
+                            </td>
+                        </tr>
+                    }
+                </table>
+            </div>
+        </div>
+    }
+
+    @if (ViewBag.InvalidDepartments != null)
+    {
+        List<MeghnaUser> meghnaUsers = ViewBag.InvalidDepartments;
+        <div>
+            <div>
+                <h3>Users with Invalid Department:</h3>
+                <table>
+                    @if (meghnaUsers.Count >= 1)
+                {
+                        <thead>
+                            <tr>
+                                <th>Employee Name</th>
+                                <th>Mobile No</th>
+                                <th>Email</th>
+                                <th>Designation</th>
+                                <th>DepartmentId</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var employee in meghnaUsers)
+                    {
+                                <tr>
+                                    <td>@employee.Name</td>
+                                    <td>@employee.MobileNo</td>
+                                    <td>@employee.Email</td>
+                                    <td>@employee.Designation</td>
+                                    <td>@employee.MeghnaDepartmentId</td>
+                                </tr>
+                            }
+                        </tbody>
+                    }
+                    else
+                    {
+                        <tr>
+                            <td style="color: red;">
+                                No users found with Invalid Department.
+                            </td>
+                        </tr>
+                    }
+                </table>
+            </div>
+        </div>
+    }
+
+    @if (ViewBag.InvalidDesignations != null)
+    {
+        List<MeghnaUser> meghnaUsers = ViewBag.InvalidDesignations;
+        <div>
+            <div>
+                <h3>Users with Invalid Designation:</h3>
+                <table>
+                    @if (meghnaUsers.Count >= 1)
+                {
+                        <thead>
+                            <tr>
+                                <th>Employee Name</th>
+                                <th>Mobile No</th>
+                                <th>Email</th>
+                                <th>Designation</th>
+                                <th>DesignationId</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var employee in meghnaUsers)
+                    {
+                                <tr>
+                                    <td>@employee.Name</td>
+                                    <td>@employee.MobileNo</td>
+                                    <td>@employee.Email</td>
+                                    <td>@employee.Designation</td>
+                                    <td>@employee.MeghnaDesignationId</td>
+                                </tr>
+                            }
+                        </tbody>
+                    }
+                    else
+                    {
+                        <tr>
+                            <td style="color: red;">
+                                No users found with Invalid Designation.
+                            </td>
+                        </tr>
+                    }
+                </table>
+            </div>
+        </div>
+    }
+</section>
+
+@section scripts{
+    <script src="~/Scripts/jquery.validate.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $("#addBulkMeghnaform").validate({
+                rules: {
+                    ecxelFile: "required"
+
+                },
+                messages: {
+                    ecxelFile: "Please upload an excel file"
+                }
+            });
+
+            $(function() {
+                setTimeout(function() {
+                    $("#flashMessage").hide('blind', {}, 500);
+                }, 5000);
+            });
+
+        });
+    </script>
+}
+
+

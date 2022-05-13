@@ -1,0 +1,422 @@
+﻿@using EFreshAdmin.Models.EntityModels
+@using EFreshAdmin.Utility
+@using EFreshStore.Utility
+@model Coupon
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    List<Coupon> coupons = ViewBag.Coupons;
+}
+
+@section style{
+
+    <link href="~/Content/css/jquery-ui.min.css" rel="stylesheet" />
+    <link rel="stylesheet" type="text/css" href="~/Content/css/form-design.css" />
+    <style>
+            .error {
+                color: red;
+            }
+
+            .ui-datepicker-header {
+                color: #3e9aba !important;
+                background-image: none !important;
+                border-radius: 0;
+            }
+
+            .ui-datepicker {
+                width: 280px;
+                padding: 2px;
+            }
+
+            .ui-datepicker-prev, .ui-datepicker-next {
+                color: #3e9aba !important;
+            }
+
+            .ui-datepicker .ui-datepicker-next span {
+                width: 60px;
+                top: 10px;
+                left: -10px;
+            }
+
+            .ui-datepicker .ui-datepicker-prev span {
+                width: 60px;
+                top: 10px;
+                left: 6px;
+            }
+
+            /*input[type=button] {
+            width: 40%;
+            padding: 15px;
+            color: white;
+            margin: 5px 0 22px 0;
+            display: inline-block;
+            border: none;
+            background: #ffa726;
+        }*/
+
+            /*#Validity, #ActiveDate {
+            width: 80%;
+            padding: 12px 15px;
+            margin-bottom: 5px;
+            border: none;
+            background-color: #f1f1f1;
+        }*/
+    </style>
+}
+<div id="content" style="margin-bottom: 3%">
+    <section id="widget-grid" class="">
+        <div class="row" style="height: 100%">
+            <article class="col-sm-12 col-md-12 col-lg-12">
+                <div class="jarviswidget" id="wid-id-4" data-widget-editbutton="false" data-widget-custombutton="false">
+                    <header>
+                        <span class="widget-icon"> <i class="fa fa-edit"></i> </span>
+                        <h2 id="couponFormHeading">Add Coupon</h2>
+                    </header>
+                    <div>
+                        <div class="widget-body no-padding">
+                            @using (Html.BeginForm("Create", "Coupon", FormMethod.Post, new { id = "couponForm", @class = "smart-form" }))
+                            {
+                                @Html.AntiForgeryToken()
+                                <div class='@TempData["Class"]' id="flashMessage" role="alert">@TempData["Message"]</div>
+                                <fieldset>
+                                    <input type="hidden" id="couponId" name="Id" />
+                                    <input type="hidden" id="couponCreatedBy" name="CreatedBy" />
+                                    <input type="hidden" id="couponCreatedOn" name="CreatedOn" />
+                                    <div class="row">
+                                        <section class="col col-6" style="padding-bottom: 5px; margin-bottom: 5px">
+                                            <section class="col col-3">
+                                                <label class="label">Code <span style="color: red"> *</span></label>
+                                            </section>
+                                            <section class="col col-9">
+                                                <label class="input">
+                                                    @Html.TextBoxFor(model => model.Code, new { placeholder = "Enter coupon code" })
+                                                    @Html.ValidationMessageFor(model => model.Code, "", new { @class = "error" })
+                                                </label>
+                                            </section>
+                                        </section>
+                                        <section class="col col-6" style="padding-bottom: 5px; margin-bottom: 5px">
+                                            <section class="col col-3">
+                                                <label class="label">Maximum Order No</label>
+                                            </section>
+                                            <section class="col col-9">
+                                                <label class="input">
+                                                    @Html.TextBoxFor(model => model.MaximumOrderNo, new { placeholder = "Enter maximum order no" })
+                                                    @Html.ValidationMessageFor(model => model.MaximumOrderNo, "", new { @class = "error" })
+                                                </label>
+                                            </section>
+                                        </section>
+
+
+                                    </div>
+                                    <div class="row">
+                                        <section class="col col-6" style="padding-bottom: 5px; margin-bottom: 5px">
+                                            <section class="col col-3">
+                                                <label class="label">Discount Percentage <span style="color: red"> *</span></label>
+                                            </section>
+                                            <section class="col col-9">
+                                                <label class="input">
+                                                    @Html.TextBoxFor(model => model.DiscountPercentage, new { placeholder = "Enter discount percentage" })
+                                                    @Html.ValidationMessageFor(model => model.DiscountPercentage, "", new { @class = "error" })
+                                                </label>
+                                            </section>
+                                        </section>
+
+                                        <section class="col col-6" style="padding-bottom: 5px; margin-bottom: 5px">
+                                            <section class="col col-3">
+                                                <label class="label">Validity</label>
+                                            </section>
+                                            <section class="col col-9">
+                                                <label class="input">
+                                                    @Html.TextBoxFor(model => model.Validity, new { @class = "datepicker", @readonly = "readonly", placeholder = "Enter validity" })
+                                                </label>
+                                            </section>
+                                        </section>
+                                    </div>
+                                    <div class="row">
+                                        <section class="col col-6" style="padding-bottom: 5px; margin-bottom: 5px">
+                                            <section class="col col-3">
+                                                <label class="label">Minimum Order Amount</label>
+                                            </section>
+                                            <section class="col col-9">
+                                                <label class="input">
+                                                    @Html.TextBoxFor(model => model.MinimumOrderAmount, new { placeholder = "Enter minimum order amount" })
+                                                    @Html.ValidationMessageFor(model => model.MinimumOrderAmount, "", new { @class = "error" })
+                                                </label>
+                                            </section>
+                                        </section>
+                                        <section class="col col-6" style="padding-bottom: 5px; margin-bottom: 5px">
+                                            <section class="col col-3">
+                                                <label class="label">User Type</label>
+                                            </section>
+                                            <section class="col col-9">
+                                                <label class="select">
+                                                    @Html.DropDownListFor(model => model.UserTypeId, new SelectList(ViewBag.UserTypes, "Id", "Name"), "---- Select User Type ----")<i></i>
+                                                </label>
+                                            </section>
+                                        </section>
+                                    </div>
+                                    <div class="row">
+                                        <section class="col col-6" style="padding-bottom: 5px; margin-bottom: 5px">
+                                            <section class="col col-3">
+                                                <label class="label">Maximum Discount</label>
+                                            </section>
+                                            <section class="col col-9">
+                                                <label class="input">
+                                                    @Html.TextBoxFor(model => model.MaximumDiscount, new { placeholder = "Enter maximum discount" })
+                                                    @Html.ValidationMessageFor(model => model.MaximumDiscount, "", new { @class = "error" })
+                                                </label>
+                                            </section>
+                                        </section>
+                                    </div>
+
+                                </fieldset>
+                                <footer style="bottom: 0">
+                                    <input type="button" value="Reset" id="couponResetButton" class="btn btn-primary" />
+                                    <button type="submit" id="couponAddButton" class="btn btn-primary">Add</button>
+                                    
+
+                                </footer>
+
+                            }
+                        </div>
+                    </div>
+                </div>
+            </article>
+
+        </div>
+        <div class="row">
+            <article class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                <div class="jarviswidget jarviswidget-color-darken" id="wid-id-0" data-widget-editbutton="false">
+                    <header>
+                        <span class="widget-icon"> <i class="fa fa-table"></i> </span>
+                        <h2>Coupons </h2>
+                    </header>
+                    <div>
+                        <div class="widget-body no-padding">
+                            <table id="dt_basic" class="table table-striped table-bordered table-hover" width="100%">
+                                <thead>
+                                    <tr>
+                                        <th>SL</th>
+                                        <th>Code</th>
+                                        <th>Discount Percentage</th>
+                                        <th>Maximum Discount</th>
+                                        <th>Minimum Order Amount</th>
+                                        <th>Maximum Order No</th>
+                                        <th>Validity</th>
+                                        <th>User Type</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if (coupons != null)
+                                    {
+                                        var count = 1;
+                                        foreach (Coupon coupon in coupons)
+                                        {
+                                            var validity = coupon.Validity == null ? "N/A" : coupon.Validity.Value.ToString("dd/MM/yyyy");
+                                            var discountPercentage = coupon.DiscountPercentage == null ? "N/A" : coupon.DiscountPercentage.ToString();
+                                            var maximumDiscount = coupon.MaximumDiscount == null ? "N/A" : coupon.MaximumDiscount.ToString();
+                                            var minimumOrderAmount = coupon.MinimumOrderAmount == null ? "N/A" : coupon.MinimumOrderAmount.ToString();
+                                            var maximumOrderNo = coupon.MaximumOrderNo == null ? "N/A" : coupon.MaximumOrderNo.ToString();
+                                            var userType = coupon.UserTypeId == null ? "N/A" : UtilityClass.GetUserTypeById((long) coupon.UserTypeId);
+
+                                            <tr>
+                                                <td>@(count++)</td>
+                                                <td>@coupon.Code</td>
+                                                <td>@discountPercentage </td>
+                                                <td>@maximumDiscount</td>
+                                                <td>@minimumOrderAmount</td>
+                                                <td>@maximumOrderNo</td>
+                                                <td>@validity</td>
+                                                <td>@userType</td>
+                                                <td>
+                                                    <input type="button" class="btn btn-success" onclick="changeCouponFormStateToEdit(@coupon.Id)" value="Edit" />
+                                                    <input type="button" class="btn btn-success" onclick="deleteCoupon(@coupon.Id)" value="Delete" />
+                                                </td>
+                                            </tr>
+                                        }
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </article>
+        </div>
+    </section>
+</div>
+
+@section scripts{
+    @Scripts.Render("~/bundles/jqueryval")
+    <script>
+        $(function () {
+            //Hide flash message after 5 sec.
+            setTimeout(function () {
+                $("#flashMessage").hide('blind', {}, 500);
+            }, 5000);
+
+
+            $(".datepicker").datepicker({
+                changeMonth: true,
+                changeYear: true,
+                yearRange: "2019:2050",
+                showAnim: "slide",
+                //nextText: '<span class="glyphicon glyphicon-chevron-right"></span>',
+                dateFormat: 'dd MM,yy'
+            });
+
+            $("#couponResetButton").click(function () {
+                $("#couponFormHeading").text("Add Coupon");
+                $("#couponAddButton").text("Add");
+                $("#couponForm").attr("action", "@BaseUrl.subDirectory/Coupon/Create");
+                $("#couponId").val("");
+                $("#Code").val("");
+                $("#DiscountPercentage").val("");
+                $("#MaximumDiscount").val("");
+                $("#MinimumOrderAmount").val("");
+                $("#MaximumOrderNo").val("");
+                $("#Validity").val("");
+                $("#UserTypeId").val("");
+
+                $("#couponCreatedOn").val("");
+                $("#couponCreatedBy").val("");
+                $("#couponForm").validate().resetForm();
+            });
+        });
+
+        function changeCouponFormStateToEdit(couponId) {
+            $(".field-validation-error").empty();
+            $("#preloader").css('display', 'block');
+
+            // Scroll to the top of the form
+            $('html, body').animate({
+                scrollTop: $("#couponFormHeading").offset().top
+            },
+                500);
+
+            // Change form state to edit
+            $("#couponFormHeading").text("Update Coupon");
+            $("#couponAddButton").text("Update");
+            $("#couponForm").attr("action", "@BaseUrl.subDirectory/Coupon/Edit");
+            $("#couponId").val(couponId);
+
+            var data = { couponId: couponId };
+            $.ajax({
+                method: 'POST',
+                url: "@Url.Action("GetCouponDetailsById", "Coupon")",
+                dataType: "json",
+            contentType: 'application/json',
+            data: JSON.stringify(data),
+            crossDomain: true,
+            success: function (data) {
+                toastr.clear();
+                if (data.Status == "Ok") {
+                    var createdOnFormatedDate = "";
+                    var createdOn = "";
+                    var validity = "";
+                    var validityFormatedDate = "";
+                    if (data.Coupon.CreatedOn == null) {
+                        createdOnFormatedDate = null;
+                    } else {
+                        createdOn = new Date(parseInt(data.Coupon.CreatedOn.substr(6)));
+                        createdOnFormatedDate = createdOn.getFullYear() + '-' + ('0' + (createdOn.getMonth() + 1)).slice(-2) + '-' + ('0' + createdOn.getDate()).slice(-2) + ' ' + ('0' + createdOn.getHours()).slice(-2) + ':' + ('0' + (createdOn.getMinutes())).slice(-2) + ':' + ('0' + createdOn.getSeconds()).slice(-2);
+                    }
+
+                    var months = [
+                        "January", "February", "March", "April", "May", "June", "July", "August", "September",
+                        "October", "November", "December"
+                    ];
+                    if (data.Coupon.Validity == null) {
+                        validityFormatedDate = null;
+                    } else {
+                        validity = new Date(parseInt(data.Coupon.Validity.substr(6)));
+                        validityFormatedDate = ('0' + validity.getDate()).slice(-2) +
+                            " " +
+                            months[validity.getMonth()] +
+                            "," +
+                            validity.getFullYear();
+                    }
+                    
+
+                    $("#Code").val($.trim(data.Coupon.Code));
+                    $("#DiscountPercentage").val($.trim(data.Coupon.DiscountPercentage));
+                    $("#MaximumDiscount").val($.trim(data.Coupon.MaximumDiscount));
+                    $("#MinimumOrderAmount").val($.trim(data.Coupon.MinimumOrderAmount));
+                    $("#MaximumOrderNo").val($.trim(data.Coupon.MaximumOrderNo));
+                    $("#Validity").val(validityFormatedDate);
+                    $("#UserTypeId").val($.trim(data.Coupon.UserTypeId));
+                    
+                    $("#couponCreatedOn").val(createdOnFormatedDate);
+                    $("#couponCreatedBy").val(data.Coupon.CreatedBy);
+                    
+                } else {
+                    toastr.error("Something went wrong");
+                }
+
+            },
+            error: function () {
+                toastr.error("Something went wrong");
+            }
+        });
+        $("#preloader").css('display', 'none');
+        }
+
+        function deleteCoupon(couponId) {
+            Swal.fire({
+                title: 'Do you want to delete this coupon?',
+                type: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#739e73',
+                cancelButtonColor: '#A90329',
+                cancelButtonText: 'No',
+                confirmButtonText: 'Yes',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.value) {
+                    location.href = '../coupon/delete/' + couponId;
+                }
+            });
+        }
+        $("#DiscountPercentage").keydown(function (e) {
+            if ($.inArray(e.keyCode, [46, 8, 9, 27, 13, 190]) !== -1 ||
+                (e.keyCode === 65 && e.ctrlKey === true) ||
+                (e.keyCode >= 35 && e.keyCode <= 39)) {
+                return;
+            }
+            if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
+                e.preventDefault();
+            }
+        });
+        $("#MaximumOrderNo").keydown(function (e) {
+            if ($.inArray(e.keyCode, [46, 8, 9, 27, 13, 190]) !== -1 ||
+                (e.keyCode === 65 && e.ctrlKey === true) ||
+                (e.keyCode >= 35 && e.keyCode <= 39)) {
+                return;
+            }
+            if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
+                e.preventDefault();
+            }
+        });
+        $("#MinimumOrderAmount").keydown(function (e) {
+            if ($.inArray(e.keyCode, [46, 8, 9, 27, 13, 190]) !== -1 ||
+                (e.keyCode === 65 && e.ctrlKey === true) ||
+                (e.keyCode >= 35 && e.keyCode <= 39)) {
+                return;
+            }
+            if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
+                e.preventDefault();
+            }
+        });
+        $("#MaximumDiscount").keydown(function (e) {
+            if ($.inArray(e.keyCode, [46, 8, 9, 27, 13, 190]) !== -1 ||
+                (e.keyCode === 65 && e.ctrlKey === true) ||
+                (e.keyCode >= 35 && e.keyCode <= 39)) {
+                return;
+            }
+            if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
+                e.preventDefault();
+            }
+        });
+    </script>
+}
+

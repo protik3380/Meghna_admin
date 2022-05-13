@@ -1,0 +1,249 @@
+﻿@using EFreshAdmin.Utility
+@using EFreshStore.Models.Context
+@model EFreshStore.Models.Context.Product
+@{
+    ViewBag.Title = "View";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    Session["BreadCrum"] = "Product List";
+    List<Product> products = ViewBag.Products;
+}
+@section style{
+    <style>
+        .error {
+            color: red;
+        }
+    </style>
+    <link href="~/Content/css/jquery-ui.min.css" rel="stylesheet" />
+    <link rel="stylesheet" type="text/css" href="~/Content/css/form-design.css" />
+}
+<div id="content" style="margin-bottom: 3%">
+    <section id="widget-grid" class="">
+        <div class="row" style="height: 100%">
+            <article class="col-sm-12 col-md-12 col-lg-12">
+                <div class="jarviswidget" id="wid-id-4" data-widget-editbutton="false" data-widget-custombutton="false">
+                    <header>
+                        <span class="widget-icon"> <i class="fa fa-edit"></i> </span>
+                        <h2 id="addProductFormHeading">Add Product</h2>
+                    </header>
+                    <div>
+                        <div class="widget-body no-padding">
+                            @using (Html.BeginForm("Add", "Product", FormMethod.Post, new { id = "productform", @class = "smart-form" }))
+                            {
+                                @Html.AntiForgeryToken()
+                                <div class='@TempData["Class"]' id="flashMessage" role="alert">@TempData["Message"]</div>
+                                <fieldset>
+                                    <input type="hidden" id="Id" name="Id" />
+                                    <input type="hidden" id="CreatedBy" name="CreatedBy" />
+                                    <input type="hidden" id="CreatedOn" name="CreatedOn" />
+                                    <div class="row">
+                                        <section class="col col-6" style="padding-bottom: 5px; margin-bottom: 5px">
+                                            <section class="col col-3">
+                                                <label class="label">Name <span style="color: red"> *</span></label>
+                                            </section>
+                                            <section class="col col-9">
+                                                <label class="input">
+                                                    <input type="text" name="Name" id="Name" placeholder="Product name">
+                                                </label>
+                                            </section>
+                                        </section>
+                                        <section class="col col-6" style="padding-bottom: 5px; margin-bottom: 5px">
+                                            <section class="col col-3">
+                                                <label class="label">Brand <span style="color: red"> *</span></label>
+                                            </section>
+                                            <section class="col col-9">
+                                                <label class="select">
+                                                    @Html.DropDownListFor(model => model.BrandId, new SelectList(ViewBag.brand, "Id", "Name"), "---Select Brand---")<i></i>
+                                                </label>
+                                            </section>
+                                        </section>
+                                    </div>
+                                    <div class="row">
+                                        <section class="col col-6" style="padding-bottom: 5px; margin-bottom: 5px">
+                                            <section class="col col-3">
+                                                <label class="label">Category <span style="color: red"> *</span></label>
+                                            </section>
+                                            <section class="col col-9">
+                                                <label class="select">
+                                                    @Html.DropDownListFor(model => model.CategoryId, new SelectList(ViewBag.category, "Id", "Name"), "---Select Category---")<i></i>
+                                                </label>
+                                            </section>
+                                        </section>
+                                        <section class="col col-6" style="padding-bottom: 5px; margin-bottom: 5px">
+                                            <section class="col col-3"></section>
+                                            <section class="col col-9">
+                                                <label class="checkbox">
+                                                    @Html.CheckBoxFor(model => model.IsActive, new { id = "productIsActive" })
+                                                    <i></i>Is Active?
+                                                </label>
+                                            </section>
+                                        </section>
+                                    </div>
+                                    <div class="row" id="formDescriptionRow">
+                                        <section class="col col-6" style="padding-bottom: 5px; margin-bottom: 5px">
+                                            <section class="col col-3">
+                                                <label class="label">Description</label>
+                                            </section>
+                                            <section class="col col-9">
+                                                <label class="textarea">
+                                                    <textarea rows="4" id="Description" name="Description" placeholder="Product description"></textarea>
+                                                </label>
+                                            </section>
+                                        </section>
+                                    </div>
+                                </fieldset>
+                                <footer style="bottom: 0">
+                                    <input type="button" value="Reset" id="productResetButton" class="btn btn-primary" />
+                                    <button type="submit" id="productAddButton" class="btn btn-primary">Add</button>
+                                </footer>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </article>
+        </div>
+        <div class="row">
+            <article class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                <div class="jarviswidget jarviswidget-color-darken" id="wid-id-0" data-widget-editbutton="false">
+                    <header>
+                        <span class="widget-icon"> <i class="fa fa-table"></i> </span>
+                        <h2>Product List</h2>
+                    </header>
+                    <div>
+                        <div class="widget-body no-padding">
+                            <table id="dt_basic" class="table table-responsive">
+                                <thead>
+                                    <tr>
+                                        <th>SL</th>
+                                        <th>Name</th>
+                                        <th>Description</th>
+                                        <th>Category</th>
+                                        <th>Brand</th>
+                                        <th>Is Active?</th>
+                                        <th style="text-align: center">Edit</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if (products != null)
+                                    {
+                                        var count = 1;
+                                        foreach (Product data in products)
+                                        {
+                                            <tr>
+                                                <td style="width: 5%">@(count++)</td>
+                                                <td style="width: 18%">@data.Name</td>
+                                                <td style="width: 43%;white-space: pre-line">@data.Description</td>
+                                                <td style="width: 12%">@data.Category.Name</td>
+                                                <td style="width: 12%">@data.Brand.Name</td>
+                                                @{
+
+                                                    var color = data.IsActive ? "green" : "red";
+                                                    var activeStatus = data.IsActive ? "Yes" : "No";
+                                                    <td style="color: @color">
+                                                        @activeStatus
+                                                    </td>
+                                                }
+                                                <td style="width: 10%;text-align: center">
+                                                    <input type="button" class="btn btn-success" onclick="changeAddProductFormStateToEdit(@data.Id)" value="Edit" />
+                                                </td>
+                                            </tr>
+                                                        }
+                                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </article>
+        </div>
+    </section>
+</div>
+@section scripts{
+    <script>
+        $(document).ready(function () {
+            $(function () {
+                setTimeout(function () {
+                    $("#flashMessage").hide('blind', {}, 500);
+                }, 5000);
+            });
+            $('#productIsActive').attr('checked', true);
+        });
+        $("#productform").validate({
+            rules: {
+                Name: "required",
+                BrandId: "required",
+                CategoryId: "required"
+            },
+            messages: {
+                Name: "Please enter name",
+                BrandId: "Please select a brand",
+                CategoryId: "Please select a category"
+            }
+        });
+        function changeAddProductFormStateToEdit(productId) {
+            $("#productform").validate().resetForm();
+            $("#preloader").css('display', 'block');
+            // Scroll to the top of the form
+            $('html, body').animate({
+                scrollTop: $("#addProductFormHeading").offset().top
+            },
+                500);
+            // Change form state to edit
+            $("#addProductFormHeading").text("Update Product");
+            $("#productAddButton").text("Update");
+            $("#productform").attr("action", "@BaseUrl.subDirectory/Product/Edit");
+            $("#Id").val(productId);
+            var data = { productId: productId };
+            $.ajax({
+                method: 'POST',
+                url: "@Url.Action("GetProductInfoById", "Product")",
+                dataType: "json",
+            contentType: 'application/json',
+            data: JSON.stringify(data),
+            crossDomain: true,
+            success: function (data) {
+                toastr.clear();
+                if (data.Status == "Ok") {
+                    var createdOnFormatedDate = "";
+                    var createdOn = "";
+                    if (data.Product.CreatedOn == null) {
+                        createdOnFormatedDate = null;
+                    } else {
+                        createdOn = new Date(parseInt(data.Product.CreatedOn.substr(6)));
+                        createdOnFormatedDate = createdOn.getFullYear() + '-' + ('0' + (createdOn.getMonth() + 1)).slice(-2) + '-' + ('0' + createdOn.getDate()).slice(-2) + ' ' + ('0' + createdOn.getHours()).slice(-2) + ':' + ('0' + (createdOn.getMinutes())).slice(-2) + ':' + ('0' + createdOn.getSeconds()).slice(-2);
+                    }                                          
+                    $("#Name").val($.trim(data.Product.Name));
+                    $("#BrandId").val(data.Product.BrandId);
+                    $("#CategoryId").val(data.Product.CategoryId);
+                    $("#Description").val(data.Product.Description);
+                    $("#CreatedOn").val(createdOnFormatedDate);
+                    $("#CreatedBy").val(data.Product.CreatedBy);
+                    if (data.Product.IsActive === true) {
+                        $("#productIsActive").prop('checked', true);
+                    } else {
+                        $("#productIsActive").prop('checked', false);
+                    }                       
+                } else {
+                    toastr.error("Something went wrong");
+                }
+
+            },
+            error: function () {
+                toastr.error("Something went wrong");
+            }
+        });
+        $("#preloader").css('display', 'none');
+        }
+
+        $("#productResetButton").click(function () {
+            $("#addProductFormHeading").text("Add Product");
+            $("#productAddButton").text("Add");
+            $("#productform").attr("action", "@BaseUrl.subDirectory/Product/Add");
+            $("#Name").val("");
+            $("#BrandId").val("");
+            $("#CategoryId").val("");
+            $("#Description").val("");         
+            $("#productIsActive").prop('checked', true);
+            $("#productform").validate().resetForm();
+        });
+    </script>
+}

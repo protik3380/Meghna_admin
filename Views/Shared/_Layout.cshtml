@@ -1,0 +1,995 @@
+﻿@using EFreshAdmin.Models
+@using EFreshStore.Models.Context
+@{
+    var actionRoute = ViewContext.RouteData.Values["Action"].ToString();
+    var controlRoute = ViewContext.RouteData.Values["Controller"].ToString();
+}
+
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+    <meta charset="utf-8">
+    <title> E-Fresh Admin </title>
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link href="~/Content/css/main.css" rel="stylesheet" />
+    <!-- Basic Styles -->
+    <link rel="stylesheet" type="text/css" media="screen" href="~/Content/SmartAdmin/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" media="screen" href="~/Content/SmartAdmin/css/font-awesome.min.css">
+    <link href="~/Content/css/simple-line-icons.css" rel="stylesheet" />
+    <link href="~/Content/css/select2.min.css" rel="stylesheet" />
+    <!-- SmartAdmin Styles : Caution! DO NOT change the order -->
+    <link rel="stylesheet" type="text/css" media="screen" href="~/Content/SmartAdmin/css/smartadmin-production-plugins.min.css">
+    <link rel="stylesheet" type="text/css" media="screen" href="~/Content/SmartAdmin/css/smartadmin-production.min.css">
+    <link rel="stylesheet" type="text/css" media="screen" href="~/Content/SmartAdmin/css/smartadmin-skins.min.css">
+
+    <!-- SmartAdmin RTL Support -->
+    <link rel="stylesheet" type="text/css" media="screen" href="~/Content/SmartAdmin/css/smartadmin-rtl.min.css">
+    <!-- We recommend you use "your_style.css" to override SmartAdmin
+    specific styles this will also ensure you retrain your customization with each SmartAdmin update.
+    <link rel="stylesheet" type="text/css" media="screen" href="~/Content/SmartAdmin/css/your_style.css"> -->
+    <link rel="stylesheet" type="text/css" media="screen" href="~/Content/SmartAdmin/css/your_style.css">
+    <link href="~/Content/css/toastr.css" rel="stylesheet" />
+    <link href="~/Content/css/sweetalert2.min.css" rel="stylesheet" />
+    <!-- FAVICONS -->
+    <link rel="shortcut icon" href="~/Content/Img/logo.png" type="image/x-icon">
+    <link rel="icon" href="~/Content/Img/logo.png" type="image/x-icon">
+
+    <!-- GOOGLE FONT -->
+    <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Open+Sans:400italic,700italic,300,400,700">
+
+    <!-- Specifying a Webpage Icon for Web Clip
+         Ref: https://developer.apple.com/library/ios/documentation/AppleApplications/Reference/SafariWebContent/ConfiguringWebApplications/ConfiguringWebApplications.html -->
+    <link rel="apple-touch-icon" href="~/Content/SmartAdmin/img/splash/sptouch-icon-iphone.png">
+    <link rel="apple-touch-icon" sizes="76x76" href="~/Content/SmartAdmin/img/splash/touch-icon-ipad.png">
+    <link rel="apple-touch-icon" sizes="120x120" href="~/Content/SmartAdmin/img/splash/touch-icon-iphone-retina.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="~/Content/SmartAdmin/img/splash/touch-icon-ipad-retina.png">
+
+    <!-- iOS web-app metas : hides Safari UI Components and Changes Status Bar Appearance -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+    <!-- Startup image for web apps -->
+    <link rel="apple-touch-startup-image" href="~/Content/SmartAdmin/img/splash/ipad-landscape.png" media="screen and (min-device-width: 481px) and (max-device-width: 1024px) and (orientation:landscape)">
+    <link rel="apple-touch-startup-image" href="~/Content/SmartAdmin/img/splash/ipad-portrait.png" media="screen and (min-device-width: 481px) and (max-device-width: 1024px) and (orientation:portrait)">
+    <link rel="apple-touch-startup-image" href="~/Content/SmartAdmin/img/splash/iphone.png" media="screen and (max-device-width: 320px)">
+
+
+    @RenderSection("style", false)
+    <style>
+        .vError {
+            color: red;
+        }
+        .dropdown-menu {
+            padding: 10px;
+            margin-right: 6%;      
+        }
+    </style>
+</head>
+
+<!--
+
+TABLE OF CONTENTS.
+
+Use search to find needed section.
+
+===================================================================
+
+|  01. #CSS Links                |  all CSS links and file paths  |
+|  02. #FAVICONS                 |  Favicon links and file paths  |
+|  03. #GOOGLE FONT              |  Google font link              |
+|  04. #APP SCREEN / ICONS       |  app icons, screen backdrops   |
+|  05. #BODY                     |  body tag                      |
+|  06. #HEADER                   |  header tag                    |
+|  07. #PROJECTS                 |  project lists                 |
+|  08. #TOGGLE LAYOUT BUTTONS    |  layout buttons and actions    |
+|  09. #MOBILE                   |  mobile view dropdown          |
+|  10. #SEARCH                   |  search field                  |
+|  11. #NAVIGATION               |  left panel & navigation       |
+|  12. #RIGHT PANEL              |  right panel userlist          |
+|  13. #MAIN PANEL               |  main panel                    |
+|  14. #MAIN CONTENT             |  content holder                |
+|  15. #PAGE FOOTER              |  page footer                   |
+|  16. #SHORTCUT AREA            |  dropdown shortcuts area       |
+|  17. #PLUGINS                  |  all scripts and plugins       |
+
+===================================================================
+
+-->
+<!-- #BODY -->
+<!-- Possible Classes
+
+    * 'smart-style-{SKIN#}'
+    * 'smart-rtl'         - Switch theme mode to RTL
+    * 'menu-on-top'       - Switch to top navigation (no DOM change required)
+    * 'no-menu'			  - Hides the menu completely
+    * 'hidden-menu'       - Hides the main menu but still accessable by hovering over left edge
+    * 'fixed-header'      - Fixes the header
+    * 'fixed-navigation'  - Fixes the main menu
+    * 'fixed-ribbon'      - Fixes breadcrumb
+    * 'fixed-page-footer' - Fixes footer
+    * 'container'         - boxed layout mode (non-responsive: will not work with fixed-navigation & fixed-ribbon)
+-->
+<body class=".smart-style-5">
+    <div id="preloader">
+        <div class="blur"></div>
+        <div class="sk-three-bounce">
+            <div class="sk-child sk-bounce1"></div>
+            <div class="sk-child sk-bounce2"></div>
+            <div class="sk-child sk-bounce3"></div>
+        </div>
+    </div>
+    <!-- HEADER -->
+<header id="header">
+    <div id="logo-group">
+
+        <!-- PLACE YOUR LOGO HERE -->
+        <span id="logo"> <img src="~/Content/Img/logo.png" alt="EFreshStore"> </span>
+        <!-- END LOGO PLACEHOLDER -->
+    </div>
+
+    <!-- pulled right: nav area -->
+
+    <div class="pull-right">
+
+        <!-- collapse menu button -->
+        <div id="hide-menu" class="btn-header pull-right">
+            <span> <a href="javascript:void(0);" data-action="toggleMenu" title="Collapse Menu"><i class="fa fa-reorder"></i></a> </span>
+        </div>
+        <!-- end collapse menu -->
+        <!-- #MOBILE -->
+        <!-- Top menu profile link : this shows only when top menu is active -->
+        <ul id="mobile-profile-img" class="header-dropdown-list padding-5 menu-on-top">
+            <li class="">
+                <a href="#" class="dropdown-toggle no-margin userdropdown" data-toggle="dropdown">
+                    <img src="~/Content/SmartAdmin/img/avatars/male.png" alt="John Doe" class="online"/>
+                </a>
+                <ul class="dropdown-menu pull-right">
+                    <li>
+                        <a href="@Url.Action("ResetPassword", "Home", new {email = @Session["email"]})" class="padding-10 padding-top-0 padding-bottom-0">Change Password</a>
+                    </li>
+                    <li class="divider"></li>
+                    <li>
+                        <a href="@Url.Action("Logout", "Home")" class="padding-10 padding-top-5 padding-bottom-5" data-action="userLogout"><strong><u>L</u>ogout</strong></a>
+                    </li>
+                </ul>
+            </li>
+        </ul>
+
+
+
+        <!-- search mobile button (this is hidden till mobile view port) -->
+        @*<div id="search-mobile" class="btn-header transparent pull-right">
+            <span> <a href="javascript:void(0)" title="Search"><i class="fa fa-search"></i></a> </span>
+        </div>*@
+        <!-- end search mobile button -->
+        <!-- input: search field -->
+        @*<form action="search.html" class="header-search pull-right">
+
+            <a href="javascript:void(0);" id="cancel-search-js" title="Cancel Search"><i class="fa fa-times"></i></a>
+        </form>*@
+        <!-- end input: search field -->
+        <!-- fullscreen button -->
+        <div id="fullscreen" class="btn-header transparent pull-right">
+            <span> <a data-action="launchFullscreen" title="Full Screen"><i class="fa fa-arrows-alt"></i></a> </span>
+        </div>
+
+        <div id="userMailId" class="btn-header transparent pull-right">
+            <span class="dropdown-toggle" data-toggle="dropdown" ><a style="font-size: 100%; margin-right: 10%">@Session["email"]</a></span>
+            <ul class="dropdown-menu">
+                <li><a href="@Url.Action("ResetPassword", "Home", new {email = @Session["email"]})">Change Password</a></li>
+                <li><a href="@Url.Action("Logout", "Home")">Logout</a></li>
+            </ul>
+        </div>
+        <!-- logout button -->
+        @*<div id="logout" class="btn-header transparent pull-right">
+                <span> <a href=@Url.Action("Logout","Home") title="Sign Out" data-action="userLogout" data-logout-msg="Are You Sure You Want To Logout?"><i class="fa fa-sign-out"></i></a> </span>
+                <span> <a href=@Url.Action("Logout","Home") title="Sign Out"><i class="fa fa-sign-out"></i></a> </span>
+            </div>*@
+        <!-- end logout button -->
+        <!-- end fullscreen button -->
+
+
+
+    </div>
+    <!-- end pulled right: nav area -->
+
+</header>
+    <!-- END HEADER -->
+    <!-- Left panel : Navigation area -->
+    <!-- Note: This width of the aside area can be adjusted through LESS variables -->
+@{
+    long userTypeId = Convert.ToInt64(Session["UserTypeId"]);
+        if (userTypeId == (long) UserTypeEnum.MasterDepotUser)
+        {
+            @Html.Partial("_MasterDepotPartial")
+        }
+        else
+        {
+            @Html.Partial("_PartialLeftSideNavigation")
+            
+        }
+    }
+    
+    <!-- END NAVIGATION -->
+    <!-- MAIN PANEL -->
+    <div id="main" role="main" style="padding-bottom: 0;margin-bottom: 0">
+        <div id="ribbon">
+            <!-- breadcrumb -->
+            @*<ol class="breadcrumb">
+                <li>Home</li>
+                @if (Session["BreadCrum"]!= null)
+                {
+                    <li>@Session["BreadCrum"]</li>
+                }
+                else
+                {
+                    <li></li>
+                }
+                
+            </ol>*@
+           
+            <!-- end breadcrumb -->
+            <!-- You can also add more buttons to the
+        ribbon for further usability
+
+        Example below:
+
+        <span class="ribbon-button-alignment pull-right">
+        <span id="search" class="btn btn-ribbon hidden-xs" data-title="search"><i class="fa-grid"></i> Change Grid</span>
+        <span id="add" class="btn btn-ribbon hidden-xs" data-title="add"><i class="fa-plus"></i> Add</span>
+        <span id="search" class="btn btn-ribbon" data-title="search"><i class="fa-search"></i> <span class="hidden-mobile">Search</span></span>
+        </span> -->
+
+        </div>
+        <!-- MAIN CONTENT -->
+        <div id="content" style="padding-bottom: 0;margin-bottom: 0">
+            @RenderBody()
+            <!-- Modal: Order Details Start-->
+            <div class="modal fade" id="modalCart" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+                 aria-hidden="true">
+                <div class="modal-dialog modal-lg" role="document">
+                    <div class="modal-content">
+                        <!--Header-->
+                        <div class="modal-header">
+                            <h3 class="modal-title" id="OrderModalHeader">Product Details</h3>
+                        </div>
+                        <!--Body-->
+                        <div class="modal-body table responsive" id="OrderDetailsModal">
+                            <table class="table table-hover table-condensed table-bordered">
+                                <tbody id="CustomerDetails" style="float: left;width: 50%"></tbody>
+                                <tbody id="DeliveryManDetails" style="float: right; width: 50%;border-top: 0px solid"></tbody>
+                            </table>
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 5%; text-align: center">SL</th>
+                                        <th style="width: 65%;text-align: center">Product name</th>
+                                        <th style="width: 15%;text-align: center">Quantity</th>
+                                        <th style="width: 15%;text-align: center">Price</th>
+
+                                    </tr>
+                                </thead>
+                                <tbody id="ProductDetailsRow"></tbody>
+                            </table>
+
+                        </div>
+                        <!--Footer-->
+                        <div class="modal-footer">
+                            <button data-dismiss="modal" class="btn btn-primary">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Modal:  Order Details End-->
+        </div>
+        <!-- END MAIN CONTENT -->
+
+    </div>
+    <!-- END MAIN PANEL -->
+    <!-- PAGE FOOTER -->
+    <div class="page-footer">
+        <div class="row">
+            <div class="col-xs-12 col-sm-6">
+                <span class="txt-color-white">&copy; @DateTime.Now.Year E-Fresh Store</span>
+            </div>
+
+            <div class="col-xs-6 col-sm-6 text-right hidden-xs">
+                <div class="txt-color-white inline-block">
+                    @*<i class="txt-color-blueLight hidden-mobile">Powered by <i class="fa fa-bolt"></i> <strong>Nerd Castle</strong> </i>*@
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- END PAGE FOOTER -->
+    <!-- SHORTCUT AREA : With large tiles (activated via clicking user name tag)
+    Note: These tiles are completely responsive,
+    you can add as many as you like
+    -->
+    <!-- END SHORTCUT AREA -->
+    <!--================================================== -->
+    <!-- PACE LOADER - turn this on if you want ajax loading to show (caution: uses lots of memory on iDevices)-->
+    <script data-pace-options='{ "restartOnRequestAfter": true }' src="~/Content/SmartAdmin/js/plugin/pace/pace.min.js"></script>
+
+    <!-- Link to Google CDN's jQuery + jQueryUI; fall back to local -->
+    @*<script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>*@
+@*<script>
+        if (!window.jQuery) {
+            document.write('<script src="~/Content/SmartAdmin/js/libs/jquery-2.1.1.min.js"><\/script>');
+        }
+    </script>*@
+    <script src="~/Content/SmartAdmin/js/libs/jquery-2.1.1.min.js"></script>
+<script src="~/Content/SmartAdmin/js/libs/jquery-ui-1.10.3.min.js"></script>
+    @*<script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"></script>*@
+    <script>
+        if (!window.jQuery.ui) {
+            document.write('<script src="~/Content/SmartAdmin/js/libs/jquery-ui-1.10.3.min.js"><\/script>');
+        }
+    </script>
+
+    <!-- IMPORTANT: APP CONFIG -->
+    <script src="~/Content/SmartAdmin/js/app.config.js"></script>
+
+    <!-- JS TOUCH : include this plugin for mobile drag / drop touch events-->
+    <script src="~/Content/SmartAdmin/js/plugin/jquery-touch/jquery.ui.touch-punch.min.js"></script>
+
+    <!-- BOOTSTRAP JS -->
+    <script src="~/Content/SmartAdmin/js/bootstrap/bootstrap.min.js"></script>
+
+    <!-- CUSTOM NOTIFICATION -->
+    <script src="~/Content/SmartAdmin/js/notification/SmartNotification.min.js"></script>
+
+    <!-- JARVIS WIDGETS -->
+    <script src="~/Content/SmartAdmin/js/smartwidgets/jarvis.widget.min.js"></script>
+    <script src="~/Content/SmartAdmin/js/plugin/bootstrap-progressbar/bootstrap-progressbar.min.js"></script>
+    <!-- EASY PIE CHARTS -->
+    <script src="~/Content/SmartAdmin/js/plugin/easy-pie-chart/jquery.easy-pie-chart.min.js"></script>
+
+    <!-- SPARKLINES -->
+    <script src="~/Content/SmartAdmin/js/plugin/sparkline/jquery.sparkline.min.js"></script>
+
+    <!-- JQUERY VALIDATE -->
+    <script src="~/Content/SmartAdmin/js/plugin/jquery-validate/jquery.validate.min.js"></script>
+
+    <!-- JQUERY MASKED INPUT -->
+    <script src="~/Content/SmartAdmin/js/plugin/masked-input/jquery.maskedinput.min.js"></script>
+
+    <!-- JQUERY SELECT2 INPUT -->
+    @*<script src="~/Content/SmartAdmin/js/plugin/select2/select2.min.js"></script>*@
+
+    <!-- JQUERY UI + Bootstrap Slider -->
+    <script src="~/Content/SmartAdmin/js/plugin/bootstrap-slider/bootstrap-slider.min.js"></script>
+
+    <!-- browser msie issue fix -->
+    <script src="~/Content/SmartAdmin/js/plugin/msie-fix/jquery.mb.browser.min.js"></script>
+
+    <!-- FastClick: For mobile devices -->
+    <script src="~/Content/SmartAdmin/js/plugin/fastclick/fastclick.min.js"></script>
+    <!--[if IE 8]>
+
+    <h1>Your browser is out of date, please update your browser by going to www.microsoft.com/download</h1>
+
+    <![endif]-->
+    <!-- MAIN APP JS FILE -->
+    <script src="~/Content/SmartAdmin/js/app.min.js"></script>
+
+    <!-- SmartChat UI : plugin -->
+    <script src="~/Content/SmartAdmin/js/smart-chat-ui/smart.chat.ui.min.js"></script>
+<script src="~/Content/SmartAdmin/js/smart-chat-ui/smart.chat.manager.min.js"></script>
+
+    <!-- Flot Chart Plugin: Flot Engine, Flot Resizer, Flot Tooltip -->
+    <script src="~/Content/SmartAdmin/js/plugin/flot/jquery.flot.cust.min.js"></script>
+    <script src="~/Content/SmartAdmin/js/plugin/flot/jquery.flot.resize.min.js"></script>
+    <script src="~/Content/SmartAdmin/js/plugin/flot/jquery.flot.time.min.js"></script>
+    <script src="~/Content/SmartAdmin/js/plugin/flot/jquery.flot.tooltip.min.js"></script>
+<script src="~/Scripts/toastr.js"></script>
+    <script src="~/Scripts/sweetalert2.min.js"></script>
+
+    <!-- Your GOOGLE ANALYTICS CODE Below -->
+<script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-XXXXXXXX-X']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+        var ga = document.createElement('script');
+        ga.type = 'text/javascript';
+        ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0];
+        s.parentNode.insertBefore(ga, s);
+    })();
+</script>
+
+    @*Data Table*@
+    <script src="~/Content/SmartAdmin/js/plugin/datatables/jquery.dataTables.min.js"></script>
+    <script src="~/Content/SmartAdmin/js/plugin/datatables/dataTables.colVis.min.js"></script>
+    <script src="~/Content/SmartAdmin/js/plugin/datatables/dataTables.tableTools.min.js"></script>
+    <script src="~/Content/SmartAdmin/js/plugin/datatables/dataTables.bootstrap.min.js"></script>
+    <script src="~/Content/SmartAdmin/js/plugin/datatable-responsive/datatables.responsive.min.js"></script>
+<script>
+    /* ======================================
+                   Preloader
+   ====================================== */
+    $(window).on("load", function() {
+        $('#sk-three-bounce').fadeOut();
+        $('#preloader').delay(350).fadeOut('slow');
+    });
+
+    $(document).ready(function () {
+        $(function () {
+
+            var trgt = [[1354586000000, 153], [1364587000000, 658], [1374588000000, 198], [1384589000000, 663], [1394590000000, 801], [1404591000000, 1080], [1414592000000, 353], [1424593000000, 749], [1434594000000, 523], [1444595000000, 258], [1454596000000, 688], [1464597000000, 364]], prft = [[1354586000000, 53], [1364587000000, 65], [1374588000000, 98], [1384589000000, 83], [1394590000000, 980], [1404591000000, 808], [1414592000000, 720], [1424593000000, 674], [1434594000000, 23], [1444595000000, 79], [1454596000000, 88], [1464597000000, 36]], sgnups = [[1354586000000, 647], [1364587000000, 435], [1374588000000, 784], [1384589000000, 346], [1394590000000, 487], [1404591000000, 463], [1414592000000, 479], [1424593000000, 236], [1434594000000, 843], [1444595000000, 657], [1454596000000, 241], [1464597000000, 341]], toggles = $("#rev-toggles"), target = $("#flotcontainer");
+            var data = [
+                {
+                    label: "Target Profit",
+                    data: trgt,
+                    bars: {
+                        show: true,
+                        align: "center",
+                        barWidth: 30 * 30 * 60 * 1000 * 80
+                    }
+                }, {
+                    label: "Actual Profit",
+                    data: prft,
+                    color: '#3276B1',
+                    lines: {
+                        show: true,
+                        lineWidth: 3
+                    },
+                    points: {
+                        show: true
+                    }
+                }, {
+                    label: "Actual Signups",
+                    data: sgnups,
+                    color: '#71843F',
+                    lines: {
+                        show: true,
+                        lineWidth: 1
+                    },
+                    points: {
+                        show: true
+                    }
+                }
+            ];
+
+            var options = {
+                grid: {
+                    hoverable: true
+                },
+                tooltip: true,
+                tooltipOpts: {
+                    //content: '%x - %y',
+                    //dateFormat: '%b %y',
+                    defaultTheme: false
+                },
+                xaxis: {
+                    mode: "time"
+                },
+                yaxes: {
+                    tickFormatter: function (val, axis) {
+                        return "$" + val;
+                    },
+                    max: 1200
+                }
+
+            };
+
+            plot2 = null;
+
+            function plotNow() {
+                var d = [];
+                toggles.find(':checkbox').each(function () {
+                    if ($(this).is(':checked')) {
+                        d.push(data[$(this).attr("name").substr(4, 1)]);
+                    }
+                });
+                if (d.length > 0) {
+                    if (plot2) {
+                        plot2.setData(d);
+                        plot2.draw();
+                    } else {
+                        plot2 = $.plot(target, d, options);
+                    }
+                }
+
+            };
+
+            toggles.find(':checkbox').on('change', function () {
+                plotNow();
+            });
+            plotNow();
+
+        });
+        $('.dropdown-toggle').mouseover(function() {
+            $('.dropdown-menu').show();
+        });
+
+        $('.dropdown-toggle').mouseout(function() {
+            t = setTimeout(function() {
+                $('.dropdown-menu').hide();
+            }, 100);
+
+            $('.dropdown-menu').on('mouseenter', function() {
+                $('.dropdown-menu').show();
+                clearTimeout(t);
+            }).on('mouseleave', function() {
+                $('.dropdown-menu').hide();
+            });
+        });
+        $.root_.addClass("fixed-header");
+        $.root_.addClass("fixed-navigation");
+        $.root_.addClass("fixed-footer");
+        $(window).resize(function () {
+
+            if ($(window).width() <= 320) {
+                $.root_.addClass("menu-on-top");
+                $("#userMailId").hide();
+                // is mobile device
+
+            } else {
+                $.root_.removeClass("menu-on-top");
+                $("#userMailId").show();
+            }
+
+        });
+    });
+    //$('.dropdown').hover(function () {
+    //    $('.dropdown-toggle', this).trigger('click');
+    //});
+    $(function() {
+        setTimeout(function() {
+            $("#flashMessage").hide('blind', {}, 500);
+        }, 5000);
+    });
+    $('#dt_basic').dataTable({
+        responsive: true,
+        "sDom": "<'dt-toolbar'<'col-xs-12 col-sm-6'f><'col-sm-6 col-xs-12 hidden-xs'l>r>" +
+            "t" +
+            "<'dt-toolbar-footer'<'col-sm-6 col-xs-12 hidden-xs'i><'col-xs-12 col-sm-6'p>>",
+
+        "autoWidth": true,
+        "oLanguage": {
+            "sSearch": '<span class="input-group-addon"><i class="glyphicon glyphicon-search"></i></span>'
+        }
+        //"order": [[0, "desc"]]
+        //"preDrawCallback": function () {
+        //     Initialize the responsive datatables helper once.
+        //    if (!responsiveHelper_dt_basic) {
+        //        responsiveHelper_dt_basic = new ResponsiveDatatablesHelper($('#dt_basic'), breakpointDefinition);
+        //    }
+        //},
+        //"rowCallback": function (nRow) {
+        //    responsiveHelper_dt_basic.createExpandIcon(nRow);
+        //},
+        //"drawCallback": function (oSettings) {
+        //    responsiveHelper_dt_basic.respond();
+        //}
+    });
+    $('#datatable_fixed_column').DataTable({
+        "sDom": "<'dt-toolbar'<'col-xs-12 col-sm-6 hidden-xs'f><'col-sm-6 col-xs-12 hidden-xs'<'toolbar'>>r>" +
+            "t" +
+            "<'dt-toolbar-footer'<'col-sm-6 col-xs-12 hidden-xs'i><'col-xs-12 col-sm-6'p>>",
+        "autoWidth": true
+    });
+    $('#dt_basic1').dataTable({
+        "sDom": "<'dt-toolbar'<'col-xs-12 col-sm-6'f><'col-sm-6 col-xs-12 hidden-xs'l>r>" +
+            "t" +
+            "<'dt-toolbar-footer'<'col-sm-6 col-xs-12 hidden-xs'i><'col-xs-12 col-sm-6'p>>",
+        "autoWidth": true,
+        "oLanguage": {
+            "sSearch": '<span class="input-group-addon"><i class="glyphicon glyphicon-search"></i></span>'
+        },
+        "order": [[0, "desc"]]
+    });
+
+
+    function showProductLineDetails(productLineId) {
+        var productLineFormValidateObj = {
+            errorPlacement: function (error, element) {
+                error.appendTo('#productLineFormMessage');
+            },
+            rules: {
+                productId: "required"
+            },
+            messages: {
+                productId: "Please select a product"
+
+            },
+            submitHandler: function(form, e) {
+                e.preventDefault();
+                $('.panel-overlay').css('display', 'block');
+                var productId = $("#productId").val();
+                var productName = $("#productId option:selected").text();
+                var rowCount = $('#productLineTable_' + productLineId + ' tr').length;
+                var input = { ProductLineId: productLineId, ProductId: productId };
+                $.ajax({
+                    type: "POST",
+                    url: '@Url.Action("AddProductToLine", "ProductLine")',
+                    data: JSON.stringify(input),
+                    contentType: "application/json;charset=UTF-8",
+                    dataType: "json",
+                    crossDomain: true,
+                    success: function(data) {
+                        toastr.clear();
+                        if (data.status == "Saved") {
+                            $(".empty-product-line").css('display', 'none');
+                            $("#productId").val('');
+                            toastr.success("Product added to this line.");
+                            rowCount++;
+                            $("#productLineTable_" + productLineId).append('<tr id="product_' + productId + '"><td class="productNameCell">' + rowCount + '. ' + productName + '</td><td class="product-line-details-action"><a class="remove-product-from-line btn btn-sm btn-danger" onclick="deleteProductLineDetail(' + productId + ',' + productLineId + ')">Delete</a></td></tr>');
+
+                        } else if (data.status == "Conflict") {
+                            toastr.error("Product is already added to this line");
+                        } else {
+                            toastr.error("Something went wrong!");
+                        }
+                        $('.panel-overlay').css('display', 'none');
+                    }
+                });
+                return false;
+
+            }
+        };
+        if ($('#productLineDetails_' + productLineId).css('display') != 'none') {
+            $("#productLineDetails_" + productLineId).css("display", "none");
+            return false;
+        }
+        $('.productLineDetails').css("display", "none");
+        $('.panel-footer').remove();
+        $('#productDetailsPanel_' + productLineId).append('<div class="panel-footer"><form class="form-inline" method="POST" id="productLineForm"><div class="form-group"><label for="productId">Add new &nbsp;</label><select class="form-inline" style="height:32px;" id="productId" name="productId"><option value="">--Select product--</option></select>&nbsp;</div><button type="submit" class="btn btn-success">Add</button><p id="productLineFormMessage"></p></form></div>');
+        $('.panel-overlay').css('display', 'block');
+        $('.productId').empty();
+        $('#productLineTable_' + productLineId).empty();
+        $('.productId').append('<option value="">--Select product--</option>');
+        $("#productLineDetails_" + productLineId).css("display", "table-row");
+        $(".empty-product-line").css('display', 'none');
+        $("#productLineForm").validate(productLineFormValidateObj); // Validating dynamically generated productLineForm
+
+        var data = { productLineId: productLineId };
+        $.ajax({
+            method: 'POST',
+            url: "@Url.Action("GetProductLineDetails", "ProductLine")",
+            dataType: "json",
+            contentType: 'application/json',
+            data: JSON.stringify(data),
+            crossDomain: true,
+            success: function(data) {
+                $('.panel-overlay').css('display', 'none');
+                $.each(data.AllProducts, function(index, value) {
+                    $('#productId').append('<option value="' + value.Id + '">' + value.Name + '</option>');
+                });
+
+                if (data.ProductsByLineId.length == 0) {
+                    $(".empty-product-line").css('display', 'block');
+                } else {
+                    $(".empty-product-line").css('display', 'none');
+                    var count = 1;
+                    $.each(data.ProductsByLineId, function(index, value) {
+                        $('#productLineTable_' + productLineId).append('<tr id="product_' + value.ProductId + '"><td class="productNameCell">' + (count++) + '. ' + value.Product.Name + '</td><td class="product-line-details-action"><a class="remove-product-from-line btn btn-sm btn-danger" onclick="deleteProductLineDetail(' + value.ProductId + ',' + productLineId + ')">Delete</a></td></tr>');
+                    });
+                }
+
+
+            },
+            error: function() {
+                toastr.error("Something went wrong");
+            }
+        });
+    }
+
+    function closeProductLineDetails(productLineId) {
+        $("#productLineDetails_" + productLineId).css("display", "none");
+    }
+
+    function deleteProductLineDetail(productId, productLineId) {
+
+        Swal.fire({
+            title: 'Do you want to delete this product ?',
+            type: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#739e73',
+            cancelButtonColor: '#A90329',
+            cancelButtonText: 'No',
+            confirmButtonText: 'Yes',
+            reverseButtons: true
+        }).then((result) => {
+            if (result.value) {
+                $('.panel-overlay').css('display', 'block');
+                var data = { productId: productId, productLineId: productLineId };
+                $.ajax({
+                    method: 'POST',
+                    url: "@Url.Action("DeleteDetail", "ProductLine")",
+                    dataType: "json",
+                    contentType: 'application/json',
+                    data: JSON.stringify(data),
+                    crossDomain: true,
+                    success: function(data) {
+                        if (data.status == "Ok") {
+                            toastr.clear();
+                            toastr.success("Product has been deleted");
+                            $('#productLineTable_' + productLineId).empty();
+                            if (data.productLineDetails.length == 0) {
+                                $(".empty-product-line").css('display', 'block');
+                            } else {
+                                $(".empty-product-line").css('display', 'none');
+                                var count = 1;
+                                $.each(data.productLineDetails,
+                                    function(index, value) {
+                                        $('#productLineTable_' + productLineId).append('<tr id="product_' +
+                                            value.ProductId +
+                                            '"><td class="productNameCell">' +
+                                            (count++) +
+                                            '. ' +
+                                            value.Product.Name +
+                                            '</td><td class="product-line-details-action"><a class="remove-product-from-line btn btn-sm btn-danger" onclick="deleteProductLineDetail(' +
+                                            value.ProductId +
+                                            ',' +
+                                            productLineId +
+                                            ')">Delete</a></td></tr>');
+                                    });
+                            }
+                        } else {
+                            toastr.error("Something went wrong");
+                        }
+
+                        $('.panel-overlay').css('display', 'none');
+
+
+                    },
+                    error: function() {
+                        toastr.error("Something went wrong");
+                    }
+                });
+            }
+        });
+
+    }
+
+    /*********************************
+          Distributor Subscription
+    *********************************/
+    function showDistributorSubscriptions(distributorId) {
+        var distributorSubscriptionFormValidateObj = {
+            errorPlacement: function(error, element) {
+                error.appendTo('#distributorFormMessage');
+            },
+            rules: {
+                productLineId: "required"
+            },
+            messages: {
+                productLineId: "Please select a product line"
+
+            },
+            submitHandler: function(form, e) {
+                e.preventDefault();
+                $('.panel-overlay').css('display', 'block');
+                var productLineId = $("#productLineId").val();
+                var productLineName = $("#productLineId option:selected").text();
+                var rowCount = $('#distributorTable_' + distributorId + ' tr').length;
+                var input = { DistributorId: distributorId, ProductLineId: productLineId };
+                $.ajax({
+                    type: "POST",
+                    url: '@Url.Action("SubscribeToProductLine", "Distributor")',
+                    data: JSON.stringify(input),
+                    contentType: "application/json;charset=UTF-8",
+                    dataType: "json",
+                    crossDomain: true,
+                    success: function(data) {
+                        toastr.clear();
+                        if (data.status == "Saved") {
+                            $("#productLineId").val('');
+                            $(".empty-distributor-subs").css('display', 'none');
+                            toastr.success("Subscribed to product line successfully.");
+                            rowCount++;
+                            $("#distributorTable_" + distributorId).append('<tr id="productLine_' + productLineId + '"><td class="productLineNameCell">' + rowCount + '. ' + productLineName + '</td><td class="distributor-sub-action"><a class="remove-productLine-from-distributor btn btn-sm btn-danger" onclick="deleteDistributorSubscription(' + productLineId + ',' + distributorId + ')">Delete</a></td></tr>');
+
+                        } else if (data.status == "Conflict") {
+                            toastr.error("Already subscribed to this product line.");
+                        } else {
+                            toastr.error("Something went wrong!");
+                        }
+                        $('.panel-overlay').css('display', 'none');
+                    }
+                });
+                return false;
+
+            }
+        };
+
+        if ($('#distributorSubscriptions_' + distributorId).css('display') != 'none') {
+            $("#distributorSubscriptions_" + distributorId).css("display", "none");
+            return false;
+        }
+        $('.distributorSubscriptions').css("display", "none");
+        $('.panel-footer').remove();
+        $('#distributorSubscriptionsPanel_' + distributorId).append('<div class="panel-footer"><form class="form-inline" method="POST" id="distributorSubscriptionForm"><div class="form-group"><label for="productLineId">Add new</label><select class="form-control" id="productLineId" name="productLineId"><option value="">--Select product line--</option></select></div><button type="submit" class="btn btn-success">Add</button><p id="distributorFormMessage"></p></form></div>');
+        $('.panel-overlay').css('display', 'block');
+        $('#distributorTable_' + distributorId).empty();
+        $("#distributorSubscriptions_" + distributorId).css("display", "table-row");
+        $(".empty-distributor-subs").css('display', 'none');
+        $("#distributorSubscriptionForm").validate(distributorSubscriptionFormValidateObj); // Validating dynamically generated productLineForm
+
+        var data = { distributorId: distributorId };
+        $.ajax({
+            method: 'POST',
+            url: "@Url.Action("GetDistributorProductLineSubscriptions", "Distributor")",
+            dataType: "json",
+            contentType: 'application/json',
+            data: JSON.stringify(data),
+            crossDomain: true,
+            success: function(data) {
+                $('.panel-overlay').css('display', 'none');
+                $.each(data.AllProductLines, function(index, value) {
+                    $('#productLineId').append('<option value="' + value.Id + '">' + value.Name + '</option>');
+                });
+
+                if (data.ProductLinesByDistributorId.length == 0) {
+                    $(".empty-distributor-subs").css('display', 'block');
+                } else {
+                    $(".empty-distributor-subs").css('display', 'none');
+
+                    var count = 1;
+                    $.each(data.ProductLinesByDistributorId, function(index, value) {
+                        $('#distributorTable_' + distributorId).append('<tr id="productLine_' + value.ProductLineId + '"><td class="productLineNameCell">' + (count++) + '. ' + value.ProductLine.Name + '</td><td class="distributor-sub-action"><a class="remove-productLine-from-distributor btn btn-sm btn-danger" onclick="deleteDistributorSubscription(' + value.ProductLineId + ',' + distributorId + ')">Delete</a></td></tr>');
+                    });
+
+                }
+
+
+            },
+            error: function() {
+                toastr.error("Something went wrong");
+            }
+        });
+    }
+
+    function closeDistributorSubscriptions(distributorId) {
+        $("#distributorSubscriptions_" + distributorId).css("display", "none");
+    }
+
+    function deleteDistributorSubscription(productLineId, distributorId) {
+        Swal.fire({
+            title: 'Do you want to delete this product line?',
+            type: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#739e73',
+            cancelButtonColor: '#A90329',
+            cancelButtonText: 'No',
+            confirmButtonText: 'Yes',
+            reverseButtons: true
+        }).then((result) => {
+            if (result.value) {
+                $('.panel-overlay').css('display', 'block');
+                var data = { productLineId: productLineId, distributorId: distributorId };
+                $.ajax({
+                    method: 'POST',
+                    url: "@Url.Action("DeleteSubscription", "Distributor")",
+                    dataType: "json",
+                    contentType: 'application/json',
+                    data: JSON.stringify(data),
+                    crossDomain: true,
+                    success: function(data) {
+                        if (data.status == "Ok") {
+                            toastr.clear();
+                            toastr.success("Product line has been deleted");
+                            $('#distributorTable_' + distributorId).empty();
+                            if (data.distributorProductLines.length == 0) {
+                                $(".empty-distributor-subs").css('display', 'block');
+                            } else {
+                                $(".empty-distributor-subs").css('display', 'none');
+                                var count = 1;
+                                $.each(data.distributorProductLines,
+                                    function(index, value) {
+                                        $('#distributorTable_' + distributorId).append('<tr id="productLine_' +
+                                            value.ProductLineId +
+                                            '"><td class="productLineNameCell">' +
+                                            (count++) +
+                                            '. ' +
+                                            value.ProductLine.Name +
+                                            '</td><td class="distributor-sub-action"><a class="remove-productLine-from-distributor btn btn-sm btn-danger" onclick="deleteDistributorSubscription(' +
+                                            value.ProductLineId +
+                                            ',' +
+                                            distributorId +
+                                            ')">Delete</a></td></tr>');
+                                    });
+                            }
+                        } else {
+                            toastr.error("Something went wrong");
+                        }
+
+                        $('.panel-overlay').css('display', 'none');
+
+
+                    },
+                    error: function() {
+                        toastr.error("Something went wrong");
+                    }
+                });
+
+            }
+        });
+
+    }
+    function GetOrderDetails(orderId, orderNo) {
+        $("#preloader").css('display', 'block');
+        var link = '@Url.Action("OrderDetails","MasterDepot", new {id = "orderId" })';
+        link = link.replace("orderId", orderId);
+        $.get(link, function (data) {
+
+            $("#OrderTotalPrice").empty();
+            $("#OrderModalHeader").empty();
+            $("#ProductDetailsRow").empty();
+            $("#OrderTotalPrice").empty();
+            $("#CustomerDetails").empty();
+            $("#DeliveryManDetails").empty();
+            $("#OrderModalHeader").append("Order Details : " + orderNo);
+            var count = 1;
+            var totalPrice = 0.0;
+            $.each(data, function (key, value) {
+                $("#OrderTotalPrice").empty();
+                totalPrice += parseFloat(value.Price);
+                //if (value.Order.CouponDiscount == null) {
+                //    discount = 0;
+                //} else {
+                //    discount = value.Order.CouponDiscount;
+                //}
+                if (key === 0) {
+
+                    $("#CustomerDetails").append("<tr><td style='border:none'></td><td style='border:none;font-weight:bold'>Customer Information</td></tr>" + "<tr><td  style='border: none;width: 20%'>Name :</td>" +
+                   "<td  style='border:none'>" + value.Order.CustomerName + "</td></tr>" +
+                   "<tr ><td style='border:none;width: 20%'>Mobile :</td>" +
+                   "<td  style='border:none'>" + value.Order.MobileNo + "</td></tr>" +
+                   "<tr><td style='border:none;width: 20%'>Email :</td>" +
+                   "<td style='border:none'>" + value.Order.Email + "</td></tr>" +
+                   "<tr><td style='border:none;width: 25%'>Delivery Address :</td>" +
+                   "<td style='border:none'>" + value.Order.DeliveryAddress + "</td></tr>"
+                   );
+                    GetDeliveryManInfoByOrderId(orderId);
+
+                }
+
+                $("#ProductDetailsRow").append("<tr><th scope='row' style='text-align:center'>" + count + "</th>" +
+                "<td style='text-align:center'>" + value.ProductUnit.Product.Name + "</td>" +
+                " <td style='text-align:center'>" + value.PacketQuantity + "</td>" +
+                " <td style='text-align:right'>" + value.Price.toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") + "</td></tr>");
+                count++;
+            });
+            $("#ProductDetailsRow").append("<tr><td scope='row'>Total</td>" +
+                "<td></td><td></td><td style='text-align:right;font-weight:bold'>" + totalPrice.toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") + "</td></tr>");
+            $("#preloader").css('display', 'none');
+
+        });
+    };
+     function GetDeliveryManInfoByOrderId(orderId) {
+            var data = { orderId: orderId };
+            $.ajax({
+                method: 'POST',
+                url: "@Url.Action("GeDeliveryManDetailsByOrderId", "MasterDepot")",
+                dataType: "json",
+            contentType: 'application/json',
+            data: JSON.stringify(data),
+            crossDomain: true,
+            success: function(data) {
+                $("#DeliveryManDetails").append("<tr><td style='border:none'></td><td style='border:none;font-weight:bold'>Delivery Man Information</td></tr><tr style='border: none'><td  style='border: none;width: 20%'>Name :</td>" +
+                    "<td  style='border:none'>" + data.MasterDepot.Name + "</td></tr>" +
+                    "<tr ><td style='border:none;width: 20%'>Mobile :</td>" +
+                    "<td  style='border:none'>" + data.MasterDepot.MobileNo + "</td></tr>" +
+                    "<tr><td style='border:none;width: 20%'>Email :</td>" +
+                    "<td style='border:none'>" + data.MasterDepot.Email + "</td></tr>"
+                );
+            },
+            error: function() {
+               // toastr.error("Something went wrong");
+            }
+        });
+        }
+</script>
+@RenderSection("scripts", false)
+
+</body>
+
+</html>

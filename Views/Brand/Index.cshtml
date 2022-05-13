@@ -1,0 +1,319 @@
+﻿@using EFreshAdmin.Utility
+@using EFreshStore.Models.Context
+@model EFreshStore.Models.Context.Brand
+
+@{
+    ViewBag.Title = "Views";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    List<Brand> brands = ViewBag.Brands;
+    Session["BreadCrum"] = "Brand";
+}
+<head>
+    <style>
+        .error {
+            color: red;
+        }
+    </style>
+    <link href="~/Content/css/jquery-ui.min.css" rel="stylesheet"/>
+    <link rel="stylesheet" type="text/css" href="~/Content/css/form-design.css"/>
+    @*<link href="~/Content/SmartAdmin/css/your_style.css" rel="stylesheet" />*@
+</head>
+<div id="content" style="margin-bottom: 3%">
+    <section id="widget-grid" class="">
+        <div class="row" style="height: 100%">
+            <article class="col-sm-12 col-md-12 col-lg-12">
+                <div class="jarviswidget" id="wid-id-4" data-widget-editbutton="false" data-widget-custombutton="false">
+                    <header>
+                        <span class="widget-icon"> <i class="fa fa-edit"></i> </span>
+                        <h2 id="addBrandFormHeading">Add Brand</h2>
+
+                    </header>
+                    <div>
+
+                        <div class="widget-body no-padding">
+                            @using (Html.BeginForm("Create", "Brand", FormMethod.Post, new { @enctype = "multipart/form-data", id = "addBrandForm", @class = "smart-form" }))
+                            {
+                                @Html.AntiForgeryToken()
+                                <div class='@TempData["Class"]' id="flashMessage" role="alert">@TempData["Message"]</div>
+                                <fieldset>
+                                    <input type="hidden" id="brandId" name="Id" />
+                                    <input type="hidden" id="brandCreatedBy" name="CreatedBy" />
+                                    <input type="hidden" id="brandCreatedOn" name="CreatedOn" />
+                                    <input type="hidden" id="brandImageLocation" name="ImageLocation" />
+                                    <input type="hidden" id="brandImage" name="BrandImage" />
+
+                                    <div class="row">
+                                        <section class="col col-6" style="padding-bottom: 5px; margin-bottom: 5px">
+                                            <section class="col col-3">
+                                                <label class="label">Name<span style="color: red"> *</span></label>
+                                            </section>
+                                            <section class="col col-9">
+                                                <label class="input">
+                                                    @Html.TextBoxFor(model => model.Name, new { id = "brandName", placeholder = "Brand name" })
+                                                    @Html.ValidationMessageFor(model => model.Name, "", new { @class = "error" })
+                                                </label>
+                                            </section>
+                                        </section>
+                                        <section class="col col-6" style="padding-bottom: 5px; margin-bottom: 5px">
+                                            <section class="col col-3">
+                                                <label class="label">Brand Image <span style="color: red"> *</span></label>
+                                            </section>
+                                            <section class="col col-9">
+                                                <div class="input input-file">
+                                                    <span class="button">Browse @Html.TextBoxFor(model => model.ImageLocation, new { id = "brandImageFile", onchange = "this.parentNode.nextSibling.value = this.value", type = "file", @class = "input input-file" })</span><input type="text" id="placeImage" placeholder="No file choosen" readonly="">
+                                                    @*<span class="button"><input name="ImageLocation" id="ImageLocation" type="file" onchange="this.parentNode.nextSibling.value = this.value">Browse</span><input type="text" placeholder="No file choosen" readonly="">*@
+                                                </div>
+                                                @Html.ValidationMessageFor(model => model.ImageLocation, "", new { @class = "error" })
+                                            </section>
+                                        </section>
+                                    </div>
+                                    <div class="row" id="formDescriptionRow">
+                                        <section class="col col-6" style="padding-bottom: 5px; margin-bottom: 5px">
+                                            <section class="col col-3">
+                                                <label class="label">Description</label>
+                                            </section>
+                                            <section class="col col-9">
+                                                <label class="textarea">
+                                                    @Html.TextAreaFor(model => model.Description, new { id = "brandDescription", placeholder = "Brand description" })
+                                                </label>
+                                                @Html.ValidationMessageFor(model => model.Description, "", new { @class = "error" })
+                                            </section>
+                                        </section>
+                                        <section class="col col-6" style="padding-bottom: 5px; margin-bottom: 5px">
+                                            <section class="col col-3"></section>
+                                            <section class="col col-9">
+                                                <label class="checkbox">
+                                                    @Html.CheckBoxFor(model => model.IsActive, new { id = "brandIsActive" })
+                                                    <i></i>Is Active?
+                                                </label>
+                                            </section>
+                                        </section>
+                                    </div>
+                                </fieldset>
+                                <footer style="bottom: 0">
+                                    <input type="button" value="Reset" id="brandResetButton" class="btn btn-primary" />
+                                    <button type="submit" id="brandAddButton" class="btn btn-primary">Add</button>
+                                </footer>
+
+                            }
+                        </div>
+
+                    </div>
+
+                </div>
+            </article>
+            <!-- END COL -->
+
+        </div>
+        <!-- row -->
+        <div class="row">
+            <!-- NEW WIDGET START -->
+            <article class="col-sm-12 col-md-12 col-lg-12">
+
+                <!-- Widget ID (each widget will need unique ID)-->
+                <div class="jarviswidget jarviswidget-color-darken" id="wid-id-3" data-widget-editbutton="false">
+                    <header>
+                        <span class="widget-icon"> <i class="fa fa-table"></i> </span>
+                        <h2>Brand Details </h2>
+                    </header>
+
+                    <!-- widget div-->
+                    <div>
+                        <!-- widget edit box -->
+                        <div class="jarviswidget-editbox">
+                            <!-- This area used as dropdown edit box -->
+                        </div>
+                        <!-- end widget edit box -->
+                        <!-- widget content -->
+                        <div class="widget-body no-padding">
+                            <div class="table-responsive">
+
+                                <table class="table" id="dt_basic">
+                                    <thead>
+                                        <tr>
+                                            <th>SL</th>
+                                            <th>Name</th>
+                                            <th>Description</th>
+                                            <th>Is Active?</th>
+                                            <th>Edit</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+
+                                        @if (brands != null)
+                                        {
+                                            var count = 1;
+                                            foreach (Brand brand in brands)
+                                            {
+                                                <tr>
+                                                    <td>@(count++)</td>
+                                                    <td id="brandName_@brand.Id">@brand.Name</td>
+                                                    <td id="brandDescription_@brand.Id">
+                                                        @brand.Description
+                                                    <input type="hidden" id="brandImageLocation_@brand.Id" value="@brand.ImageLocation" />
+                                                    <input type="hidden" id="brandCreatedBy_@brand.Id" value="@brand.CreatedBy" />
+                                                    <input type="hidden" id="brandCreatedOn_@brand.Id" value="@brand.CreatedOn" />
+                                                    <input type="hidden" id="brandImage_@brand.Id" value="@brand.BrandImage" />
+                                                </td>
+                                                @{
+
+                                                    var color = brand.IsActive ? "green" : "red";
+                                                    var activeStatus = brand.IsActive ? "Yes" : "No";
+                                                    <td style="color: @color">
+                                                        @activeStatus
+                                                    </td>
+                                                }
+                                                <td>
+                                                    @*<input type="button" class="btn btn-success" onclick="location.href = '../brand/edit/@brand.Id'" value="Edit"/>*@
+                                                    <input type="button" class="btn btn-success" onclick="changeAddBrandFormStateToEdit(@brand.Id)" value="Edit" />
+                                                </td>
+
+
+                                            </tr>
+                                                }
+                                            }
+                                    </tbody>
+                                </table>
+
+                            </div>
+                        </div>
+                        <!-- end widget content -->
+
+                    </div>
+                    <!-- end widget div -->
+
+                </div>
+                <!-- end widget -->
+
+            </article>
+            <!-- WIDGET END -->
+
+        </div>
+        <!-- end row -->
+        <!-- END ROW -->
+
+    </section>
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+
+    <script>
+        $(document).ready(function() {
+            $(function () {
+                setTimeout(function () {
+                    $("#flashMessage").hide('blind', {}, 500);
+                }, 5000);
+            });
+            $('#brandIsActive').attr('checked', true);
+        });
+
+        $(".UploadFile").change(function () {
+            if (this.files[0].size > 2097152) {
+                alert("File is too big!");
+                this.value = "";
+            };
+        });
+
+        function changeAddBrandFormStateToEdit(brandId) {
+            $(".field-validation-error").empty();
+            $("#preloader").css('display', 'block');
+
+            if ($('#formBrandImageRow').length) {
+                $("#formBrandImageRow").remove();
+            }
+
+            // Scroll to the top of the form
+            $('html, body').animate({
+                scrollTop: $("#addBrandFormHeading").offset().top
+                },
+                500);
+
+            // Change form state to edit
+            $("#addBrandFormHeading").text("Update Brand");
+            $("#brandAddButton").text("Update");
+            $("#addBrandForm").attr("action", "@BaseUrl.subDirectory/Brand/Edit");
+            $("#brandId").val(brandId);
+
+            var data = { brandId: brandId };
+            $.ajax({
+                method: 'POST',
+                url: "@Url.Action("GetBrandDetailsById", "Brand")",
+                dataType: "json",
+                contentType: 'application/json',
+                data: JSON.stringify(data),
+                crossDomain: true,
+                success: function (data) {
+                    toastr.clear();
+                    if (data.Status == "Ok") {
+                        var createdOnFormatedDate = "";
+                        var createdOn = "";
+                        if (data.Brand.CreatedOn == null) {
+                            createdOnFormatedDate = null;
+                        } else {
+                            createdOn = new Date(parseInt(data.Brand.CreatedOn.substr(6)));
+                            createdOnFormatedDate = createdOn.getFullYear() + '-' + ('0' + (createdOn.getMonth() + 1)).slice(-2) + '-' + ('0' + createdOn.getDate()).slice(-2) + ' ' + ('0' + createdOn.getHours()).slice(-2) + ':' + ('0' + (createdOn.getMinutes())).slice(-2) + ':' + ('0' + createdOn.getSeconds()).slice(-2);
+                        }                       
+                        $("#brandName").val($.trim(data.Brand.Name));
+                        $("#brandDescription").val($.trim(data.Brand.Description));
+                        $("#brandCreatedOn").val(createdOnFormatedDate);
+                        $("#brandCreatedBy").val(data.Brand.CreatedBy);
+                        $("#brandImageLocation").val(data.Brand.ImageLocation);
+                        $("#brandImage").val(data.Brand.BrandImage);
+                        $("#brandImageFile").rules("add", { required: false });
+                        if (data.Brand.IsActive === true) {
+                            $("#brandIsActive").prop('checked', true);
+                        } else {
+                            $("#brandIsActive").prop('checked', false);
+                        }
+                        var imageUrl = '@BaseUrl.imageUrl' + data.Brand.BrandImage;
+                        //$("#formDescriptionRow").after(
+                        //    '<div class="row" id="formBrandImageRow">' +
+                        //    +'<section class="col col-6" style="padding-bottom: 5px; margin-bottom: 5px">'
+                        //    +'<section class="col col-3">'
+                        //    +'<label class="label">Image</label>' 
+                        //    +'</section>'
+                        //    +'<section class="col col-9">'
+                        //    +'<img src="'+imageUrl+'" width="100px" height="100px" style="border-radius: 5px; border: 1px solid #efefef" alt="tab-img"/>'
+                        //    +'</section>'
+                        //    +'</section>'
+                        //    +'</div>'
+                        //);
+                        $("#formDescriptionRow").after('<div class="row" id="formBrandImageRow">' +
+                            '<section class="col col-2"></section><section class="col col-2">' +
+                            '<label class="label">Image</label></section><section class="col col-6"> ' +
+                            '<img src="' + imageUrl + '" width="100px" height="100px" style="border-radius: 5px; border: 1px solid #efefef" alt="tab-img"/>' +
+                            '</section><section class="col col-2"></section></div>');
+                        
+                    } else {
+                        toastr.error("Something went wrong");
+                    }
+
+                },
+                error: function () {
+                    toastr.error("Something went wrong");
+                }
+            });
+            $("#preloader").css('display', 'none');
+        }
+
+        $("#brandResetButton").click(function () {
+
+            $("#formBrandImageRow").fadeOut(300,
+                function() {
+                    $("#formBrandImageRow").remove();
+                });
+            $("#addBrandFormHeading").text("Add Brand");
+            $("#brandAddButton").text("Add");
+            $("#addBrandForm").attr("action", "@BaseUrl.subDirectory/Brand/Create");
+            $("#brandName").val("");
+            $("#brandIsActive").prop('checked', true);
+            $("#brandImageFile").val("");
+            $("#placeImage").val("");
+            $("#ImageLocation").val("");
+            $("#brandDescription").val("");
+            $(".field-validation-error").empty();
+            $("#brandImageFile").rules("add", { required: true });
+        });
+    </script>
+}

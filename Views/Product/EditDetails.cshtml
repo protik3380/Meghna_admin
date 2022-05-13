@@ -1,0 +1,437 @@
+﻿@using EFreshAdmin.Utility
+@model EFreshStore.Models.Context.ProductUnit
+@{
+    ViewBag.Title = "EditDetails";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" type="text/css" href="~/Content/css/form-design.css" />
+    <style>
+        .ui-datepicker-header {
+            color: #3e9aba !important;
+            background-image: none !important;
+            border-radius: 0;
+        }
+
+        .ui-datepicker {
+            width: 280px;
+            padding: 2px;
+        }
+
+        .ui-datepicker-prev, .ui-datepicker-next {
+            /*color: #3e9aba !important;*/
+            color: black !important;
+        }
+
+        .ui-datepicker .ui-datepicker-next span {
+            width: 60px;
+            top: 10px;
+            left: -10px;
+        }
+
+        .ui-datepicker .ui-datepicker-prev span {
+            width: 60px;
+            top: 10px;
+            left: 6px;
+        }
+
+        #dropdown {
+            width: 80%;
+            padding: 12px 15px;
+            margin-bottom: 5px;
+            border: none;
+            background-color: #f1f1f1;
+        }
+    </style>
+</head>
+@*<body>
+    <div class="container">
+        <div class="form-horizontal" id="div1">
+            @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "productDetailsform", @enctype = "multipart/form-data" }))
+            {
+                @Html.AntiForgeryToken()
+                <div class="form-horizontal">
+                    <h2>Edit Product Details</h2>
+                    <hr />
+                    <input type="hidden" name="Id" value="@Model.Id" />
+                    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+                    <div class='@TempData["Class"]' id="flashMessage" role="alert">@TempData["Message"]</div>
+
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.ProductId, "Product Name", htmlAttributes: new { @class = "control-label col-md-4" })
+                        <div class="col-md-8">
+
+                            @Html.DropDownListFor(c => c.ProductId, new SelectList(ViewBag.product, "Id", "Name"), "---Select---", new { @id = "dropdown" })
+                            <br />
+                            @Html.ValidationMessageFor(model => model.ProductId, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.StockKeepingUnit, "Stock Keeping Unit", htmlAttributes: new { @class = "control-label col-md-4" })
+                        <div class="col-md-8">
+                            @Html.TextBoxFor(model => model.StockKeepingUnit, new { placeholder = "Enter produt Stock Keeping Unit" })
+                            <br />
+                            @Html.ValidationMessageFor(model => model.StockKeepingUnit, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.CartonSize, "Carton Size", htmlAttributes: new { @class = "control-label col-md-4" })
+                        <div class="col-md-8">
+                            @Html.TextBoxFor(model => model.CartonSize, new { placeholder = "Enter carton size" })
+                            <br />
+                            @Html.ValidationMessageFor(model => model.CartonSize, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.CartonSizeUnit, "Carton Size Unit", htmlAttributes: new { @class = "control-label col-md-4" })
+                        <div class="col-md-8">
+                            @Html.TextBoxFor(model => model.CartonSizeUnit, new { placeholder = "Enter carton size unit" })
+                            <br />
+                            @Html.ValidationMessageFor(model => model.CartonSizeUnit, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.DistributorPricePerCarton, "Distributor Price Per Carton", htmlAttributes: new { @class = "control-label col-md-4" })
+                        <div class="col-md-8">
+                            @Html.TextBoxFor(model => model.DistributorPricePerCarton, new { placeholder = "Enter Distributor Price Per Carton" })
+                            <br />
+                            @Html.ValidationMessageFor(model => model.DistributorPricePerCarton, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.TradePricePerCarton, "Trade Price Per Carton", htmlAttributes: new { @class = "control-label col-md-4" })
+                        <div class="col-md-8">
+                            @Html.TextBoxFor(model => model.TradePricePerCarton, new { placeholder = "Enter Trade Price Per Carton" })
+                            <br />
+                            @Html.ValidationMessageFor(model => model.TradePricePerCarton, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.MaximumRetailPrice, "Maximum retail price", htmlAttributes: new { @class = "control-label col-md-4" })
+                        <div class="col-md-8">
+                            @Html.TextBoxFor(model => model.MaximumRetailPrice, new { placeholder = "Enter maximum retail price" })
+                            <br />
+                            @Html.ValidationMessageFor(model => model.MaximumRetailPrice, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.EffectiveDate, "Effective Date", htmlAttributes: new { @class = "control-label col-md-4" })
+                        <div class="col-md-8">
+                            @Html.TextBoxFor(model => model.EffectiveDate, new { placeholder = "Enter effective date", @readonly = "readonly", @class = "ui-datepicker-prev ui-datepicker-next ui-datepicker-header" })
+                            <br />
+                            @Html.ValidationMessageFor(model => model.EffectiveDate, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.Label("ImageLoactoin", "Image", htmlAttributes: new { @class = "control-label col-md-4" })
+                        <div class="col-md-5">
+                            @foreach (var image in Model.ProductImages)
+                            {
+                                if (image.ImageLocation != null)
+                                {
+                                    <img src="@BaseUrl.imageUrl\@image.ImageLocation" width="100px" height="100px" style="border-radius: 5px; border: 1px solid #efefef" alt="tab-img">
+                                }
+                            }
+                        </div>
+                    </div>
+
+
+                    <div class="form-group">
+                        @Html.Label("ImageLoactoin", "Product Images", htmlAttributes: new { @class = "control-label col-md-4" })
+                        <div class="col-md-5">
+                            <input type="file" name="ProductImages[0].ImageLocation" id="ProductImages[0].ImageLocation" class="form-control UploadFile" />
+                            <input type="file" name="ProductImages[1].ImageLocation" id="ProductImages[1].ImageLocation" class="form-control UploadFile" />
+                            <input type="file" name="ProductImages[2].ImageLocation" id="ProductImages[2].ImageLocation" class="form-control UploadFile" />
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="col-md-offset-4 col-md-8">
+                            <input type="submit" id="submit" value="Update" class="btn btn-default" />
+                            <br>
+                        </div>
+                    </div>
+                </div>
+            }
+            <div style="margin-left: 50px; color: red">
+                @Html.ActionLink("Back to List", "ViewProductUnit", "", htmlAttributes: new { @class = "backLink" })
+            </div>
+        </div>
+    </div>
+
+    @section scripts{
+        @Scripts.Render("~/bundles/jqueryval")
+        <script type="text/javascript">
+            $(".UploadFile").change(function () {
+                if (this.files[0].size > 2097152) {
+                    alert("File is too big!");
+                    this.value = "";
+                };
+            });
+            $(document).ready(function () {
+                $('#EffectiveDate').datepicker({
+                    changeMonth: true,
+                    changeYear: true,
+                    dateFormat: "d MM, yy",
+                    showAnim: "slide"
+                });
+
+
+                //$("#saveButton").click(function () {
+                //    var productId = $("#ProductId").val();
+                //    var stockKeepingUnit = $("#StockKeepingUnit").val();
+                //    var cartonSize = $("#CartonSize").val();
+                //    var distributorPricePerCarton = $("#DistributorPricePerCarton").val();
+                //    var tradePricePerCarton = $("#TradePricePerCarton").val();
+                //    var maximumRetailPrice = $("#MaximumRetailPrice").val();
+                //    var ProductUnitVm = {};
+                //    var Images = [];
+                //    ProductUnitVm.ProductId = productId;
+                //    ProductUnitVm.StockKeepingUnit = stockKeepingUnit;
+                //    ProductUnitVm.CartonSize = cartonSize;
+                //    ProductUnitVm.DistributorPricePerCarton = distributorPricePerCarton;
+                //    ProductUnitVm.TradePricePerCarton = tradePricePerCarton;
+                //    ProductUnitVm.MaximumRetailPrice = maximumRetailPrice;
+
+                //    var imageLocation1 = $("#ImageLocation1").get();
+                //    var imageLocation2 = $("#ImageLocation2").get();
+                //    var imageLocation3 = $("#ImageLocation3").get();
+                //    Images[0].ImageLocation = imageLocation1;
+                //    //var Images = [
+                //    //    { ImageLocation: imageLocation1 },
+                //    //    { ImageLocation: imageLocation2 },
+                //    //    { ImageLocation: imageLocation3 }
+                //    //];
+
+                //    ProductUnitVm.ProductImages = Images;
+                //    var data=$('#productDetailsform').serialize();
+                //    $.ajax({
+                //        type: "POST",
+                //        url: 'http://localhost:50644/api/products/AddDetails',
+                //        contentType: "application/json; charset=utf-8",
+                //        dataType: "json",
+                //        crossDomain: true,
+                //        data: JSON.stringify(ProductUnitVm),
+                //        success: function (data) {
+                //            alert(data);
+
+                //        }
+
+                //    });
+                //});
+
+                //var images = [];
+                //var image = {};
+                //var i = 0;
+
+                //$("#btnAdd").click(function () {
+                //    //image.Id = i++;
+                //    image.ImageLocation = $("#ImageLocation").get(0);
+                //    alert(image.ImageLocation);
+                //    var table = "<tr><td><input hidden='hidden' name='ProductImages[" + i + "].Id' type='text'  value=" + i + " />" + i + "</td><td><input hidden='hidden' type='file'name='ProductImages[" + i + "].ImageLocation'  value=" + image.ImageLocation + " />" + image.ImageLocation + "</td></tr>";
+                //    for (var j = 0; j < images.length; j++) {
+                //        if (images[j].ImageLocation === image.ImageLocation) {
+                //            alert("this product is already exsit");
+                //            return;
+                //        }
+                //    }
+                //    $("#tblImage").append(table);
+                //    i++;
+                //    images.push(image);
+                //});
+
+                $(function () {
+                    setTimeout(function () {
+                        $("#flashMessage").hide('blind', {}, 500);
+                    }, 5000);
+                });
+            });
+        </script>
+    }
+</body>*@
+</html>
+<section id="widget-grid" class="" style="margin-bottom: 2%">
+    <div class="row">
+        <article class="col-sm-12 col-md-12 col-lg-12">
+            <div class="jarviswidget" id="wid-id-3" data-widget-editbutton="false" data-widget-custombutton="false">
+                <header>
+                    <span class="widget-icon"> <i class="fa fa-edit"></i> </span>
+                    <h2>Update Product Details</h2>
+
+                </header>
+                <div>
+                    <div class="widget-body no-padding">
+                        @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "AddProductDetailsform", @enctype = "multipart/form-data", @class = "smart-form", @novalidate = "novalidate" }))
+                        {
+
+                            @Html.AntiForgeryToken()
+                            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+                            <fieldset>
+                                <div class="row" style="padding-bottom: 0px;margin-bottom: 0px">
+                                    <section class="col col-6" style="padding-bottom: 0;margin-bottom: 0px">
+                                        <section class="col col-3">
+                                            <label class="label">Name <span style="color: red"> *</span></label>
+                                        </section>
+                                        <section class="col col-9">
+                                            <label class="select">
+                                                <label class="select">
+                                                    @Html.DropDownListFor(x => x.ProductId, new SelectList(ViewBag.product, "Id", "Name"), "----Select Product----")<i></i>
+                                                </label>
+                                            </label>
+                                        </section>
+                                    </section>
+                                    <section class="col col-6" style="padding-bottom: 0px;margin-bottom: 0px">
+                                        <section class="col col-3">
+                                            <label class="label">Stock Keeping Unit <span style="color: red"> *</span></label>
+                                        </section>
+                                        <section class="col col-9">
+                                            <label class="input">
+                                                @Html.TextBoxFor(model => model.StockKeepingUnit, new { placeholder = "Enter produt Stock Keeping Unit" })
+                                                @Html.ValidationMessageFor(model => model.StockKeepingUnit, "", new { @class = "text-danger" })
+                                            </label>
+
+                                        </section>
+                                    </section>
+                                </div>
+                                <div class="row" style="padding-bottom: 0px;margin-bottom: 0px">
+                                    <section class="col col-6" style="padding-bottom: 0px;margin-bottom: 0px">
+                                        <section class="col col-3">
+                                            <label class="label">Carton Size<span style="color: red"> *</span></label>
+                                        </section>
+                                        <section class="col col-9">
+                                            <label class="input">
+                                                @Html.TextBoxFor(model => model.CartonSize, new { placeholder = "Enter carton size" })
+                                                @Html.ValidationMessageFor(model => model.CartonSize, "", new { @class = "text-danger" })
+                                            </label>
+                                        </section>
+                                    </section>
+                                    <section class="col col-6" style="padding-bottom: 0px;margin-bottom: 0px">
+                                        <section class="col col-3">
+                                            <label class="label">Carton Size Unit<span style="color: red"> *</span></label>
+                                        </section>
+                                        <section class="col col-9">
+                                            <label class="input">
+                                                @Html.TextBoxFor(model => model.CartonSizeUnit, new { placeholder = "Enter carton size unit" })
+                                                @Html.ValidationMessageFor(model => model.CartonSizeUnit, "", new { @class = "text-danger" })
+                                            </label>
+
+                                        </section>
+                                    </section>
+                                </div>
+                                <div class="row" style="padding-bottom: 0px;margin-bottom: 0px">
+                                    <section class="col col-6" style="padding-bottom: 0px;margin-bottom: 0px">
+                                        <section class="col col-3">
+                                            <label class="label">Maximum Retail Price<span style="color: red"> *</span></label>
+                                        </section>
+                                        <section class="col col-9">
+                                            <label class="input">
+                                                @Html.TextBoxFor(model => model.MaximumRetailPrice, new { placeholder = "Enter maximum retail price" })
+                                                @Html.ValidationMessageFor(model => model.MaximumRetailPrice, "", new { @class = "text-danger" })
+                                            </label>
+
+                                        </section>
+                                    </section>
+                                    <section class="col col-6" style="padding-bottom: 0px;margin-bottom: 0px">
+                                        <section class="col col-3">
+                                            <label class="label">Distributor Price Per Carton<span style="color: red"> *</span></label>
+                                        </section>
+                                        <section class="col col-9">
+                                            <label class="input">
+                                                @Html.TextBoxFor(model => model.DistributorPricePerCarton, new { placeholder = "Enter Distributor Price Per Carton" })
+                                                <br />
+                                                @Html.ValidationMessageFor(model => model.DistributorPricePerCarton, "", new { @class = "text-danger" })
+                                            </label>
+
+                                        </section>
+                                    </section>
+                                </div>
+
+                                <div class="row" style="padding-bottom: 0px;margin-bottom: 0px">
+                                    <section class="col col-6" style="padding-bottom: 0px;margin-bottom: 0px">
+                                        <section class="col col-3">
+                                            <label class="label">Trade Price Per Carton<span style="color: red"> *</span></label>
+                                        </section>
+                                        <section class="col col-9">
+                                            <label class="input">
+                                                @Html.TextBoxFor(model => model.TradePricePerCarton, new { placeholder = "Enter Trade Price Per Carton" })
+                                                @Html.ValidationMessageFor(model => model.TradePricePerCarton, "", new { @class = "text-danger" })
+                                            </label>
+
+                                        </section>
+                                    </section>
+                                    <section class="col col-6" style="padding-bottom: 0px;margin-bottom: 0px">
+                                        <section class="col col-3">
+                                            <label class="label">Effective Date <span style="color: red"> *</span></label>
+                                        </section>
+                                        <section class="col col-9">
+                                            <label class="input">
+                                                <i class="icon-append fa fa-calendar"></i>
+                                                @Html.TextBoxFor(model => model.EffectiveDate, new { placeholder = "Enter effective date", @readonly = "readonly", @class = "ui-datepicker-prev ui-datepicker-next ui-datepicker-header" })
+                                                @Html.ValidationMessageFor(model => model.EffectiveDate, "", new { @class = "text-danger" })
+                                            </label>
+
+                                        </section>
+                                    </section>
+                                </div>
+
+                                <div class="row" style="padding-bottom: 0px;margin-bottom: 0px">
+
+                                    <section class="col col-6" style="padding-bottom: 5px;margin-bottom: 5px">
+                                        <section>
+                                            <section class="col col-3">
+                                                <label class="label">Product Images</label>
+                                            </section>
+                                            <section class="col col-9">
+                                                <div class="input input-file">
+                                                    
+                                                    <div class="form-group">
+                                                     
+                                                        <div>
+                                                            @foreach (var image in Model.ProductImages)
+                                                            {
+                                                                if (image.ImageLocation != null)
+                                                                {
+                                                                    <img src="@BaseUrl.imageUrl\@image.ImageLocation" width="100px" height="100px" style="border-radius: 5px; border: 1px solid #efefef" alt="tab-img">
+                                                                }
+                                                            }
+                                                        </div>
+                                                    </div>
+                                                    <br/>
+                                                    <div>
+                                                        <div class="input input-file">
+                                                            <span class="button"><input name="ProductImages[0].ImageLocation" id="ProductImages[0].ImageLocation" type="file" onchange="this.parentNode.nextSibling.value = this.value">Browse</span><input type="text" placeholder="No file choosen" readonly="">
+                                                        </div>
+                                                        <div class="input input-file">
+                                                            <span class="button"><input name="ProductImages[1].ImageLocation" id="ProductImages[1].ImageLocation" type="file" onchange="this.parentNode.nextSibling.value = this.value">Browse</span><input type="text" placeholder="No file choosen" readonly="">
+                                                        </div>
+                                                        <div class="input input-file">
+                                                            <span class="button"><input name="ProductImages[2].ImageLocation" id="ProductImages[2].ImageLocation" type="file" onchange="this.parentNode.nextSibling.value = this.value">Browse</span><input type="text" placeholder="No file choosen" readonly="">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </section>
+                                        </section>
+                                       
+                                    </section>
+                                </div>
+                            </fieldset>
+                            <footer>
+                                <button type="submit" id="brandAddButton" class="btn btn-primary">Update</button>
+                            </footer>
+                        }
+
+                    </div>
+                </div>
+            </div>
+        </article>
+    </div>
+</section>

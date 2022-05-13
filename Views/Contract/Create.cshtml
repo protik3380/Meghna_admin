@@ -1,0 +1,169 @@
+﻿
+@model EFreshStore.Models.Context.CorporateContract
+
+@{
+    ViewBag.Title = "Create";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@section style{
+    <style>
+        .error {
+            color: red;
+        }
+    </style>
+}
+
+<section id="widget-grid" class="">
+    <div class="row" style="height: 100%">
+        <article class="col-sm-12 col-md-12 col-lg-12">
+            <div class="jarviswidget" id="wid-id-4" data-widget-editbutton="false" data-widget-custombutton="false">
+                <header>
+                    <span class="widget-icon"> <i class="fa fa-edit"></i> </span>
+                    <h2>Add Corporate Contract</h2>
+
+                </header>
+                <div>
+
+                    <div class="widget-body no-padding">
+                        @using (Html.BeginForm(null, null, FormMethod.Post, new {id = "corporateContractform", @class = "smart-form"}))
+                        {
+                            @Html.AntiForgeryToken()
+                            <div class='@TempData["Class"]' id="flashMessage" role="alert">@TempData["Message"]</div>
+                            <fieldset>
+
+
+                                <div class="row">
+                                    <section class="col col-2"></section>
+                                    <section class="col col-2">
+                                        <label class="label">Company Name<span style="color: red"> *</span></label>
+                                    </section>
+                                    <section class="col col-6">
+                                        <label class="input">
+                                            <input type="text" name="CompanyName" id="CompanyName" placeholder="Company name">
+                                        </label>
+                                    </section>
+                                    <section class="col col-2"></section>
+                                </div>
+
+                                <div class="row">
+                                    <section class="col col-2"></section>
+                                    <section class="col col-2">
+                                        <label class="label">FMCG Discount Percentage <span style="color: red"> *</span></label>
+                                    </section>
+                                    <section class="col col-6">
+                                        <label class="input">
+                                            <input type="number" name="FMCGDiscountPercentage" id="FMCGDiscountPercentage" placeholder="FMCG Discount Percentage">
+                                        </label>
+                                    </section>
+                                    <section class="col col-2"></section>
+                                </div>
+
+                                <div class="row">
+                                    <section class="col col-2"></section>
+                                    <section class="col col-2">
+                                        <label class="label">LPG Discount Percentage</label>
+                                    </section>
+                                    <section class="col col-6">
+                                        <label class="input">
+                                            <input type="number" name="LPGDiscountPercentage" id="LPGDiscountPercentage" placeholder="LPG Discount Percentage">
+                                        </label>
+                                    </section>
+                                    <section class="col col-2"></section>
+                                </div>
+                                <div class="row">
+                                    <section class="col col-2"></section>
+                                    <section class="col col-2">
+                                        <label class="label">Effective Date</label>
+                                    </section>
+                                    <section class="col col-6">
+                                        <label class="input">
+                                            <i class="icon-append fa fa-calendar"></i>
+                                            <input type="text" name="Validity" autocomplete="off" id="Validity" placeholder="Effective date">
+                                        </label>
+                                    </section>
+                                    <section class="col col-2"></section>
+                                </div>
+
+                                <div class="row">
+                                    <section class="col col-2"></section>
+                                    <section class="col col-2">
+                                        <label class="label">Description</label>
+                                    </section>
+                                    <section class="col col-6">
+                                        <label class="textarea">
+                                            <textarea rows="4" id="Description" name="Description" placeholder="Description"></textarea>
+                                        </label>
+                                    </section>
+                                    <section class="col col-2"></section>
+                                </div>
+                                <div class="row" style="margin-bottom: 5%">
+
+                                </div>
+                            </fieldset>
+                            <footer style="bottom: 0">
+                                <button type="submit" class="btn btn-primary">
+                                    Add
+                                </button>
+                            </footer>
+                        }
+                    </div>
+
+                </div>
+
+            </div>
+        </article>
+        <!-- END COL -->
+
+    </div>
+
+    <!-- END ROW -->
+
+</section>
+
+@section scripts{
+    @*@Scripts.Render("~/bundles/jqueryval")*@
+<script src="~/Scripts/jquery.validate.min.js"></script>
+    <script>
+        $("#corporateContractform").validate({
+
+            rules: {
+                CompanyName: "required",
+                FMCGDiscountPercentage: {
+                    required: true,
+                    range: [0, 100],
+                    number: true
+                },
+                LPGDiscountPercentage: {
+                  
+                    range: [0, 100],
+                    number: true
+                }
+
+            },
+            messages: {
+                CompanyName: "Please enter company name",
+                FMCGDiscountPercentage: {
+                    required: "Please enter fmcg discount percentage"
+                }
+
+
+            }
+        });
+        $(document).ready(function() {
+            $('#Validity').datepicker({
+                dateFormat: "d MM, yy",
+                prevText: '<i class="fa fa-chevron-left"></i>',
+                nextText: '<i class="fa fa-chevron-right"></i>',
+                onSelect: function (selectedDate) {
+                    $('#finishdate').datepicker('option', 'maxDate', selectedDate);
+                }
+            });
+
+            $(function() {
+                setTimeout(function() {
+                    $("#flashMessage").hide('blind', {}, 500);
+                }, 5000);
+            });
+        });
+    </script>
+}

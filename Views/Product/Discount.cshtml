@@ -1,0 +1,293 @@
+﻿@model EFreshStoreCore.Model.Context.ProductDiscount 
+@{
+    ViewBag.Title = "Discount";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    Session["BreadCrum"] = "Set Product Discount";
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <link href="~/Content/css/jquery-ui.min.css" rel="stylesheet"/>
+    <link rel="stylesheet" type="text/css" href="~/Content/css/form-design.css" />
+    <style>
+        .ui-datepicker-header {
+            color: #3e9aba !important;
+            background-image: none !important;
+            border-radius: 0;
+        }
+        .ui-datepicker {
+            width: 280px;
+            padding: 2px;
+        }
+
+        .ui-datepicker-prev, .ui-datepicker-next {
+            color: #3e9aba !important;
+        }
+
+        .ui-datepicker .ui-datepicker-next span {
+            width: 60px;
+            top: 10px;
+            left: -10px;
+        }
+
+        .ui-datepicker .ui-datepicker-prev span {
+            width: 60px;
+            top: 10px;
+            left: 6px;
+        }
+
+        input[type=button] {
+            width: 40%;
+            padding: 15px;
+            color: white;
+            margin: 5px 0 22px 0;
+            display: inline-block;
+            border: none;
+            background: #ffa726;
+        }
+        #Validity, #ActiveDate {
+            width: 80%;
+            padding: 12px 15px;
+            margin-bottom: 5px;
+            border: none;
+            background-color: #f1f1f1;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="form-horizontal" id="div1">
+            @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "productDiscountForm", @enctype = "multipart/form-data" }))
+            {
+                @Html.AntiForgeryToken()
+
+            <div class='@TempData["Class"]' id="flashMessage" role="alert">@TempData["Message"]</div>
+            <div class="form-horizontal">
+                <h2>Set Product Discount</h2>
+                <hr />
+                @Html.ValidationSummary(true)
+                
+                <div class="form-group">
+                    @Html.LabelFor(model => model.ProductUnit.Product, "Products", htmlAttributes: new {@class = "control-label col-md-4"})
+                    <div class="col-md-8">
+                        @Html.DropDownList("Products", new SelectList(ViewBag.products, "Id", "Name"), "-- Select Product --", new{ @class = "required"})
+                        <br/>@Html.ValidationMessageFor(model => model.ProductUnitId, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.ProductUnitId, "Product Unit", htmlAttributes: new {@class = "control-label col-md-4"})
+                    <div class="col-md-8">
+                        @Html.DropDownListFor(model => model.ProductUnitId, Enumerable.Empty<SelectListItem>(), "--Select Product Unit--", new{ @class = "required"})
+                        <br/>
+                        @Html.ValidationMessageFor(model => model.ProductUnitId, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.DiscountPercentage, "Discount Percentage", htmlAttributes: new {@class = "control-label col-md-4"})
+                    <div class="col-md-8">
+                        @Html.TextBoxFor(model => model.DiscountPercentage, new {placeholder = "Enter discount percentage", @class = "required"})
+                        <br/>@Html.ValidationMessageFor(model => model.DiscountPercentage, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.ActiveDate,"Start Date", htmlAttributes: new {@class = "control-label col-md-4"})
+                    <div class="col-md-8">
+                        <input id="ActiveDate" name="ActiveDate" class="datepicker" placeholder = "Enter start date" readonly>
+                        @*@Html.TextBoxFor(model => model.ActiveDate, new {placeholder = "Enter effective date", @readonly = "readonly", @class = "datepicker ui-datepicker-prev ui-datepicker-next ui-datepicker-header"})*@
+                        <br/>@Html.ValidationMessageFor(model => model.ActiveDate, "", new {@class = "text-danger"})
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.Validity,"End Date", htmlAttributes: new {@class = "control-label col-md-4"})
+                    <div class="col-md-8">
+                        <input id="Validity" name="Validity" class="datepicker" placeholder="Enter end date" readonly>
+                        <br/>@Html.ValidationMessageFor(model => model.Validity, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                <div id="submitForm">
+                    <div class="form-group">
+                        <div class="col-md-offset-4 col-md-8">
+                            <input type="submit" id="saveButton" value="Submit" class="btn btn-default toggle-disabled" disabled/>
+                            <br>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="confirmSubmit" hidden>
+                    <div class="form-group">
+                        <div class="col-md-offset-4 col-md-8">
+                            <input type="button" id="saveButton" value="Submit" class="btn btn-default toggle-disabled" data-toggle="modal" data-target="#confirmModal" disabled/>
+                            <br>
+                        </div>
+                    </div>
+
+                    <!-- Modal -->
+                    <div class="modal fade" id="confirmModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+                         aria-hidden="true">
+                        <div class="modal-dialog" role="document" style="width: 300px; margin-top: 20%;">
+                            <div class="modal-content">
+                                <div class="modal-body">
+                                    Previous discount will be deactivated. <br />
+                                    Do you want to add this discount?
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-primary" data-dismiss="modal">No</button>
+                                    <button type="submit" class="btn btn-primary">Yes</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            }
+            <div style="margin-left: 50px; color: red">
+                @Html.ActionLink("Back to List", "ViewProductDiscounts", "", htmlAttributes: new { @class = "backLink" })
+            </div>
+        </div>
+    </div>
+
+@section scripts{
+    <script src="~/Scripts/jquery.validate.min.js"></script>
+    @Scripts.Render("~/bundles/jqueryval")
+    <script type="text/javascript">
+        $(document).on('change keyup', '.required', function(e) {
+            var disabled = true;
+            $(".required").each(function() {
+                var value = this.value;
+                if ((value) && (value.trim() != '')) {
+                    disabled = false;
+                } else {
+                    disabled = true;
+                    return false;
+                }
+            });
+
+            if (disabled) {
+                $('.toggle-disabled').prop("disabled", true);
+            } else {
+                $('.toggle-disabled').prop("disabled", false);
+            }
+        });
+        $(document).ready(function() {
+            $(".datepicker").datepicker({
+                changeMonth: true,
+                changeYear: true,
+                yearRange: "2019:2050",
+                showAnim: "slide",
+                //nextText: '<span class="glyphicon glyphicon-chevron-right"></span>',
+                dateFormat: 'dd MM,yy'
+            });
+            //date validation regex
+            //$.validator.addMethod(
+            //        "regex",
+            //        function (value, element, regexp) {
+            //            //var re = new RegExp(regexp);
+            //            var re = new RegExp("^[0-9]{2}/[0-9]{2}/[0-9]{4}$");
+            //            return this.optional(element) || re.test(value);
+            //        },
+            //        "Invalid date format"
+            //);
+
+            $("#productDiscountForm").validate({
+                rules: {
+                    ProductUnitId: "required",
+                    DiscountPercentage: {
+                        required: true,
+                        range: [0, 100],
+                        number: true
+                    },
+                    Validity: {
+                        required: true,
+                        greaterThan: "#ActiveDate"
+                    },
+                    ActiveDate: {
+                        required: true
+                    }
+                },
+                messages: {
+                    ProductUnitId: "Please enter product unit",
+                    DiscountPercentage: {
+                        required: "Please enter discount percentage"
+                    },
+                    Validity: {
+                        required: "Please enter validity"
+                    },
+                    ActiveDate: {
+                        required: "Please enter an active date"
+                    }
+                }
+            });
+
+            $("#Products").change(function() {
+
+                var productId = $("#Products").val();
+                var product = { id: productId };
+                $("#ProductUnitId").empty();
+                $("#ProductUnitId").append('<option value="" selected>Select Product Unit</option>');
+
+                $.ajax({
+                    url: '@Url.Action("GetProductUnitsByProduct", "Product")',
+                    type: "GET",
+                    dataType: 'JSON',
+                    contentType: "application/json; charset=utf-8",
+                    data: product,
+                    success: function(data) {
+                        $.each(data, function(index, value) {
+                            $("#ProductUnitId").append('<option value="' + value.Id + '">' + value.StockKeepingUnit + '</option>');
+                        });
+                    },
+                    error: function() {
+                        alert("Something went wrong");
+                    }
+
+                });
+            });
+
+
+            $("#ProductUnitId").change(function () {
+                var productUnitId = $("#ProductUnitId").val();
+                var product = { id: productUnitId };
+
+                $.ajax({
+                    url: '@Url.Action("GetDiscountByProductUnit", "Product")',
+                    type: "GET",
+                    dataType: 'JSON',
+                    contentType: "application/json; charset=utf-8",
+                    data: product,
+                    success: function (data) {
+                        //alert("successful");
+                        if (data.Id !== 0) {
+                            $("#submitForm").hide();
+                            $("#confirmSubmit").show();
+                        } else {
+                            $("#submitForm").show();
+                            $("#confirmSubmit").hide();
+                        }
+                    },
+                    error: function () {
+                        alert("Something went wrong");
+                    }
+
+                });
+            });
+
+            $(function() {
+                setTimeout(function() {
+                    $("#flashMessage").hide('blind', {}, 500);
+                }, 5000);
+            });
+        });
+    </script>
+}
+</body>
+</html>
+
+

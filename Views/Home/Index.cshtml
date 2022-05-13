@@ -1,0 +1,683 @@
+﻿@using EFreshAdmin.Models
+@using EFreshAdmin.Models.EntityModels
+@using EFreshAdmin.Utility
+@using EFreshAdmin.Utility.Enums
+@using EFreshStore.Models.Context
+@section style
+{
+    <link href="~/Content/SmartAdmin/css/boxshadow-cards.css" rel="stylesheet"/>
+<style>
+    
+    /* The Modal (background) */
+    .modal {
+        display: none; /* Hidden by default */
+        position: fixed; /* Stay in place */
+        z-index: 999; /* Sit on top */
+        padding-top: 10px; /* Location of the box */
+        left: 0;
+        top: 0;
+        width: 100%; /* Full width */
+        height: 100%; /* Full height */
+        overflow: auto; /* Enable scroll if needed */
+        background-color: rgb(0,0,0); /* Fallback color */
+        background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+    }
+
+    /* Modal Content */
+    .modal-content {
+        background-color: #fefefe;
+        margin: auto;
+        padding: 10px;
+        border: 1px solid #888;
+        width: 70%;
+    }
+
+    /* The Close Button */
+    .close {
+        color: #aaaaaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+    }
+
+        .close:hover,
+        .close:focus {
+            color: #000;
+            text-decoration: none;
+            cursor: pointer;
+        }
+</style>
+}
+@{
+    long totalPendingOrders = 0;
+    long totalConfirmedOrders = 0;
+    long totalOnProcessingOrders = 0;
+    long totalShippedOrders = 0;
+    long totalDeliveredOrders = 0;
+    long totalReceivedOrders = 0;
+    long totalRejectedOrders = 0;
+    long totalBrand = 0;
+    long totalCategory = 0;
+    long totalProducts = 0;
+    long totalCustomer = 0;
+    long totalMGIUsers = 0;
+    long totalCorporateUsers = 0;
+    long totalMasterDepots = 0;
+    List<ThanaWiseMasterDepot> listOfMasterDepotWithThana = null;
+    List<Distributor> distributorList = null;
+    long userTypeId = Convert.ToInt64(Session["UserTypeId"]);
+    long userId = Convert.ToInt64(Session["UserId"]);
+    if (userTypeId == (long)UserTypeEnum.MasterDepotUser)
+    {
+        totalPendingOrders = ApiUtility.CountTotalOrdersByOrderStatus(userId,(long)OrderStatusEnum.Pending);
+        totalConfirmedOrders = ApiUtility.CountTotalOrdersByOrderStatus(userId,(long)OrderStatusEnum.Confirm);
+        totalOnProcessingOrders = ApiUtility.CountTotalOrdersByOrderStatus(userId, (long)OrderStatusEnum.OnProcessing);
+        totalShippedOrders = ApiUtility.CountTotalOrdersByOrderStatus(userId, (long)OrderStatusEnum.Shipped);
+        totalDeliveredOrders = ApiUtility.CountTotalOrdersByOrderStatus(userId, (long)OrderStatusEnum.Delivered);
+        totalReceivedOrders = ApiUtility.CountTotalOrdersByOrderStatus(userId, (long)OrderStatusEnum.Received);
+        totalRejectedOrders = ApiUtility.CountTotalOrdersByOrderStatus(userId, (long)OrderStatusEnum.Rejected);
+        listOfMasterDepotWithThana = ApiUtility.GetAllThanaAgainstMasterDepot();
+        distributorList = ApiUtility.GetAllDistributorAgainstMasterDepot();
+        ViewBag.ShowDiv = true;
+
+    }
+    else if (userTypeId == (long)UserTypeEnum.Admin)
+    {
+        totalBrand = (long)ApiUtility.CountTotalBrand();
+        totalCategory = (long)ApiUtility.CountTotalCategory();
+        totalProducts = (long)ApiUtility.CountTotalProduct();
+        totalCustomer = (long)ApiUtility.CountTotalCustomer();
+        totalMGIUsers = (long)ApiUtility.CountTotalMGIUser();
+        totalCorporateUsers = (long)ApiUtility.CountTotalCorporateUser();
+        totalMasterDepots = (long)ApiUtility.CountTotalMasterDepot();
+        ViewBag.ShowDiv = false;
+    }
+
+}
+<!-- row -->
+<div class="row">
+    <!-- NEW WIDGET START -->
+    <article class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+
+        <!-- Widget ID (each widget will need unique ID)-->
+        <div class="jarviswidget" id="wid-id-2" data-widget-colorbutton="false" data-widget-fullscreenbutton="false" data-widget-editbutton="false" data-widget-sortable="false">
+            <!-- widget options:
+            usage: <div class="jarviswidget" id="wid-id-0" data-widget-editbutton="false">
+
+            data-widget-colorbutton="false"
+            data-widget-editbutton="false"
+            data-widget-togglebutton="false"
+            data-widget-deletebutton="false"
+            data-widget-fullscreenbutton="false"
+            data-widget-custombutton="false"
+            data-widget-collapsed="true"
+            data-widget-sortable="false"
+
+            -->
+            <div align="center" style="padding: 0;margin: 0">
+                <header style="padding: 0;margin: 0">
+                    <h2 style="font-weight:bold">DASHBOARD</h2>
+                </header>
+            </div>
+
+
+            <!-- widget div-->
+            <div>
+                <!-- widget edit box -->
+                <div class="jarviswidget-editbox">
+                    <!-- This area used as dropdown edit box -->
+                    <input class="form-control" type="text">
+                </div>
+                <!-- end widget edit box -->
+                <!-- widget content -->
+
+                <div class="widget-body">
+                    <div class="container-fluid">
+                        
+                      
+                   @if (ViewBag.ShowDiv)
+                   {
+                       <div class="row" align="center" id="masterDepot">
+                           <div class="col-xs-12 col-sm-3 col-md-3 col-lg-3">
+                               <div class="wrimagecard wrimagecard-topimage">
+                                   <a href="@Url.Action("PendingOrders", "MasterDepot")">
+                                       <div class="wrimagecard-topimage_header" style="background-color: rgba(255, 188, 113, 0.1)">
+                                           <center><i id="totalCanceledRequest" class="fa" style="color: #f78707; font-size: 54px">@totalPendingOrders</i></center>
+                                       </div>
+                                       <div class="wrimagecard-topimage_title">
+                                           <center>
+                                               <p style="font-size: 13px">
+                                                   <strong> Pending Orders</strong>
+                                               </p>
+                                           </center>
+                                       </div>
+                                   </a>
+                               </div>
+                           </div>
+
+                           <div class="col-xs-12 col-sm-3 col-md-3 col-lg-3">
+                               <div class="wrimagecard wrimagecard-topimage">
+                                   <a href="@Url.Action("ConfirmedOrders", "MasterDepot")">
+                                       <div class="wrimagecard-topimage_header" style="background-color: rgba(237, 149, 48, 0.09)">
+                                           <center><i id="totalCanceledRequest" class="fa" style="color: #e59e4d; font-size: 54px">@totalConfirmedOrders</i></center>
+                                       </div>
+                                       <div class="wrimagecard-topimage_title">
+                                           <center>
+                                               <p style="font-size: 13px">
+                                                   <strong> Confirmed Orders</strong>
+                                               </p>
+                                           </center>
+                                       </div>
+                                   </a>
+                               </div>
+                           </div>
+
+                           <div class="col-xs-12 col-sm-3 col-md-3 col-lg-3">
+                               <div class="wrimagecard wrimagecard-topimage">
+                                   <a href="@Url.Action("OnProcessingOrders", "MasterDepot")">
+                                       <div class="wrimagecard-topimage_header" style="background-color: rgba(250, 188, 9, 0.1)">
+                                           <center><i id="totalCanceledRequest" class="fa" style="color: #ffb12f; font-size: 54px">@totalOnProcessingOrders</i></center>
+                                       </div>
+                                       <div class="wrimagecard-topimage_title">
+                                           <center>
+                                               <p style="font-size: 13px">
+                                                   <strong> On Processing Orders</strong>
+                                               </p>
+                                           </center>
+                                       </div>
+                                   </a>
+                               </div>
+                           </div>
+
+                           <div class="col-xs-12 col-sm-3 col-md-3 col-lg-3">
+                               <div class="wrimagecard wrimagecard-topimage">
+                                   <a href="@Url.Action("ShippedOrders", "MasterDepot")">
+                                       <div class="wrimagecard-topimage_header" style="background-color: rgba(45, 140, 172, 0.09)">
+                                           <center><i id="totalCanceledRequest" class="fa" style="color: #098ebc; font-size: 54px">@totalShippedOrders</i></center>
+                                       </div>
+                                       <div class="wrimagecard-topimage_title">
+                                           <center>
+                                               <p style="font-size: 13px">
+                                                   <strong> Shipped Orders</strong>
+                                               </p>
+                                           </center>
+                                       </div>
+                                   </a>
+                               </div>
+                           </div>
+
+                           <div class="col-xs-12 col-sm-3 col-md-3 col-lg-3">
+                               <div class="wrimagecard wrimagecard-topimage">
+                                   <a href="@Url.Action("DeliveredOrders", "MasterDepot")">
+                                       <div class="wrimagecard-topimage_header" style="background-color: rgba(37, 152, 154, 0.05)">
+                                           <center><i id="totalCanceledRequest" class="fa" style="color: #26adaf; font-size: 54px">@totalDeliveredOrders</i></center>
+                                       </div>
+                                       <div class="wrimagecard-topimage_title">
+                                           <center>
+                                               <p style="font-size: 13px">
+                                                   <strong> Delivered Orders</strong>
+                                               </p>
+                                           </center>
+                                       </div>
+                                   </a>
+                               </div>
+                           </div>
+                           <div class="col-xs-12 col-sm-3 col-md-3 col-lg-3">
+                               <div class="wrimagecard wrimagecard-topimage">
+                                   <a href="@Url.Action("ReceivedOrders", "MasterDepot")">
+                                       <div class="wrimagecard-topimage_header" style="background-color: rgba(26, 206, 77, 0.09)">
+                                           <center><i id="totalCanceledRequest" class="fa" style="color: #00b734; font-size: 54px">@totalReceivedOrders</i></center>
+                                       </div>
+                                       <div class="wrimagecard-topimage_title">
+                                           <center>
+                                               <p style="font-size: 13px">
+                                                   <strong> Received Orders</strong>
+                                               </p>
+                                           </center>
+                                       </div>
+                                   </a>
+                               </div>
+                           </div>
+                           <div class="col-xs-12 col-sm-3 col-md-3 col-lg-3">
+                               <div class="wrimagecard wrimagecard-topimage">
+                                   <a href="@Url.Action("RejectedOrders", "MasterDepot")">
+                                       <div class="wrimagecard-topimage_header" style="background-color: rgba(253, 83, 38, 0.05)">
+                                           <center><i id="totalCanceledRequest" class="fa" style="color: #ec3e10; font-size: 54px">@totalRejectedOrders</i></center>
+                                       </div>
+                                       <div class="wrimagecard-topimage_title">
+                                           <center>
+                                               <p style="font-size: 13px">
+                                                   <strong> Canceled Orders</strong>
+                                               </p>
+                                           </center>
+                                       </div>
+                                   </a>
+                               </div>
+                           </div>
+
+                       </div>
+                       <div class="row" align="center" style="margin-top: 5%; margin-bottom: 0;">
+                           <div class="col-xs-12 col-sm-3 col-md-3 col-lg-3">
+                               <div class="wrimagecard wrimagecard-topimage" style="background-color: rgba(1, 74, 137, 0.05);">
+                                   <a onclick="onDistributorWithMasterDepot()" style="cursor: pointer">
+                                       <div class="wrimagecard-topimage_title">
+                                           <center>
+                                               <p style="color: rgb(1, 74, 137); font-size: 12px">
+                                                   <strong>View Distributors</strong>
+                                               </p>
+                                           </center>
+                                       </div>
+                                   </a>
+                               </div>
+                           </div>
+
+                           <div class="col-xs-12 col-sm-3 col-md-3 col-lg-3">
+                               <div class="wrimagecard wrimagecard-topimage" style="background-color: rgba(1, 74, 137, 0.05);">
+                                   <a id="myBtn" onclick="onThanaWithMasterDepot()" style="cursor: pointer">
+                                       <div class="wrimagecard-topimage_title">
+                                           <center>
+                                               <p style="color: rgb(1, 74, 137); font-size: 12px">
+                                                   <strong> View Thana List</strong>
+                                               </p>
+                                           </center>
+                                       </div>
+                                   </a>
+                               </div>
+                           </div>
+                       </div>
+                    <div id="myModal" class="modal">
+                        <!-- Modal content -->
+                        <div class="modal-content">
+                            <span class="close"></span>
+                            <div class="modal-body">
+                                <div class="panel-body">
+                                    <h2>
+                                        <strong style="text-align: center">Thana List</strong>
+                                    </h2>
+                                    <div class="table-responsive">
+                                        <div class="table-responsive" align="center">
+                                            <table class="table" id="dt_basic" style="width: 100%">
+                                                <thead>
+                                                    <tr style="width: 100%">
+                                                        <th>SL</th>
+                                                        <th>Name</th>
+                                                        <th>District</th>
+                                                        <th>Is Active?</th>
+
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+
+                                                    @{
+
+                                                        if (listOfMasterDepotWithThana.Count != 0)
+                                                        {
+                                                            int sl = 1;
+                                                            foreach (var masterDepotWithThana in listOfMasterDepotWithThana)
+                                                            {
+
+                                                                <tr style="width: 100%">
+                                                                    <td>@sl</td>
+                                                                    <td>@masterDepotWithThana.Thana.Name</td>
+                                                                    <td>@masterDepotWithThana.Thana.District.Name</td>
+                                                                    @{
+                                                                        var status = masterDepotWithThana.Thana.IsActive ? "Yes" : "No";
+                                                                        var color = masterDepotWithThana.Thana.IsActive ? "green" : "red";
+                                                                        <td style="color: @color;">@status</td>
+                                                                    }
+                                                                </tr>
+                                                                                sl += 1;
+                                                                            }
+                                                                        }
+                                                    }
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                        <div id="distributorList" class="modal">
+                            <!-- Modal content -->
+                            <div class="modal-content">
+                                <span class="close1"></span>
+                                <div class="modal-body">
+                                    <div class="panel-body">
+                                        <h2>
+                                            <strong style="text-align: center">Distributor List</strong>
+                                        </h2>
+                                        <div class="table-responsive">
+                                            <div class="table-responsive" align="center">
+                                                <table class="table" id="dt_basic1" style="width: 100%">
+                                                    <thead>
+                                                        <tr style="width: 100%">
+                                                            <th>SL</th>
+                                                            <th>Name</th>
+                                                            <th>Contact Person</th>
+                                                            <th>Address</th>
+                                                            <th>Email</th>
+                                                            <th>Phone</th>
+                                                            <th>Is Active?</th>
+
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+
+                                                        @{
+                                                            if (distributorList.Count != 0)
+                                                            {
+                                                                int sl = 1;
+                                                                foreach (var distributor in distributorList)
+                                                                {
+
+                                                                    <tr style="width: 100%">
+                                                                        <td>@sl</td>
+                                                                        <td>@distributor.Name</td>
+                                                                        <td>@distributor.ContactPerson</td>
+                                                                        <td>@distributor.Address</td>
+                                                                        <td>@distributor.Email</td>
+                                                                        <td>@distributor.Phone</td>
+                                                                        @{
+                                                                            var status = distributor.IsActive ? "Yes" : "No";
+                                                                            var color = distributor.IsActive ? "green" : "red";
+                                                                            <td style="color: @color;">@status</td>
+                                                                        }
+                                                                    </tr>
+                                                                                    sl += 1;
+                                                                                }
+                                                                            }
+                                                        }
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                                                                            }
+                                                                            else
+                                                                            {
+                        <div class="row" align="center">
+                            <div class="col-xs-12 col-sm-3 col-md-3 col-lg-3">
+                                <div class="wrimagecard wrimagecard-topimage">
+                                    <a href="@Url.Action("Index", "Brand")">
+                                        <div class="wrimagecard-topimage_header" style="background-color: rgba(255, 188, 113, 0.1)">
+                                            <center><i id="totalCanceledRequest" class="fa" style="color: #f78707; font-size: 54px">@totalBrand</i></center>
+                                        </div>
+                                        <div class="wrimagecard-topimage_title">
+                                            <center>
+                                                <p style="font-size: 13px">
+                                                    <strong>Brands</strong>
+                                                </p>
+                                            </center>
+                                        </div>
+                                    </a>
+                                </div>
+                            </div>
+
+                            <div class="col-xs-12 col-sm-3 col-md-3 col-lg-3">
+                                <div class="wrimagecard wrimagecard-topimage">
+                                    <a href="@Url.Action("Index", "Category")">
+                                        <div class="wrimagecard-topimage_header" style="background-color: rgba(237, 149, 48, 0.09)">
+                                            <center><i id="totalCanceledRequest" class="fa" style="color: #e59e4d; font-size: 54px">@totalCategory</i></center>
+                                        </div>
+                                        <div class="wrimagecard-topimage_title">
+                                            <center>
+                                                <p style="font-size: 13px">
+                                                    <strong>Categories</strong>
+                                                </p>
+                                            </center>
+                                        </div>
+                                    </a>
+                                </div>
+                            </div>
+
+                            <div class="col-xs-12 col-sm-3 col-md-3 col-lg-3">
+                                <div class="wrimagecard wrimagecard-topimage">
+                                    <a href="@Url.Action("ViewProductUnit","Product")">
+                                        <div class="wrimagecard-topimage_header" style="background-color: rgba(250, 188, 9, 0.1)">
+                                            <center><i id="totalCanceledRequest" class="fa" style="color: #ffb12f; font-size: 54px">@totalProducts</i></center>
+                                        </div>
+                                        <div class="wrimagecard-topimage_title">
+                                            <center>
+                                                <p style="font-size: 13px">
+                                                    <strong>Products</strong>
+                                                </p>
+                                            </center>
+                                        </div>
+                                    </a>
+                                </div>
+                            </div>
+
+                            <div class="col-xs-12 col-sm-3 col-md-3 col-lg-3">
+                                <div class="wrimagecard wrimagecard-topimage">
+                                    <a href="#">
+                                        <div class="wrimagecard-topimage_header" style="background-color: rgba(45, 140, 172, 0.09)">
+                                            <center><i id="totalCanceledRequest" class="fa" style="color: #098ebc; font-size: 54px">@totalCustomer</i></center>
+                                        </div>
+                                        <div class="wrimagecard-topimage_title">
+                                            <center>
+                                                <p style="font-size: 13px">
+                                                    <strong>Registered Customers</strong>
+                                                </p>
+                                            </center>
+                                        </div>
+                                    </a>
+                                </div>
+                            </div>
+
+                            <div class="col-xs-12 col-sm-3 col-md-3 col-lg-3">
+                                <div class="wrimagecard wrimagecard-topimage">
+                                    <a href="@Url.Action("CorporateUser","Contract")">
+                                        <div class="wrimagecard-topimage_header" style="background-color: rgba(37, 152, 154, 0.05)">
+                                            <center><i id="totalCanceledRequest" class="fa" style="color: #26adaf; font-size: 54px">@totalCorporateUsers</i></center>
+                                        </div>
+                                        <div class="wrimagecard-topimage_title">
+                                            <center>
+                                                <p style="font-size: 13px">
+                                                    <strong> Registered Coporate User</strong>
+                                                </p>
+                                            </center>
+                                        </div>
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="col-xs-12 col-sm-3 col-md-3 col-lg-3">
+                                <div class="wrimagecard wrimagecard-topimage">
+                                    <a href="@Url.Action("Index","MeghnaUser")">
+                                        <div class="wrimagecard-topimage_header" style="background-color: rgba(26, 206, 77, 0.09)">
+                                            <center><i id="totalCanceledRequest" class="fa" style="color: #00b734; font-size: 54px">@totalMGIUsers</i></center>
+                                        </div>
+                                        <div class="wrimagecard-topimage_title">
+                                            <center>
+                                                <p style="font-size: 13px">
+                                                    <strong> Registered Meghna Employee</strong>
+                                                </p>
+                                            </center>
+                                        </div>
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="col-xs-12 col-sm-3 col-md-3 col-lg-3">
+                                <div class="wrimagecard wrimagecard-topimage">
+                                    <a href="@Url.Action("Index","MasterDepot")">
+                                        <div class="wrimagecard-topimage_header" style="background-color: rgba(253, 83, 38, 0.05)">
+                                            <center><i id="totalCanceledRequest" class="fa" style="color: #ec3e10; font-size: 54px">@totalMasterDepots</i></center>
+                                        </div>
+                                        <div class="wrimagecard-topimage_title">
+                                            <center>
+                                                <p style="font-size: 13px">
+                                                    <strong> Master Depots</strong>
+                                                </p>
+                                            </center>
+                                        </div>
+                                    </a>
+                                </div>
+                            </div>
+
+                        </div>
+                        }
+
+                        <div id="container" style="min-width: 250px; height: 270px; max-width: 100%; margin: 0 auto;">
+                        </div>
+                    </div>
+
+
+                </div>
+                <!-- end widget content -->
+
+            </div>
+            <!-- end widget div -->
+
+        </div>
+        <!-- end widget -->
+
+    </article>
+    <!-- WIDGET END -->
+</div>
+<!-- end row -->
+<!-- The Modal -->
+
+
+    <!-- Flot Chart Plugin: Flot Engine, Flot Resizer, Flot Tooltip -->
+    <script src="~/Content/SmartAdmin/js/plugin/flot/jquery.flot.cust.min.js"></script>
+    <script src="~/Content/SmartAdmin/js/plugin/flot/jquery.flot.resize.min.js"></script>
+    <script src="~/Content/SmartAdmin/js/plugin/flot/jquery.flot.fillbetween.min.js"></script>
+    <script src="~/Content/SmartAdmin/js/plugin/flot/jquery.flot.orderBar.min.js"></script>
+    <script src="~/Content/SmartAdmin/js/plugin/flot/jquery.flot.pie.min.js"></script>
+    <script src="~/Content/SmartAdmin/js/plugin/flot/jquery.flot.time.min.js"></script>
+    <script src="~/Content/SmartAdmin/js/plugin/flot/jquery.flot.tooltip.min.js"></script>
+    <script src="~/Content/SmartAdmin/js/chart/exporting.js"></script>
+    <script src="~/Content/SmartAdmin/js/chart/highcharts.js"></script>
+    <script src="~/Content/SmartAdmin/js/plugin/moment/moment.min.js"></script>
+    <script src="~/Content/SmartAdmin/js/plugin/chartjs/chart.min.js"></script>
+
+
+
+    <script type="text/javascript">
+        // PAGE RELATED SCRIPTS
+
+        @*/* chart colors default */
+        var $chrt_border_color = "#efefef";
+        var $chrt_grid_color = "#DDD"
+        var $chrt_main = "#E24913";
+        /* red       */
+        var $chrt_second = "#6595b4";
+        /* blue      */
+        var $chrt_third = "#FF9F01";
+        /* orange    */
+        var $chrt_fourth = "#7e9d3a";
+        /* green     */
+        var $chrt_fifth = "#BD362F";
+        /* dark red  */
+        var $chrt_mono = "#000";
+
+        var parkingListCountByTypeArray = [];
+
+        $(document).ready(function() {
+            // DO NOT REMOVE : GLOBAL FUNCTIONS!
+            pageSetUp();
+            var referredLawyer = parseFloat('@Request.RequestContext.HttpContext.Session["ReferredLawyer"]');
+            var verifiedLawyers = parseFloat('@Request.RequestContext.HttpContext.Session["VerifiedLawyer"]');
+            var unVerifiedlawyers = parseFloat('@Request.RequestContext.HttpContext.Session["UnverifiedLawyer"]');
+        var lawyers = verifiedLawyers + unVerifiedlawyers;
+        var selfRegisterdLawyers = lawyers - referredLawyer;
+        Highcharts.chart('container', {
+
+            chart: {
+                plotBackgroundColor: null,
+                plotBorderWidth: null,
+                plotShadow: false,
+                type: 'pie'
+            },
+            title: {
+                text: ''
+            },
+            tooltip: {
+                pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+            },
+            plotOptions: {
+                pie: {
+                    allowPointSelect: true,
+                    cursor: 'pointer',
+                    dataLabels: {
+                        enabled: true,
+                        format: '<b>{point.name}</b>: {point.percentage:.1f} %'
+                    }
+                }
+            },
+            series: [{
+                name: '',
+                colorByPoint: true,
+                data: [{
+                    name: 'Self Registerd',
+                    y: selfRegisterdLawyers
+                    //sliced: true,
+                    //selected: true
+                }, {
+                    name: 'Through Agent',
+                    y: referredLawyer
+                }]
+
+            }]
+        });*@
+        /*Total Cancel Request End */
+        function onThanaWithMasterDepot() {
+            // Get the modal
+            var modal = document.getElementById("myModal");
+
+            // Get the button that opens the modal
+            var btn = document.getElementById("myBtn");
+
+            // Get the <span> element that closes the modal
+            var span = document.getElementsByClassName("close")[0];
+
+            // When the user clicks the button, open the modal 
+
+                modal.style.display = "block";
+
+            // When the user clicks on <span> (x), close the modal
+            span.onclick = function () {
+                modal.style.display = "none";
+            }
+
+            // When the user clicks anywhere outside of the modal, close it
+            window.onclick = function (event) {
+                if (event.target == modal) {
+                    modal.style.display = "none";
+                }
+            }
+        }
+
+        function onDistributorWithMasterDepot() {
+            // Get the modal
+            var modal1 = document.getElementById("distributorList");
+
+            // Get the button that opens the modal
+           
+
+            // Get the <span> element that closes the modal
+            var span = document.getElementsByClassName("close1")[0];
+
+            // When the user clicks the button, open the modal 
+         
+                modal1.style.display = "block";
+            // When the user clicks on <span> (x), close the modal
+            span.onclick = function () {
+                modal1.style.display = "none";
+            }
+
+            // When the user clicks anywhere outside of the modal, close it
+            window.onclick = function (event) {
+                if (event.target == modal1) {
+                    modal1.style.display = "none";
+                }
+            }
+        }
+
+      
+    </script>
+

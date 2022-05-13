@@ -1,0 +1,257 @@
+﻿@using EFreshAdmin.Utility
+@using EFreshStore.Models.Context
+@model EFreshStore.Models.Context.ProductLine
+
+@{
+    ViewBag.Title = "Product Line List";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    Session["BreadCrum"] = "Product Line List";
+    List<ProductLine> productLines = ViewBag.ProductLines;
+}
+<style>
+    .error {
+        color: red;
+    }
+</style>
+<div id="content">
+    <section id="widget-grid" class="" style="padding-bottom: 2%">
+
+        <div class="row" style="height: 100%">
+            <article class="col-sm-12 col-md-12 col-lg-12">
+                <div class="jarviswidget" id="wid-id-4" data-widget-editbutton="false" data-widget-custombutton="false">
+                    <header>
+                        <span class="widget-icon"> <i class="fa fa-edit"></i> </span>
+                        <h2 id="addProductLineFormHeading">Add Product Line</h2>
+
+                    </header>
+                    <div>
+
+                        <div class="widget-body no-padding">
+                            @using (Html.BeginForm("Create", "ProductLine", FormMethod.Post, new {id = "productLineform", @class = "smart-form"}))
+                            {
+                                @Html.AntiForgeryToken()
+                                <div class='@TempData["Class"]' id="flashMessage" role="alert">@TempData["Message"]</div>
+                                <input type="hidden" id="productLineId" name="Id"/>
+                                <input type="hidden" id="productLineCreatedBy" name="CreatedBy"/>
+                                <input type="hidden" id="productLineCreatedOn" name="CreatedOn"/>
+                                <fieldset style="padding-bottom: 3%">
+                                    <div class="row">
+                                        <section class="col col-6">
+                                            <section class="col col-3">
+                                                <label class="label">Name<span style="color: red"> *</span></label>
+                                            </section>
+                                            <section class="col col-9">
+                                                <label class="input">
+                                                    @*<input type="text" name="Name" id="Name">*@
+                                                    @Html.TextBoxFor(model => model.Name, new {id = "productLineName", placeholder = "Product line name"})
+                                                    @Html.ValidationMessageFor(model => model.Name, "", new {@class = "error"})
+                                                </label>
+                                            </section>
+                                        </section>
+                                        <section class="col col-6">
+                                            <section class="col col-3">
+                                                <label class="label">Description</label>
+                                            </section>
+                                            <section class="col col-9">
+                                                <label class="textarea">
+                                                    @*<input type="text" name="Description" id="Description">*@
+                                                    @Html.TextAreaFor(model => model.Description, new {id = "productLineDescription", placeholder = "Product line description"})
+                                                </label>
+                                            </section>
+                                        </section>    
+                                    </div>
+                                    <div class="row">
+                                        <section class="col col-6">
+                                            <section class="col col-3"></section>
+                                            <section class="col col-9">
+                                                <label class="checkbox">
+                                                    @Html.CheckBoxFor(model => model.IsActive, new { id = "productLineIsActive" })
+                                                    <i></i>Is Active?
+                                                </label>
+                                            </section>
+                                        </section>
+                                    </div>
+
+                                </fieldset>
+                                <footer style="bottom: 0">
+                                    <input type="button" value="Reset" id="productLineResetButton" class="btn btn-primary"/>
+                                    <button type="submit" id="productLineAddButton" class="btn btn-primary">Add</button>
+                                </footer>
+
+                            }
+                        </div>
+
+                    </div>
+
+                </div>
+            </article>
+            <!-- END COL -->
+
+        </div>
+        <!-- row -->
+        <div class="row">
+            <article class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                <!-- Widget ID (each widget will need unique ID)-->
+                <div class="jarviswidget jarviswidget-color-darken" id="wid-id-0" data-widget-editbutton="false">
+                    <header>
+                        <span class="widget-icon"> <i class="fa fa-table"></i> </span>
+                        <h2>Product Line List </h2>
+                    </header>
+                    <!-- widget div-->
+                    <div>
+                        <!-- widget content -->
+                        <div class="widget-body no-padding">
+                            <table id="dt_basic" class="table table-striped table-bordered" width="100%">
+                                <thead>
+                                    <tr>
+                                        <th>SL</th>
+                                        <th>Name</th>
+                                        <th>Description</th>
+                                        <th>Is Active?</th>
+                                        <th>Edit</th>
+                                        <th>Details</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if (productLines != null)
+                                    {
+                                        var count = 1;
+                                        foreach (var data in productLines)
+                                        {
+
+                                            <tr id="productLine_@data.Id">
+                                                <td>@(count++)</td>
+                                                <td>@data.Name</td>
+                                                <td>@data.Description</td>
+                                                @{
+                                                    var color = data.IsActive ? "green" : "red";
+                                                    var activeStatus = data.IsActive ? "Yes" : "No";
+                                                    <td style="color: @color">
+                                                        @activeStatus
+                                                    </td>
+                                                }
+                                                <td>
+                                                    <input type="button" class="btn btn-success" onclick="changeAddProductLineFormStateToEdit(@data.Id)" value="Edit"/>
+                                                </td>
+                                                <td>
+                                                    <a role="button" class="btn btn-success" id="showProductLineDetails_@data.Id" onclick="showProductLineDetails(@data.Id)">Details</a>
+                                                </td>
+                                            </tr>
+                                            <tr id="productLineDetails_@data.Id" class="productLineDetails">
+                                                <td colspan="5" style="display: table-cell">
+
+                                                    <div class="panel panel-default" id="productDetailsPanel_@data.Id">
+                                                        <a role="button" class="panel-close-btn" onclick="closeProductLineDetails(@data.Id)"><i class="fa fa-times" aria-hidden="true"></i></a>
+                                                        <div class="panel-overlay">
+                                                            <img src="~/Content/Img/infinity3.gif" />
+                                                        </div>
+                                                        <!-- Default panel contents -->
+                                                        <div align="center" style="padding: 0 0; margin: 0 0"><h3>Product Line Details</h3></div>
+                                                        <div class="panel-body" style="width: 100%">
+                                                            <div class="empty-product-line">
+                                                                <img src="~/Content/Img/no products1.png" />
+                                                                <h3>No product is linked to <strong>@data.Name</strong></h3>
+                                                            </div>
+
+                                                            <table class="table table-responsive" id="productLineTable_@data.Id"></table>
+
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        }
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                        <!-- end widget content -->
+                    </div>
+                    <!-- end widget div -->
+                </div>
+                <!-- end widget -->
+            </article>
+        </div>
+        <!-- end row -->
+    </section>
+ 
+</div>
+
+@section scripts{
+    @Scripts.Render("~/bundles/jqueryval")
+    <script>
+        $(document).ready(function () {
+
+            $(function() {
+                setTimeout(function() {
+                    $("#flashMessage").hide('blind', {}, 500);
+                }, 5000);
+            });
+            $('#productLineIsActive').attr('checked', true);
+        });
+        function changeAddProductLineFormStateToEdit(productLineId) {
+            $(".field-validation-error").empty();
+            $("#preloader").css('display', 'block');
+
+            // Scroll to the top of the form
+            $('html, body').animate({
+                scrollTop: $("#addProductLineFormHeading").offset().top
+            },
+                500);
+
+            // Change form state to edit
+            $("#addProductLineFormHeading").text("Update Product Line");
+            $("#productLineAddButton").text("Update");
+            $("#productLineform").attr("action", "@BaseUrl.subDirectory/ProductLine/Edit");
+            $("#productLineId").val(productLineId);
+
+            var data = { productLineId: productLineId };
+            $.ajax({
+                method: 'POST',
+                url: "@Url.Action("GetProductLineById", "ProductLine")",
+                dataType: "json",
+            contentType: 'application/json',
+            data: JSON.stringify(data),
+            crossDomain: true,
+            success: function (data) {
+                toastr.clear();
+                if (data.Status === "Ok") {
+                    var createdOnFormatedDate = "";
+                    var createdOn = "";
+                    if (data.ProductLine.CreatedOn == null) {
+                        createdOnFormatedDate = null;
+                    } else {
+                        createdOn = new Date(parseInt(data.ProductLine.CreatedOn.substr(6)));
+                        createdOnFormatedDate = createdOn.getFullYear() + '-' + ('0' + (createdOn.getMonth() + 1)).slice(-2) + '-' + ('0' + createdOn.getDate()).slice(-2) + ' ' + ('0' + createdOn.getHours()).slice(-2) + ':' + ('0' + (createdOn.getMinutes())).slice(-2) + ':' + ('0' + createdOn.getSeconds()).slice(-2);
+                    }
+                    $("#productLineName").val($.trim(data.ProductLine.Name));
+                    $("#productLineDescription").val($.trim(data.ProductLine.Description));
+                    $("#productLineCreatedOn").val(createdOnFormatedDate);
+                    $("#productLineCreatedBy").val(data.ProductLine.CreatedBy);
+                    if (data.ProductLine.IsActive === true) {
+                        $("#productLineIsActive").prop('checked', true);
+                    } else {
+                        $("#productLineIsActive").prop('checked', false);
+                    }
+                } else {
+                    toastr.error("Something went wrong");
+                }
+
+            },
+            error: function () {
+                toastr.error("Something went wrong");
+            }
+        });
+        $("#preloader").css('display', 'none');
+        }
+
+        $("#productLineResetButton").click(function () {
+            $("#productLineIsActive").prop('checked', true);
+            $("#addProductLineFormHeading").text("Add Product Line");
+            $("#producLineAddButton").text("Add");
+            $("#producLineForm").attr("action", "@BaseUrl.subDirectory/ProducLine/Create");
+            $("#productLineName").val("");
+            $("#productLineDescription").val("");
+            $(".field-validation-error").empty();
+        });
+    </script>
+}

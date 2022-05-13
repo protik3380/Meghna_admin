@@ -1,0 +1,47 @@
+﻿@model List<EFreshStoreCore.Model.Context.OrderDetail>
+
+               <div class='@TempData["Class"]' id="flashMessage" role="alert">@TempData["Message"]</div>
+<article class="col-xs-6 col-sm-6 col-md-6 col-lg-6" id="orderDetails">
+    <div class="jarviswidget jarviswidget-color-darken" id="wid-id-0" data-widget-editbutton="false">
+        <header>
+            <span class="widget-icon"> <i class="fa fa-table"></i> </span>
+            <h2> Order Details </h2>
+        </header>
+        <div>
+            <div class="widget-body no-padding">
+                <table id="dt_basic" class="table table-striped table-bordered table-hover" width="100">
+                    <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th>Quantity</th>
+                            <th>Price</th>
+                            <th>Edit</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+
+                                <td>@item.ProductUnit.Product.Name</td>
+                                <td>@item.Quantity</td>
+                                <td>@item.Price</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</article>
+@section scripts{
+    <script>
+        $(document).ready(function() {
+            $(function() {
+                setTimeout(function() {
+                    $("#flashMessage").hide('blind', {}, 500);
+                }, 5000);
+            });
+        });
+    </script>
+}

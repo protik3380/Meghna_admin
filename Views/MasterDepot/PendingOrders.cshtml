@@ -1,0 +1,324 @@
+﻿@using EFreshStoreCore.Model.Context
+@{
+    ViewBag.Title = "Pending Orders";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div class='@TempData["Class"]' id="flashMessage" role="alert">@TempData["Message"]</div>
+<section id="widget-grid" class="" style="margin-bottom: 5%">
+    <!-- row -->
+    <div class="row">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+            <article class="col-xs-7 col-sm-7 col-md-7 col-lg-7">
+                <div class="jarviswidget jarviswidget-color-darken" id="wid-id-0" data-widget-editbutton="false">
+                    <header>
+                        <span class="widget-icon"> <i class="fa fa-table"></i> </span>
+                        <h2>Pending Orders </h2>
+                    </header>
+                    <div>
+                        <div class="widget-body no-padding">
+                            <table id="dt_basic1" @*class="table table-striped table-border table-hover table-responsive"*@ class="table table-striped table-border table-hover table-responsive" style="width: 100%">
+                                <thead>
+                                <tr style="width: 100%">
+                                    <th>Order No</th>
+                                    <th>Customer Name</th>
+                                    <th>Delivery Address</th>
+                                    <th>Contact</th>
+                                    <th>Order Date</th>
+                                    <th>Details</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                @if (Model != null)
+                                {
+                                    foreach (Order data in Model)
+                                    {
+                                        var orderDate = data.OrderDate.HasValue ? data.OrderDate.Value.ToString("dd/MM/yyyy hh:mm:ss tt") : "";
+                                        <tr style="width: 100%">
+                                            <td>@data.OrderNo</td>
+                                            <td>@data.CustomerName</td>
+                                            <td>@data.DeliveryAddress</td>
+                                            <td>@data.MobileNo</td>
+                                            <td>@orderDate</td>
+                                            <td>
+                                                @*<input type="button" class="btn btn-success" onclick="location.href='../brand/edit/@data.Id'" value="Edit" />*@
+
+                                                <input type="button" onclick="OrderDetails(@data.Id, '@data.OrderNo', '@data.UserId')" id="detailsBtn" value="Details" class="buttonDesign"/>
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </article>
+
+            <!-- partial view for order details -->
+            <article id="orderDetails" class="col-xs-5 col-sm-5 col-md-5 col-lg-5">
+                <div class="jarviswidget jarviswidget-color-darken" id="wid-id-0" data-widget-editbutton="false">
+                    <header>
+                        <span class="widget-icon"> <i class="fa fa-table"></i> </span>
+                        <h2 id="tableHeader"> </h2>
+                    </header>
+                    <div>
+                        <div class="widget-body no-padding">
+                            @using (Html.BeginForm("SaveOrRejectOrder", "MasterDepot", FormMethod.Post, new {id = "saveOrderForm"}))
+                            {
+                                <table class="table table-striped table-bordered table-hover" width="100%">
+                                    <thead>
+                                    <tr>
+                                        <th>Product Name</th>
+                                        <th style="width: 20%">Qty</th>
+                                        <th>Price</th>
+                                        <th>Packet Qty</th>
+                                        <th></th>
+                                    </tr>
+                                    </thead>
+                                    <tbody id="orderDetailsTbl">
+
+                                    </tbody>
+                                    <tr style="width: 100%; border: 0 solid #ffffff;">
+                                        <td style="border: 0 solid #ffffff;"><strong>Sub Total<br />Discount<br />Grand Total</strong></td>
+                                        <td id="totalPrice" style="text-align: right; border: 0 solid #ffffff;"></td>
+                                        <td style="border: 0 solid #ffffff;"></td>
+                                        <td style="border: 0 solid #ffffff;"></td>
+                                        <td style="border: 0 solid #ffffff;"></td>
+                                    </tr>
+                                    <tr>
+                                        @*<td></td>*@
+
+                                        <td id="hiddenOrder" hidden>
+                                            @*<input type="hidden" id="orders.Id" name="orders.Id">*@
+                                        </td>@*<td></td>*@
+                                        <td>
+                                            <div class="form-control">
+                                                <select id="OrderRejectId" name="OrderRejectId" style="width: 90px">
+                                                    @{
+                                                        List<OrderReject> rejects = ViewBag.RejectStatus;
+                                                        <option value="-1">Select...</option>
+                                                        foreach (var rejectStatus in rejects)
+                                                        {
+                                                            <option value="@rejectStatus.Id">@rejectStatus.Status</option>
+                                                        }
+                                                    }
+                                                </select>
+                                            </div>
+                                        </td>
+                                        <td><input type="submit" value="Cancel" id="Cancel"></td>
+                                        <td><input type="submit" value="Confirm" id="Confirm"></td><td></td><td></td>
+                                    </tr>
+                                </table>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </article>
+
+        </div>
+    </div>
+    <!-- end row -->
+</section>
+@*<div style="margin-bottom: 100px;"></div>*@
+
+@section Scripts{
+    @*<script src="~/Scripts/jquery.validate.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>*@
+<script>
+    $(document).ready(function () {
+        //$("#saveOrderForm").validate({
+        //    rules: {
+        //            ecxelFile: "required"
+        //    },
+        //    messages: {
+        //        ecxelFile: "Please upload an excel file"
+        //    }
+        //});
+
+        $("#orderDetails").hide();
+        //$(':input[type="submit"]').prop('disabled', true);
+        $('#Cancel').prop('disabled', true);
+        $('#Confirm').prop('disabled', false);
+        //rejectStatus
+
+        $("#OrderRejectId").change(function () {
+            var rejectId = $("#OrderRejectId").val();
+            if (rejectId === "-1") {
+                $('#Cancel').prop('disabled', true);
+                $('#Confirm').prop('disabled', false);
+            } else {
+                $('#Cancel').prop('disabled', false);
+                $('#Confirm').prop('disabled', true);
+            }
+        });
+
+        $(function() {
+            setTimeout(function() {
+                $("#flashMessage").hide('blind', {}, 500);
+            }, 5000);
+        });
+    });
+    function OrderDetails(orderId, orderNo, userId) {
+        var UserId = userId;
+        $("#preloader").css('display', 'block');
+        var link = '@Url.Action("OrderDetails","MasterDepot", new {id = "orderId" })';
+        link = link.replace("orderId", orderId);
+        $.get(link, function (data) {
+            $("#orderDetailsTbl").empty();
+            $("#totalPrice").empty();
+            $("#tableHeader").empty();
+            $("#tableHeader").append("Order Details : " + orderNo);
+            var count = 0;
+            var totalPrice = 0.0;
+            var discount = 0.0;
+            var updateTotalPrice = 0.0;
+            $.each(data, function (key, value) {
+                $("#totalPrice").empty();
+                totalPrice += parseFloat(value.Price);
+                if (value.Order.CouponDiscount == null) {
+                    discount = 0;
+                } else {
+                    discount = value.Order.CouponDiscount;
+                }
+                
+                updateTotalPrice = totalPrice - discount;
+                $('#totalPrice').append("<span id='orderDetailsSubTotal'>" + totalPrice.toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") + "</span></br><span id='couponDiscountPrice'>" + discount.toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") + "</span></br><span id='orderDetailsGrandTotal'>" + updateTotalPrice.toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") + "</span>");
+                $('#orderDetailsTbl').append('<tr><td>' + value.ProductUnit.Product.Name +
+                    '</td><td id="oldQuantity_' + value.Id + '">' + value.Quantity + '</td><td id="pendingOrderProductUnitId_'+ value.ProductUnitId +'">' + value.Price + '</td><td>' +
+                    '<input type="text" onkeyup="packetQty(' + value.Id + ',' + value.PacketQuantity + ',' + value.Price + ')" maxlength="4" size="4" class="text-center" value = "' + value.PacketQuantity + '" id="' + value.Id + '" data-qty="' + value.PacketQuantity + '" name="orders.OrderDetails[' + count + '].PacketQuantity" required /></td><td><a class="btn btn-sm btn-danger" onclick="deleteProductFromPendingOrder(' + value.Id + ',' + value.OrderId + ',' + value.ProductUnitId + ',$(this))"><i class="fa fa-remove"></i></a></td></tr>');
+                $('#orderDetailsTbl').append('<tr hidden><td><input name="orders.OrderDetails[' + count + '].Id" type="text" value="' + value.Id +
+                    '"/><td><input name="orders.Id" type="text" value="' + orderId +
+                    '"/></td><td><input name="orders.UserId" type="text" value="' + UserId +
+                    '"/></td></tr>');
+                count = count + 1;
+                //'"/><td><input name="orders.Id" type="text" value="' + orderId +
+            });
+            $("#preloader").css('display', 'none');
+
+        });
+        $('#orderId').val(orderId);
+        $("#orderDetails").show();
+    };
+
+    function packetQty(id, packetQuantity, price) {
+        toastr.clear();
+        var qty = parseInt(packetQuantity);
+        var oldPrice = parseFloat(price.toString().replace(/\,/g, ''));
+        var pricePerUnit = oldPrice / qty;
+        var qtyInputValue = 0;
+       
+        if ($('#' + id).val() == '') {
+            qtyInputValue = qty;
+        }else
+        {
+            qtyInputValue = parseInt($('#' + id).val());
+        }
+        var newPrice = 0.0;
+        var oldTotal = 0.0;
+        var oldGrandTotal = 0.0;
+        var calculatedSubTotal = 0.0;
+        var calculatedGrandTotal = 0.0;
+
+        var oldQty = parseInt($('#' + id).attr('data-qty'));
+        var oldUpdatedPrice = pricePerUnit * oldQty;
+        //alert(qtyInputValue);
+        if (qty < qtyInputValue || qtyInputValue <= 0) {
+            toastr.error("Sorry! Maximum/Minimum quantity exceeded.");
+            //$('#accept').prop('disabled', true);
+            $('#' + id).val(qty);
+            newPrice = pricePerUnit * qty;
+            oldTotal = parseFloat($('#orderDetailsSubTotal').text().replace(/\,/g, ''));
+            oldGrandTotal = parseFloat($('#orderDetailsGrandTotal').text().replace(/\,/g, ''));
+            calculatedSubTotal = oldTotal;
+            calculatedGrandTotal = oldGrandTotal;
+            if (oldQty < qty) {
+                calculatedSubTotal = oldTotal + (newPrice - oldUpdatedPrice);
+                calculatedGrandTotal = oldGrandTotal + (newPrice - oldUpdatedPrice);
+            }
+            $('#' + id).attr('data-qty', qty);
+            $('#orderDetailsSubTotal').text(calculatedSubTotal.toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","));
+            $('#orderDetailsGrandTotal').text(calculatedGrandTotal.toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","));
+        } else {
+            newPrice = pricePerUnit * qtyInputValue;
+            oldTotal = parseFloat($('#orderDetailsSubTotal').text().replace(/\,/g, ''));
+            oldGrandTotal = parseFloat($('#orderDetailsGrandTotal').text().replace(/\,/g, ''));
+            calculatedSubTotal = oldTotal;
+            calculatedGrandTotal = oldGrandTotal;
+
+            if (oldQty > qtyInputValue) {
+                calculatedSubTotal = oldTotal - (oldUpdatedPrice - newPrice);
+                calculatedGrandTotal = oldGrandTotal - (oldUpdatedPrice - newPrice);
+            } else {
+                calculatedSubTotal = oldTotal + (newPrice - oldUpdatedPrice);
+                calculatedGrandTotal = oldGrandTotal + (newPrice - oldUpdatedPrice);
+            }
+            $('#' + id).attr('data-qty', qtyInputValue);
+            $('#orderDetailsSubTotal').text(calculatedSubTotal.toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","));
+            $('#orderDetailsGrandTotal').text(calculatedGrandTotal.toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","));
+            $('#Confirm').prop('disabled', false);
+        }
+    };
+
+    function deleteProductFromPendingOrder(orderDetailId, orderId, productUnitId, row) {
+        
+        Swal.fire({
+            title: 'Do you want to delete this product ?',
+            type: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#739e73',
+            cancelButtonColor: '#A90329',
+            cancelButtonText: 'No',
+            confirmButtonText: 'Yes',
+            reverseButtons: true
+        }).then((result) => {
+            if (result.value) {
+                $("#preloader").css('display', 'block');
+                var data = { Id: orderDetailId, OrderId: orderId, ProductUnitId: productUnitId };
+                $.ajax({
+                    method: 'POST',
+                    url: "@Url.Action("DeleteProductFromPendingOrder", "MasterDepot")",
+                    dataType: "json",
+                contentType: 'application/json',
+                data: JSON.stringify(data),
+                crossDomain: true,
+                success: function(data) {
+                    if (data.status == "Ok") {
+                        toastr.clear();
+                        toastr.success("Product has been deleted");
+                       
+                        var priceOfDeletedProdUnit = parseFloat($('#pendingOrderProductUnitId_' + productUnitId).text().replace(/\,/g, ''));
+                        var qtyOfDeletedProdUnit = parseInt($('#' + orderDetailId).val());
+                        var oldQtyOfDeletedProdUnit = parseInt($('#oldQuantity_' + orderDetailId).text());
+                        var pricePerUnit = priceOfDeletedProdUnit / oldQtyOfDeletedProdUnit;
+                        priceOfDeletedProdUnit = pricePerUnit * qtyOfDeletedProdUnit;
+                        var oldTotal = parseFloat($('#orderDetailsSubTotal').text().replace(/\,/g, ''));
+                        var oldGrandTotal = parseFloat($('#orderDetailsGrandTotal').text().replace(/\,/g, ''));
+                        var newTotal = oldTotal - priceOfDeletedProdUnit;
+                        var newGrandTotal = oldGrandTotal - priceOfDeletedProdUnit;
+
+                        var discount = parseFloat($('#couponDiscountPrice').text().replace(/\,/g, ''));
+                        newGrandTotal = newGrandTotal - discount;
+
+                        $('#orderDetailsSubTotal').text(newTotal.toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","));
+                        $('#orderDetailsGrandTotal').text(newGrandTotal.toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","));
+
+                        row.closest('tr').fadeOut(500, function () {
+                            row.closest('tr').remove();
+                        });
+                    } else {
+                        toastr.error("Something went wrong");
+                    }
+                    $("#preloader").css('display', 'none');
+
+                },
+                error: function() {
+                    toastr.error("Something went wrong");
+                    $("#preloader").css('display', 'none');
+
+                }
+            });
+        }
+        });
+    }
+</script>
+}

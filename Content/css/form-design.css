@@ -1,0 +1,55 @@
+﻿
+        body {
+            background-color: white;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+        
+        .ui-datepicker-header {
+        color: #3e9aba !important;
+        background-image: none !important;
+        border-radius: 0;
+        }
+        #div1 {
+            width: 750px;
+            height: auto;
+            padding: 50px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+           #DeliveryAddress2,#DeliveryAddress1,#Address,textarea,select,input[type=text],input[type=password] {
+            width: 80%;
+            padding: 12px 15px;
+            margin-bottom: 5px;
+            border: none;
+            background-color: #f1f1f1;
+            /*background-color: #d2d8e0;*/
+        }
+             
+
+
+        input[type=submit] {
+            width: 30%;
+            padding: 15px;
+            color: white;
+            margin: 5px 0 22px 0;
+            display: inline-block;
+            border: none;
+            background: #ffa726;
+        }
+
+            input[type=submit]:hover {
+                background-color: rgb(60, 125, 201);
+                color: white;
+            }
+
+            #MasterDepotId, #LocationId
+            {
+            width: 80%;
+            margin-bottom: 5px;
+            border: none;
+            background-color: #f1f1f1;
+            }

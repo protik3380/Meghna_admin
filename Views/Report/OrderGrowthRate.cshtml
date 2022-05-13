@@ -1,0 +1,242 @@
+﻿@using EFreshAdmin.Models
+@model OrderGrowthRateVM
+
+@{
+    ViewBag.Title = "Sales By Product";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section style{
+
+    <link href="~/Content/css/jquery-ui.min.css" rel="stylesheet" />
+    <link rel="stylesheet" type="text/css" href="~/Content/css/form-design.css" />
+<link href="~/Content/css/CircleProgressBar.css" rel="stylesheet" />
+    <style>
+        .error {
+            color: red;
+        }
+
+        .ui-datepicker-header {
+            color: #3e9aba !important;
+            background-image: none !important;
+            border-radius: 0;
+        }
+
+        .ui-datepicker {
+            width: 280px;
+            padding: 2px;
+        }
+
+        .ui-datepicker-prev, .ui-datepicker-next {
+            color: #3e9aba !important;
+        }
+
+        .ui-datepicker .ui-datepicker-next span {
+            width: 60px;
+            top: 10px;
+            left: -10px;
+        }
+
+        .ui-datepicker .ui-datepicker-prev span {
+            width: 60px;
+            top: 10px;
+            left: 6px;
+        }
+    </style>
+}
+
+<div id="content" style="margin-bottom: 3%">
+    <section id="widget-grid" class="">
+        <div class="row" style="height: 100%">
+            <article class="col-sm-12 col-md-12 col-lg-12">
+                <div class="jarviswidget" id="wid-id-4" data-widget-editbutton="false" data-widget-custombutton="false">
+                    <header>
+                        <span class="widget-icon"> <i class="fa fa-list-alt"></i> </span>
+                        <h2>Order Growth Rate</h2>
+                    </header>
+                    <div>
+                        <div class="widget-body no-padding">
+                            @using (Html.BeginForm(null, null, FormMethod.Get, new { id = "OrderGrowthForm", @class = "smart-form" }))
+                            {
+                                <div class='@TempData["Class"]' id="flashMessage" role="alert">@TempData["Message"]</div>
+                                <fieldset>
+                                    <div class="row">
+                                        <section class="col col-6" style="padding-bottom: 5px; margin-bottom: 5px">
+                                            <section class="col col-3">
+                                                <label class="label">Prior From Date <span style="color: red"> *</span></label>
+                                            </section>
+                                            <section class="col col-9">
+                                                <label class="input">
+                                                    @Html.TextBoxFor(m => m.PriorFromDate, new { @class = "datepicker", @readonly = "readonly", placeholder = "Prior from date" })
+                                                </label>
+                                            </section>
+                                        </section>
+                                        <section class="col col-6" style="padding-bottom: 5px; margin-bottom: 5px">
+                                            <section class="col col-3">
+                                                <label class="label">Prior To Date <span style="color: red"> *</span></label>
+                                            </section>
+                                            <section class="col col-9">
+                                                <label class="input">
+                                                    @Html.TextBoxFor(m => m.PriorToDate, new { @class = "datepicker", @readonly = "readonly", placeholder = "Prior to date" })
+                                                </label>
+                                            </section>
+                                        </section>
+                                    </div>
+                                    <div class="row">
+                                        <section class="col col-6" style="padding-bottom: 5px; margin-bottom: 5px">
+                                            <section class="col col-3">
+                                                <label class="label">Current From Date <span style="color: red"> *</span></label>
+                                            </section>
+                                            <section class="col col-9">
+                                                <label class="input">
+                                                    @Html.TextBoxFor(m => m.CurrentFromDate, new { @class = "datepicker", @readonly = "readonly", placeholder = "Current from date" })
+                                                </label>
+                                            </section>
+                                        </section>
+                                        <section class="col col-6" style="padding-bottom: 5px; margin-bottom: 5px">
+                                            <section class="col col-3">
+                                                <label class="label">Current To Date <span style="color: red"> *</span></label>
+                                            </section>
+                                            <section class="col col-9">
+                                                <label class="input">
+                                                    @Html.TextBoxFor(m => m.CurrentToDate, new { @class = "datepicker", @readonly = "readonly", placeholder = "Current to date" })
+                                                </label>
+                                            </section>
+                                        </section>
+                                    </div>
+                                    
+                                </fieldset>
+                                <footer style="bottom: 0">
+                                    <button type="submit" class="btn btn-primary">Show</button>
+                                </footer>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </article>
+
+        </div>
+        <div class="row">
+            <article class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                <div class="jarviswidget jarviswidget-color-darken" id="wid-id-0" data-widget-editbutton="false">
+                    @if (Model.OrderGrowthRate != null)
+                    {
+                        if (Double.IsInfinity((double)Model.OrderGrowthRate) || Double.IsNaN((double)Model.OrderGrowthRate))
+                        {
+                            <div>
+                                <p class="text-center text-danger"> N/A</p>
+
+                            </div>
+                        }
+                        else
+                        {
+                            var orderGrowthDate = Convert.ToDouble(Model.OrderGrowthRate);
+                            <div>
+                                <div class="widget-body">
+                                    <div class="container-fluid">
+                                        <div class="row" align="center">
+                                            <div class="col-xs-12 col-sm-4 col-md-4 col-lg-4">
+                                                <div class="wrimagecard wrimagecard-topimage">
+                                                    <a href="#">
+                                                        <div class="bg-white rounded-lg p-5 shadow">
+                                                            <!-- Progress bar 1 -->
+                                                            <div class="progress mx-auto" data-value="@(Convert.ToInt64(orderGrowthDate))">
+                                                                <span class="progress-left">
+                                                                    <span class="progress-bar border-primary"></span>
+                                                                </span>
+                                                                <span class="progress-right">
+                                                                    <span class="progress-bar border-primary"></span>
+                                                                </span>
+                                                                <div class="progress-value w-100 h-100 rounded-circle d-flex align-items-center justify-content-center">
+                                                                    <div class="h2 font-weight-bold">
+                                                                        @orderGrowthDate<sup class="small" style="color: #fff;">%</sup>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+
+                                                        </div>
+                                                        <div class="wrimagecard-topimage_title">
+                                                            <center>
+                                                                <p style="font-size: 13px">
+                                                                    <strong>Order Growth Rate</strong>
+                                                                </p>
+                                                            </center>
+                                                        </div>
+                                                    </a>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+
+                    }
+                </div>
+            </article>
+        </div>
+    </section>
+</div>
+
+
+@section scripts
+{
+
+    <script src="~/Content/js/select2.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $(function () {
+
+                $(".progress").each(function () {
+
+                    var value = $(this).attr('data-value');
+                    var left = $(this).find('.progress-left .progress-bar');
+                    var right = $(this).find('.progress-right .progress-bar');
+
+                    if (value > 0) {
+                        if (value <= 50) {
+                            right.css('transform', 'rotate(' + percentageToDegrees(value) + 'deg)');
+                        } else {
+                            right.css('transform', 'rotate(180deg)')
+                            left.css('transform', 'rotate(' + percentageToDegrees(value - 50) + 'deg)');
+                        }
+                    }
+
+                });
+
+                function percentageToDegrees(percentage) {
+
+                    return percentage / 100 * 360;
+
+                }
+
+            });
+
+            $(".datepicker").datepicker({
+                changeMonth: true,
+                changeYear: true,
+                yearRange: "2019:2050",
+                showAnim: "slide",
+                //nextText: '<span class="glyphicon glyphicon-chevron-right"></span>',
+                dateFormat: 'dd MM,yy'
+            });
+        });
+        $("#OrderGrowthForm").validate({
+
+            rules: {
+                PriorToDate: "required",
+                PriorFromDate: "required",
+                CurrentToDate: "required",
+                CurrentFromDate: "required"
+
+            },
+            messages: {
+                PriorToDate: "Please select a date",
+                PriorFromDate: "Please select a date",
+                CurrentToDate: "Please select a date",
+                CurrentFromDate: "Please select a date"
+            }
+        });
+    </script>
+}

@@ -1,0 +1,226 @@
+﻿@using EFreshAdmin.Models.EntityModels
+@using EFreshAdmin.Utility
+@model CorporateDesignation
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    List<CorporateDesignation> corporateDesignations = ViewBag.CorporateDesignations;
+    Session["BreadCrum"] = "Corporate Designation";
+}
+<head>
+    <link href="~/Content/css/jquery-ui.min.css" rel="stylesheet" />
+    <link rel="stylesheet" type="text/css" href="~/Content/css/form-design.css" />
+    @*<link href="~/Content/SmartAdmin/css/your_style.css" rel="stylesheet" />*@
+    <style>
+        .error {
+            color: red;
+        }
+    </style>
+
+</head>
+<section id="widget-grid" class="">
+    <div class="row" style="height: 100%">
+        <article class="col-sm-12 col-md-12 col-lg-12">
+            <div class="jarviswidget" id="wid-id-4" data-widget-editbutton="false" data-widget-custombutton="false">
+                <header>
+                    <span class="widget-icon"> <i class="fa fa-edit"></i> </span>
+                    <h2 id="corporateDesignationFormHeading">Add Corporate Designation</h2>
+
+                </header>
+                <div>
+
+                    <div class="widget-body no-padding">
+                        @using (Html.BeginForm("Create", "CorporateDesignation", FormMethod.Post, new { id = "addCorporateDesignationForm", @class = "smart-form" }))
+                        {
+                            @Html.AntiForgeryToken()
+                            <div class='@TempData["Class"]' id="flashMessage" role="alert">@TempData["Message"]</div>
+                            <fieldset>
+                                <input type="hidden" id="corporateDesignationIdHiddenField" name="Id" />
+                                <input type="hidden" id="corporateDesignationCreatedOn" name="CreatedOn" />
+                                <input type="hidden" id="corporateDesignationCreatedBy" name="CreatedBy" />
+                                <div class="row">
+                                    <section class="col col-6" style="padding-bottom: 5px; margin-bottom: 5px">
+                                        <section class="col col-3">
+                                            <label class="label">Name <span style="color: red"> *</span></label>
+                                        </section>
+                                        <section class="col col-9">
+                                            <label class="input">
+                                                <label class="input">
+                                                    @Html.TextBoxFor(model => model.Name, new { id = "corporateDesignationName", placeholder = "Designation" })
+                                                    @Html.ValidationMessageFor(model => model.Name, "", new { @class = "error" })
+                                                </label>
+                                            </label>
+                                        </section>
+                                    </section>
+                                    <section class="col col-6" style="padding-bottom: 5px; margin-bottom: 5px">
+                                        <label class="checkbox">
+                                            @Html.CheckBoxFor(model => model.IsActive, new { id = "corporateDesignationIsActive" })
+                                            <i></i>Is Active?
+                                        </label>
+                                    </section>
+                                </div>
+                            </fieldset>
+                            <footer style="bottom: 0">
+                                <input type="button" value="Reset" id="corporateDesignationResetButton" class="btn btn-primary"/>
+                                <button type="submit" id="corporateDesignationAddButton" class="btn btn-primary">Add</button>
+                            </footer>
+                        }
+                    </div>
+                </div>
+            </div>
+        </article>
+        <!-- END COL -->
+    </div>
+    <!-- END ROW -->
+</section>
+
+<section id="widget-grid" class="" style="margin-bottom: 20px">
+    <!-- row -->
+    <div class="row">
+        <article class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+            <!-- Widget ID (each widget will need unique ID)-->
+            <div class="jarviswidget jarviswidget-color-darken" id="wid-id-0" data-widget-editbutton="false">
+                <header>
+                    <span class="widget-icon"> <i class="fa fa-table"></i> </span>
+                    <h2>Corporate Designation Details </h2>
+                </header>
+                <!-- widget div-->
+                <div>
+                    <!-- widget content -->
+                    <div class="widget-body no-padding">
+                        <table id="dt_basic" class="table table-striped table-bordered table-hover" width="100%">
+                            <thead>
+                                <tr>
+                                    <th>SL</th>
+                                    <th>Id</th>
+                                    <th>Name</th>
+                                    <th>Is Active?</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (corporateDesignations.Count > 0)
+                                {
+                                    var count = 1;
+                                    foreach (var corporateDesignation in corporateDesignations)
+                                    {
+                                        var status = corporateDesignation.IsActive ? "Yes" : "No";
+                                        var color = corporateDesignation.IsActive ? "green" : "red";
+                                        <tr>
+                                            <td>@(count++)</td>
+                                            <td>@corporateDesignation.Id</td>
+                                            <td id="corporateDesignationName_@corporateDesignation.Id">@corporateDesignation.Name</td>
+                                            <td id="corporateDesignationStatus_@corporateDesignation.Id" data-is-active="@corporateDesignation.IsActive" style="color: @color">@status
+                                                <input type="hidden" id="corporateDesignationCreatedOn_@corporateDesignation.Id" value="@corporateDesignation.CreatedOn" />
+                                                <input type="hidden" id="corporateDesignationCreatedBy_@corporateDesignation.Id" value="@corporateDesignation.CreatedBy" />
+                                            </td>
+                                            <td>
+                                                <input type="button" class="btn btn-success" id="editCorporateDesignationButton_@corporateDesignation.Id" onclick="changeFormStateSaveToEdit(@corporateDesignation.Id)" value="Edit" />
+                                                <input type="button" class="btn btn-danger" id="deleteCorporateDesignationButton_@corporateDesignation.Id" onclick="deleteCorporateDesignation(@corporateDesignation.Id)" value="Delete" />
+
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                    <!-- end widget content -->
+                </div>
+                <!-- end widget div -->
+            </div>
+            <!-- end widget -->
+        </article>
+    </div>
+    <!-- end row -->
+</section>
+@section scripts{
+    @Scripts.Render("~/bundles/jqueryval")
+
+    <script>
+        $(document).ready(function() {
+            $(function() {
+                setTimeout(function() {
+                        $("#flashMessage").hide('blind', {}, 500);
+                    },
+                    5000);
+            });
+            $('#corporateDesignationIsActive').attr('checked', true);
+        });
+
+        function changeFormStateSaveToEdit(corporateDesignationId) {
+            $(".field-validation-error").empty();
+            $("#preloader").css('display', 'block');
+            $('html, body').animate({
+                scrollTop: $("#corporateDesignationFormHeading").offset().top
+                },
+                500);
+            $("#corporateDesignationFormHeading").text("Update Corporate Designation");
+            $("#corporateDesignationAddButton").text("Update");
+            $("#addCorporateDesignationForm").attr("action", "@BaseUrl.subDirectory/CorporateDesignation/Edit");
+            $("#corporateDesignationIdHiddenField").val(corporateDesignationId);
+
+            var data = { designationId: corporateDesignationId };
+            $.ajax({
+                method: 'POST',
+                url: "@Url.Action("GetDesignationDetailsById", "CorporateDesignation")",
+                dataType: "json",
+                contentType: 'application/json',
+                data: JSON.stringify(data),
+                crossDomain: true,
+                success: function (data) {
+                    toastr.clear();
+                    if (data.Status == "Ok") {
+                        var createdOn = new Date(parseInt(data.CorporateDesignation.CreatedOn.substr(6)));
+                        var createdOnFormatedDate = createdOn.getFullYear() + '-' + ('0' + (createdOn.getMonth() + 1)).slice(-2) + '-' + ('0' + createdOn.getDate()).slice(-2) + ' ' + ('0' + createdOn.getHours()).slice(-2) + ':' + ('0' + (createdOn.getMinutes())).slice(-2) + ':' + ('0' + createdOn.getSeconds()).slice(-2);
+
+                        $("#corporateDesignationCreatedOn").val(createdOnFormatedDate);
+                        $("#corporateDesignationCreatedBy").val(data.CorporateDesignation.CreatedBy);
+                        $("#corporateDesignationName").val(data.CorporateDesignation.Name);
+                        if (data.CorporateDesignation.IsActive === true) {
+                            $("#corporateDesignationIsActive").prop('checked', true);
+                        } else {
+                            $("#corporateDesignationIsActive").prop('checked', false);
+                        }
+                        
+                    } else {
+                        toastr.error("Something went wrong");
+                    }
+
+                },
+                error: function () {
+                    toastr.error("Something went wrong");
+                }
+            });
+            $("#preloader").css('display', 'none');
+        }
+
+        function deleteCorporateDesignation(corporateDesignationId) {
+            Swal.fire({
+                title: 'Do you want to delete this designation ?',
+                type: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#739e73',
+                cancelButtonColor: '#A90329',
+                cancelButtonText: 'No',
+                confirmButtonText: 'Yes',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.value) {
+                    location.href = '/corporateDesignation/delete/' + corporateDesignationId;
+                }
+            });
+        }
+
+        $('#corporateDesignationResetButton').click(function() {
+            $("#corporateDesignationFormHeading").text("Add Corporate Designation");
+            $("#corporateDesignationAddButton").text("Add");
+            $("#addCorporateDesignationForm").attr("action", "@BaseUrl.subDirectory/CorporateDesignation/Create");
+            $("#corporateDesignationName").val("");
+            $("#corporateDesignationIsActive").prop('checked', true);
+            $(".field-validation-error").empty();
+        });
+    </script>
+
+}
+

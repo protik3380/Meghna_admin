@@ -1,0 +1,677 @@
+﻿@using EFreshAdmin.Utility
+@using EFreshStoreCore.Model.Context
+
+@model ProductDiscount
+@{
+    ViewBag.Title = "View Product Discounts";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    Session["BreadCrum"] = "Product Discounts";
+    List<ProductDiscount> productDiscounts = ViewBag.ProductDiscounts;
+}
+@section style{
+    
+    <link href="~/Content/css/jquery-ui.min.css" rel="stylesheet" />
+    <link rel="stylesheet" type="text/css" href="~/Content/css/form-design.css" />
+<style>
+    .error {
+        color: red;
+    }
+
+    .ui-datepicker-header {
+        color: #3e9aba !important;
+        background-image: none !important;
+        border-radius: 0;
+    }
+
+    .ui-datepicker {
+        width: 280px;
+        padding: 2px;
+    }
+
+    .ui-datepicker-prev, .ui-datepicker-next {
+        color: #3e9aba !important;
+    }
+
+    .ui-datepicker .ui-datepicker-next span {
+        width: 60px;
+        top: 10px;
+        left: -10px;
+    }
+
+    .ui-datepicker .ui-datepicker-prev span {
+        width: 60px;
+        top: 10px;
+        left: 6px;
+    }
+
+    /*input[type=button] {
+        width: 40%;
+        padding: 15px;
+        color: white;
+        margin: 5px 0 22px 0;
+        display: inline-block;
+        border: none;
+        background: #ffa726;
+    }*/
+
+    /*#Validity, #ActiveDate {
+        width: 80%;
+        padding: 12px 15px;
+        margin-bottom: 5px;
+        border: none;
+        background-color: #f1f1f1;
+    }*/
+</style>
+}
+<div id="content" style="margin-bottom: 3%">
+    <section id="widget-grid" class="">
+        <div class="row" style="height: 100%">
+            <article class="col-sm-12 col-md-12 col-lg-12">
+                <div class="jarviswidget" id="wid-id-4" data-widget-editbutton="false" data-widget-custombutton="false">
+                    <header>
+                        <span class="widget-icon"> <i class="fa fa-edit"></i> </span>
+                        <h2 id="addProductDiscountFormHeading">Add Product Discount</h2>
+                    </header>
+                    <div>
+                        <div class="widget-body no-padding">
+                            @using (Html.BeginForm("CreateDiscount", "Product", FormMethod.Post, new { id = "productDiscountForm", @class = "smart-form" }))
+                            {
+                                <div class='@TempData["Class"]' id="flashMessage" role="alert">@TempData["Message"]</div>
+                                <fieldset>
+                                    <input type="hidden" id="productDiscountId" name="Id" />
+                                    <input type="hidden" id="productDiscountCreatedBy" name="CreatedBy" />
+                                    <input type="hidden" id="productDiscountCreatedOn" name="CreatedOn"/>
+                                    <div class="row" style="padding-bottom: 0px;margin-bottom: 0px">
+                                        <section class="col col-6" style="padding-bottom: 5px; margin-bottom: 5px">
+                                            <section class="col col-3">
+                                                <label class="label">Product Type <span style="color: red"> *</span></label>
+                                            </section>
+                                            <section class="col col-9">
+                                                <label class="select">
+                                                    <label class="select">
+                                                        @Html.DropDownList("productTypeId", new SelectList(ViewBag.productTypes, "Id", "Name"), "---- Select Product Type----")<i></i>
+                                                        @Html.ValidationMessage("productTypeId")
+                                                    </label>
+                                                </label>
+                                            </section>
+                                        </section>
+                                        <section class="col col-6" style="padding-bottom: 5px; margin-bottom: 5px">
+                                            <section class="col col-3">
+                                                <label class="label">Category <span style="color: red"> *</span></label>
+                                            </section>
+                                            <section class="col col-9">
+                                                <label class="select">
+                                                    <label class="select">
+                                                       @Html.DropDownList("categoryId", new SelectList(ViewBag.categories, "Id", "Name"), "---- Select Category ----")<i></i>
+                                                    @Html.ValidationMessage("categoryId", "", new { @class = "error" })
+                                                    </label>
+                                                </label>
+                                            </section>
+                                        </section>
+                                    </div>
+                                    <div class="row">
+                                        <section class="col col-6" style="padding-bottom: 5px; margin-bottom: 5px">
+                                            <section class="col col-3">
+                                                <label class="label">Products <span style="color: red"> *</span></label>
+                                            </section>
+                                            <section class="col col-9">
+                                                <label class="select">
+                                                    @Html.DropDownList("Product", Enumerable.Empty<SelectListItem>(), "---- Select Product ----")<i></i>
+                                                    @Html.ValidationMessage("Product", "", new {@class = "error"})
+                                                </label>
+                                            </section>
+                                        </section>
+                                        <section class="col col-6" style="padding-bottom: 5px; margin-bottom: 5px">
+                                            <section class="col col-3">
+                                                <label class="label">Start Date <span style="color: red"> *</span></label>
+                                            </section>
+                                            <section class="col col-9">
+                                                <label class="input">
+                                                    @Html.TextBoxFor(model => model.ActiveDate, new {@class = "datepicker", @readonly = "readonly", placeholder = "Start date"})
+                                                    @Html.ValidationMessageFor(model => model.ActiveDate, "", new {@class = "error"})
+                                                </label>
+                                            </section>
+                                        </section>
+
+                                    </div>
+                                    <div class="row">
+                                        <section class="col col-6" style="padding-bottom: 5px; margin-bottom: 5px">
+                                            <section class="col col-3">
+                                                <label class="label">Product Unit <span style="color: red"> *</span></label>
+                                            </section>
+                                            <section class="col col-9">
+                                                <label class="select">
+                                                    @Html.DropDownListFor(model => model.ProductUnitId, Enumerable.Empty<SelectListItem>(), "---- Select Product Unit ----")<i></i>
+                                                    @Html.ValidationMessageFor(model => model.ProductUnitId, "", new {@class = "error"})
+                                                </label>
+                                            </section>
+                                        </section>
+
+                                        <section class="col col-6" style="padding-bottom: 5px; margin-bottom: 5px">
+                                            <section class="col col-3">
+                                                <label class="label">End Date <span style="color: red"> *</span></label>
+                                            </section>
+                                            <section class="col col-9">
+                                                <label class="input">
+                                                    @Html.TextBoxFor(model => model.Validity, new {@class = "datepicker", @readonly = "readonly", placeholder = "End date"})
+                                                    @Html.ValidationMessageFor(model => model.Validity, "", new {@class = "error"})
+                                                    @*<input type="text" name="Validity" class="datepicker" id="Validity" placeholder="Enter end date">*@
+                                                </label>
+                                            </section>
+                                        </section>
+                                    </div>
+                                    <div class="row">
+                                        <section class="col col-6" style="padding-bottom: 5px; margin-bottom: 5px">
+                                            <section class="col col-3">
+                                                <label class="label">Discount Percentage <span style="color: red"> *</span></label>
+                                            </section>
+                                            <section class="col col-9">
+                                                <label class="input">
+                                                    @Html.TextBoxFor(model => model.DiscountPercentage, new {placeholder = "Discount percentage"})
+                                                    @Html.ValidationMessageFor(model => model.DiscountPercentage, "", new {@class = "error"})
+                                                </label>
+                                            </section>
+                                        </section>
+                                    </div>
+                                </fieldset>
+                                <footer style="bottom: 0">
+                                    <input type="button" value="Reset" id="productDiscountResetButton" class="btn btn-primary" />
+                                    <button type="submit" id="productDiscountAddButton" class="btn btn-primary">Add</button>
+                                </footer>
+                                
+                            }
+                        </div>
+                    </div>
+                </div>
+            </article>
+            
+        </div>
+        <div class="row">
+            <article class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                <div class="jarviswidget jarviswidget-color-darken" id="wid-id-0" data-widget-editbutton="false">
+                    <header>
+                        <span class="widget-icon"> <i class="fa fa-table"></i> </span>
+                        <h2>Product Discounts </h2>
+                    </header>
+                    <div>
+                        <div class="widget-body no-padding">
+                            <table id="dt_basic" class="table table-striped table-bordered table-hover" width="100%">
+                                <thead>
+                                    <tr>
+                                        <th>SL</th>
+                                        <th>Product Name</th>
+                                        <th>Product Unit</th>
+                                        <th>Discount Percentage</th>
+                                        <th>Start Date</th>
+                                        <th>End Date</th>
+                                        <th>Edit</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if (productDiscounts != null)
+                                    {
+                                        var count = 1;
+                                        foreach (ProductDiscount data in productDiscounts)
+                                        {
+                                            string end = "";
+                                            string start = "";
+                                            if (data.Validity != null && data.ActiveDate != null)
+                                            {
+                                                end = data.Validity.Value.ToString("dd/MM/yyyy");
+                                                start = data.ActiveDate.Value.ToString("dd/MM/yyyy");
+                                            }
+                                            <tr>
+                                                <td>@(count++)</td>
+                                                <td>@data.ProductUnit.Product.Name</td>
+                                                <td>@data.ProductUnit.StockKeepingUnit</td>
+                                                <td>@data.DiscountPercentage</td>
+                                                <td>@start</td>
+                                                <td>@end</td>
+                                                <td>
+                                                    <input type="button" class="btn btn-success" onclick="changeProductDiscountFormStateToEdit(@data.Id, @data.ProductUnit.ProductId)" value="Edit" />
+                                                </td>
+                                            </tr>
+                                        }
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </article>
+        </div>
+    </section>
+</div>
+    @section scripts{
+        <script src="~/Scripts/jquery.validate.min.js"></script>
+        @*@Scripts.Render("~/bundles/jqueryval")*@
+        <script type="text/javascript">
+            $(document).on('change keyup',
+                '.required',
+                function(e) {
+                    var disabled = true;
+                    $(".required").each(function() {
+                        var value = this.value;
+                        if ((value) && (value.trim() != '')) {
+                            disabled = false;
+                        } else {
+                            disabled = true;
+                            return false;
+                        }
+                    });
+
+                    if (disabled) {
+                        $('.toggle-disabled').prop("disabled", true);
+                    } else {
+                        $('.toggle-disabled').prop("disabled", false);
+                    }
+                });
+
+            $("#productDiscountForm").validate({
+                rules: {
+                    productTypeId: "required",
+                    categoryId: "required",
+                    ProductUnitId: "required",
+                    Product: "required",
+                    DiscountPercentage: {
+                        required: true,
+                        range: [0, 100],
+                        number: true
+                    },
+                    Validity: {
+                        required: true
+                    },
+                    ActiveDate: {
+                        required: true
+                    }
+                },
+                messages: {
+                    productTypes: "Please select a type",
+                    categories: "Please select a category",
+                    ProductUnitId: "Please enter product unit",
+                    DiscountPercentage: {
+                        required: "Please enter discount percentage"
+                    },
+                    Validity: {
+                        required: "Please enter end date"
+                    },
+                    ActiveDate: {
+                        required: "Please enter an start date"
+                    },
+                    Product: {
+                        required: "Please select product"
+                    }
+                },
+                submitHandler: function(form) {
+                    var productUnitId = $("#ProductUnitId").val();
+                    var product = { id: productUnitId };
+
+                    $.ajax({
+                        url: '@Url.Action("GetDiscountByProductUnit", "Product")',
+                        type: "GET",
+                        dataType: 'JSON',
+                        contentType: "application/json; charset=utf-8",
+                        data: product,
+                        success: function (data) {
+
+                            //alert("successful");
+                            if (data.Id !== 0) {
+                                Swal.fire({
+                                    title: 'Previous discount will be deactivated. Do you want to add this discount ?',
+                                    type: 'warning',
+                                    showCancelButton: true,
+                                    confirmButtonColor: '#739e73',
+                                    cancelButtonColor: '#A90329',
+                                    cancelButtonText: 'No',
+                                    confirmButtonText: 'Yes',
+                                    reverseButtons: true
+                                }).then((result) => {
+                                    if (result.value) {
+                                        form.submit();
+                                    }
+                                });
+                            } else {
+                                form.submit();
+                            }
+                        },
+                        error: function () {
+                            alert("Something went wrong");
+                        }
+
+                    });
+                }
+            });
+            $(document).ready(function() {
+                $(".datepicker").datepicker({
+                    changeMonth: true,
+                    changeYear: true,
+                    yearRange: "2019:2050",
+                    showAnim: "slide",
+                    //nextText: '<span class="glyphicon glyphicon-chevron-right"></span>',
+                    dateFormat: 'dd MM,yy'
+                });
+
+
+                //date validation regex
+                //$.validator.addMethod(
+                //        "regex",
+                //        function (value, element, regexp) {
+                //            //var re = new RegExp(regexp);
+                //            var re = new RegExp("^[0-9]{2}/[0-9]{2}/[0-9]{4}$");
+                //            return this.optional(element) || re.test(value);
+                //        },
+                //        "Invalid date format"
+                //);
+
+                
+
+                $("#Product").change(function() {
+
+                    var productId = $("#Product").val();
+                    var product = { id: productId };
+                    $("#ProductUnitId").empty();
+                    $("#ProductUnitId").append('<option value="" selected>Select Product Unit</option>');
+
+                    $.ajax({
+                        url: '@Url.Action("GetProductUnitsByProduct", "Product")',
+                        type: "GET",
+                        dataType: 'JSON',
+                        contentType: "application/json; charset=utf-8",
+                        data: product,
+                        success: function(data) {
+                            $.each(data,
+                                function(index, value) {
+                                    $("#ProductUnitId").append('<option value="' +
+                                        value.Id +
+                                        '">' +
+                                        value.StockKeepingUnit +
+                                        '</option>');
+                                });
+                        },
+                        error: function() {
+                            alert("Something went wrong");
+                        }
+
+                    });
+                });
+               
+
+                function LoadProducts() {
+                    var productTypeId = $("#productTypeId").val();
+                    var categoryId = $("#categoryId").val();
+                    $("#Product").empty();
+                    $("#Product").append('<option value="" selected>---- Select Product ----</option>');
+                    if (productTypeId !== "" && categoryId !== "") {
+                        var product = { productTypeId: productTypeId, categoryId: categoryId };
+
+                        $.ajax({
+                            url: '@Url.Action("GetProductByProductTypeAndCategory", "Product")',
+                            type: "GET",
+                            dataType: 'JSON',
+                            contentType: "application/json; charset=utf-8",
+                            data: product,
+                            success: function (data) {
+                                //alert("successful");
+                                $.each(data,
+                                 function(index, value) {
+                                     $("#Product").append('<option value="' +
+                                         value.Id +
+                                         '">' +
+                                         value.Name +
+                                         '</option>');
+                                 });
+                           
+                            },
+                            error: function () {
+                                alert("Something went wrong");
+                            }
+
+                        });
+                    }
+                }
+                $("#productTypeId").change(function () {
+                    LoadProducts();
+                });
+                $("#categoryId").change(function () {
+                    LoadProducts();
+                });
+                @*$("#ProductUnitId").change(function() {
+                    var productUnitId = $("#ProductUnitId").val();
+                    var product = { id: productUnitId };
+
+                    $.ajax({
+                        url: '@Url.Action("GetDiscountByProductUnit", "Product")',
+                        type: "GET",
+                        dataType: 'JSON',
+                        contentType: "application/json; charset=utf-8",
+                        data: product,
+                        success: function(data) {
+                            //alert("successful");
+                            if (data.Id !== 0) {
+                                $("#submitForm").hide();
+                                $("#confirmSubmit").show();
+                            } else {
+                                $("#submitForm").show();
+                                $("#confirmSubmit").hide();
+                            }
+                        },
+                        error: function() {
+                            alert("Something went wrong");
+                        }
+
+                    });
+                });*@
+
+
+                $(function() {
+                    setTimeout(function() {
+                            $("#flashMessage").hide('blind', {}, 500);
+                        },
+                        5000);
+                });
+
+                $("#productDiscountResetButton").click(function () {
+                    //$("#ProductUnitId").removeAttr('disabled');
+                    //$("#productTypeId").removeAttr('disabled');
+                    //$("#Product").removeAttr('disabled');
+                    //$("#categoryId").removeAttr('disabled');
+                    $("#addProductDiscountFormHeading").text("Add Product Discount");
+                    $("#productDiscountAddButton").text("Add");
+                    $("#productDiscountForm").attr("action", "@BaseUrl.subDirectory/Product/Discount");
+                    $("#productDiscountId").val("");
+                    $("#productDiscountCreatedOn").val("");
+                    $("#productDiscountCreatedBy").val("");
+                    $("#DiscountPercentage").val("");
+                    $("#Validity").val("");
+                    $("#ActiveDate").val("");
+                    $("#categoryId").val("");
+                    $("#ProductUnitId").val("");
+                    $("#productTypeId").val("");
+                    $("#Product").val("");
+                    $("#productDiscountForm").validate().resetForm();
+
+                });
+            });
+
+            function changeProductDiscountFormStateToEdit(discountId, productId) {
+
+                // Scroll to the top of the form
+                $('html, body').animate({
+                        scrollTop: $("#addProductDiscountFormHeading").offset().top
+                    },
+                    500);
+                
+                var product = { productId: productId};
+                var pTypeId = 0;
+                var pCategoryId = 0;
+                $.ajax({
+                    url: '@Url.Action("GetProductInfoById", "Product")',
+                    type: "GET",
+                    dataType: 'JSON',
+                    contentType: "application/json; charset=utf-8",
+                    data: product,
+                    success: function (data) {
+                        console.log(data);
+                        console.log(data.Product.CategoryId);
+                        console.log(data.Product.Category.ProductTypeId);
+                        var categoryId = data.Product.CategoryId;
+                        var productTypeId = data.Product.Category.ProductTypeId;
+                        pTypeId = data.Product.Category.ProductTypeId;
+                        pCategoryId = data.Product.CategoryId;
+                        $("#productTypeId").val(productTypeId).attr("selected", "selected");
+                        $("#categoryId").val(categoryId).attr("selected", "selected");
+                        $("#Product").empty();
+                        $("#Product").append('<option value="">---- Select Product ----</option>');
+                        //pTypeId = $("#productTypeId").val().attr("selected", "selected");
+                        //pCategoryId = $("#categoryId").val().attr("selected", "selected");
+
+                        if (pTypeId !== "" && pCategoryId !== "") {
+                            var products = { productTypeId: pTypeId, categoryId: pCategoryId };
+
+                            $.ajax({
+                                url: '@Url.Action("GetProductByProductTypeAndCategory", "Product")',
+                                type: "GET",
+                                dataType: 'JSON',
+                                contentType: "application/json; charset=utf-8",
+                                data: products,
+                                success: function (data) {
+                                    //alert("successful");
+                                    $.each(data,
+                                     function (index, value) {
+                                         $("#Product").append('<option value="' +
+                                             value.Id +
+                                             '">' +
+                                             value.Name +
+                                             '</option>');
+                                     });
+
+                                    $("#Product").val(productId);
+                                },
+                                error: function () {
+                                    alert("Something went wrong");
+                                }
+
+                            });
+                        }
+                        //alert("successful");
+                        //$.each(data,
+                        // function (index, value) {
+                        //     $("#Product").append('<option value="' +
+                        //         value.Id +
+                        //         '">' +
+                        //         value.Name +
+                        //         '</option>');
+                        // });
+
+                    },
+                    error: function () {
+                        alert("Something went wrong");
+                    }
+
+                });
+               
+                // Change form state to edit
+                $("#addProductDiscountFormHeading").text("Update Product Discount");
+                $("#productDiscountAddButton").text("Update");
+                $("#productDiscountForm").attr("action", "@BaseUrl.subDirectory/Product/EditDiscount");
+                $("#productDiscountId").val(discountId);
+              
+
+                var data = { discountId: discountId };
+                $.ajax({
+                    method: 'POST',
+                    url: "@Url.Action("GetProductDiscountByDiscountId", "Product")",
+                    dataType: "json",
+                    contentType: 'application/json',
+                    data: JSON.stringify(data),
+                    crossDomain: true,
+                    success: function(data) {
+                        toastr.clear();
+                        if (data.Status == "Ok") {
+                            var createdOnFormatedDate = "";
+                            var createdOn = "";
+                            var activeDateFormatedDate = "";
+                            var activeDate = "";
+                            var validityFormatedDate = "";
+                            var validity = "";
+                            if (data.ProductDiscount.CreatedOn == null) {
+                                createdOnFormatedDate = null;
+                            } else {
+                                createdOn = new Date(parseInt(data.ProductDiscount.CreatedOn.substr(6)));
+                                createdOnFormatedDate = createdOn.getFullYear() +
+                                    '-' +
+                                    ('0' + (createdOn.getMonth() + 1)).slice(-2) +
+                                    '-' +
+                                    ('0' + createdOn.getDate()).slice(-2) +
+                                    ' ' +
+                                    ('0' + createdOn.getHours()).slice(-2) +
+                                    ':' +
+                                    ('0' + (createdOn.getMinutes())).slice(-2) +
+                                    ':' +
+                                    ('0' + createdOn.getSeconds()).slice(-2);
+                            }
+                            var months = [
+                                "January", "February", "March", "April", "May", "June", "July", "August", "September",
+                                "October", "November", "December"
+                            ];
+                            activeDate = new Date(parseInt(data.ProductDiscount.ActiveDate.substr(6)));
+                            activeDateFormatedDate = ('0' + activeDate.getDate()).slice(-2) +
+                                " " +
+                                months[activeDate.getMonth()] +
+                                "," +
+                                activeDate.getFullYear();
+                            validity = new Date(parseInt(data.ProductDiscount.Validity.substr(6)));
+                            validityFormatedDate = ('0' + validity.getDate()).slice(-2) +
+                                " " +
+                                months[validity.getMonth()] +
+                                "," +
+                                validity.getFullYear();
+                            //$("#categoryName").val($.trim(data.ProductDiscount.Name));
+                            $("#productDiscountCreatedOn").val(createdOnFormatedDate);
+                            $("#productDiscountCreatedBy").val(data.ProductDiscount.CreatedBy);
+                            $("#DiscountPercentage").val(data.ProductDiscount.DiscountPercentage);
+                            $("#Validity").val(validityFormatedDate);
+                            $("#ActiveDate").val(activeDateFormatedDate);
+                            //$("#Product").val(data.ProductDiscount.ProductUnit.ProductId);
+
+                            var product = { id: data.ProductDiscount.ProductUnit.ProductId };
+                            $("#ProductUnitId").empty();
+                            $("#ProductUnitId").append('<option value="" selected>-- Select --</option>');
+                            $.ajax({
+                                url: '@Url.Action("GetProductUnitsByProduct", "Product")',
+                                type: "GET",
+                                dataType: 'JSON',
+                                contentType: "application/json; charset=utf-8",
+                                data: product,
+                                success: function(productUnits) {
+                                    $.when(
+                                        $.each(productUnits,
+                                            function(index, value) {
+                                                $("#ProductUnitId").append('<option value="' +
+                                                    value.Id +
+                                                    '">' +
+                                                    value.StockKeepingUnit +
+                                                    '</option>');
+                                            })).done(function() {
+                                        $("#ProductUnitId").val(data.ProductDiscount.ProductUnitId);
+                                    });
+                                }
+                            });
+
+                        } else {
+                            toastr.error("Something went wrong");
+                        }
+
+                    },
+                    error: function() {
+                        toastr.error("Something went wrong");
+                    }
+                });
+                //$("#ProductUnitId").attr('readonly', true);
+                //$("#productTypeId").attr("readonly", true);
+                //$("#Product").attr("readonly", true);
+                //$("#categoryId").attr("disabled", true);
+                $("#preloader").css('display', 'none');
+            }
+        </script>
+    }

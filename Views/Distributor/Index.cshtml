@@ -1,0 +1,426 @@
+﻿@using EFreshAdmin.Models.EntityModels
+@using EFreshAdmin.Utility
+@using EFreshStore.Models.Context
+@model Distributor
+
+@{
+    ViewBag.Title = "Views";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    List<Distributor> distributors = ViewBag.Distributors;
+    Session["BreadCrum"] = "Distributor";
+}
+<head>
+    <style>
+        .error {
+            color: red;
+        }
+    </style>
+</head>
+<div id="content" style="margin-bottom: 3%">
+    <section id="widget-grid" class="">
+        <div class="row">
+            <article class="col-sm-12 col-md-12 col-lg-12">
+                <!-- Widget ID (each widget will need unique ID)-->
+                <div class="jarviswidget" id="wid-id-8" data-widget-editbutton="false" data-widget-custombutton="false">
+                    <header>
+                        <span class="widget-icon"> <i class="fa fa-edit"></i> </span>
+                        <h2 id="addDistributorFormHeading">Add Distributor </h2>
+                    </header>
+                    <!-- widget div-->
+                    <div>
+                        <!-- widget content -->
+                        <div class="widget-body no-padding">
+                            @using (Html.BeginForm("Create", "Distributor", FormMethod.Post, new { id = "AddDistributorForm", @class = "smart-form" }))
+                            {
+                                @Html.ValidationSummary(true)
+                                <div class='@TempData["Class"]' id="flashMessage" role="alert">@TempData["Message"]</div>
+                                <input type="hidden" id="distributorId" name="Id" />
+                                <input type="hidden" id="distributorCreatedBy" name="CreatedBy" />
+                                <input type="hidden" id="distributorCreatedOn" name="CreatedOn" />
+                                <fieldset>
+                                    <div class="row" style="padding-bottom: 0; margin-bottom: 0">
+                                        <section class="col col-6" style="padding-bottom: 0; margin-bottom: 0">
+                                            <section class="col col-3">
+                                                <label class="label">Name<span style="color: red"> *</span></label>
+                                            </section>
+                                            <section class="col col-9">
+                                                <label class="input">
+                                                    <input type="text" name="Name" id="Name" placeholder="Distributor name">
+                                                </label>
+                                            </section>
+                                        </section>
+                                        <section class="col col-6" style="padding-bottom: 0; margin-bottom: 0">
+                                            <section class="col col-3">
+                                                <label class="label">Contact Person <span style="color: red"> *</span></label>
+                                            </section>
+                                            <section class="col col-9">
+                                                <label class="input">
+                                                    <input type="text" name="ContactPerson" id="ContactPerson" placeholder="Contact person">
+                                                </label>
+                                            </section>
+                                        </section>
+                                    </div>
+                                    <div class="row" style="padding-bottom: 0; margin-bottom: 0">
+                                        <section class="col col-6" style="padding-bottom: 0px; margin-bottom: 0px">
+                                            <section class="col col-3">
+                                                <label class="label">Mobile No <span style="color: red"> *</span></label>
+                                            </section>
+                                            <section class="col col-9">
+                                                <label class="input">
+                                                    <input type="text" name="Phone" id="Phone" maxlength="11" placeholder="Mobile no">
+                                                </label>
+                                            </section>
+                                        </section>
+                                        <section class="col col-6" style="padding-bottom: 0px; margin-bottom: 0px">
+                                            <section class="col col-3">
+                                                <label class="label">Master Depot<span style="color: red"> *</span></label>
+                                            </section>
+                                            <section class="col col-9">
+                                                <label class="select">
+                                                    @Html.DropDownListFor(model => model.MasterDepotId, new SelectList(ViewBag.masterDepot, "Id", "Name"), "---Select Master Depot---")<i></i>
+                                                </label>
+                                            </section>
+                                        </section>
+                                    </div>
+                                    <div class="row" style="padding-bottom: 0; margin-bottom: 0">
+                                        <section class="col col-6" style="padding-bottom: 0px; margin-bottom:0px">
+                                            <section class="col col-3">
+                                                <label class="label">E-Mail <span style="color: red"> *</span></label>
+                                            </section>
+                                            <section class="col col-9">
+                                                <label class="input">
+                                                    <input type="text" name="Email" id="Email" placeholder="Email">
+                                                </label>
+                                            </section>
+                                        </section>
+                                        <section class="col col-6" style="padding-bottom: 0px; margin-bottom: 0px">
+                                            <section class="col col-3">
+                                                <label class="label">Thana <span style="color: red"> *</span></label>
+                                            </section>
+                                            <section class="col col-9">
+                                                <label class="select">
+                                                    @Html.DropDownListFor(model => model.ThanaId, new SelectList(Enumerable.Empty<Thana>()), "---Select---")<i></i>
+                                                </label>
+                                            </section>
+                                        </section>
+                                    </div>
+                                    <div class="row" style="padding-bottom: 0; margin-bottom: 0">
+                                        <section class="col col-6" style="padding-bottom: 0px; margin-bottom: 0px">
+                                            <section class="col col-3">
+                                                <label class="label">Address <span style="color: red"> *</span></label>
+                                            </section>
+                                            <section class="col col-9">
+                                                <label class="textarea">
+                                                    <textarea rows="4" id="Address" name="Address"></textarea>
+                                                </label>
+                                            </section>
+                                        </section>
+                                        <section class="col col-6" style="padding-bottom: 5px; margin-bottom: 5px">
+                                            <section class="col col-3"></section>
+                                            <section class="col col-9">
+                                                <label class="checkbox">
+                                                    @Html.CheckBoxFor(model => model.IsActive, new { id = "distributorIsActive" })
+                                                    <i></i>Is Active?
+                                                </label>
+                                            </section>
+                                        </section>
+                                    </div>
+                                </fieldset>
+                                <footer style="bottom: 0">
+                                    <input type="button" value="Reset" id="distributorResetButton" class="btn btn-primary" />
+                                    <button type="submit" id="distributorAddButton" class="btn btn-primary">Add</button>
+                                </footer>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </article>
+        </div>
+        <!-- row -->
+        <div class="row">
+            <!-- NEW WIDGET START -->
+            <article class="col-sm-12 col-md-12 col-lg-12">
+
+                <!-- Widget ID (each widget will need unique ID)-->
+                <div class="jarviswidget jarviswidget-color-darken" id="wid-id-3" data-widget-editbutton="false">
+                    <header>
+                        <span class="widget-icon"> <i class="fa fa-table"></i> </span>
+                        <h2>Distributor Details</h2>
+                    </header>
+
+                    <!-- widget div-->
+                    <div>
+                        <!-- widget edit box -->
+                        <div class="jarviswidget-editbox">
+                            <!-- This area used as dropdown edit box -->
+                        </div>
+                        <!-- end widget edit box -->
+                        <!-- widget content -->
+                        <div class="widget-body no-padding">
+                            <div class="table-responsive">
+
+                                <table class="table" id="dt_basic">
+                                    <thead>
+                                        <tr>
+                                            <th>SL</th>
+                                            <th>Name</th>
+                                            <th>Address</th>
+                                            <th>Contact Person</th>
+                                            <th>Phone</th>
+                                            <th>Thana</th>
+                                            <th>Is Active?</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @if (distributors != null)
+                                        {
+                                            var count = 1;
+                                            foreach (Distributor data in distributors)
+                                            {
+                                                <tr>
+                                                    <td>@(count++)</td>
+                                                    <td>@data.Name</td>
+                                                    <td>@data.Address</td>
+                                                    <td>@data.ContactPerson</td>
+                                                    <td>@data.Phone</td>
+                                                    <td>@data.Thana.Name</td>
+                                                    @{
+                                                        var status = data.IsActive ? "Yes" : "No";
+                                                        var color = data.IsActive ? "green" : "red";
+                                                        <td style="color: @color;">@status</td>
+                                                    }
+                                                    <td>
+                                                        <input type="button" class="btn btn-success" onclick="changeDistributorFormStateToEdit(@data.Id)" value="Edit" />
+                                                        <a role="button" class="btn btn-success" id="distributorSubscriptionsBtn_@data.Id" onclick="showDistributorSubscriptions(@data.Id)">Product Line</a>
+                                                    </td>
+                                                </tr>
+                                                <tr id="distributorSubscriptions_@data.Id" class="distributorSubscriptions">
+                                                    <td colspan="8" style="display: table-cell">
+
+                                                        <div class="panel panel-default" id="distributorSubscriptionsPanel_@data.Id">
+                                                            <a role="button" class="panel-close-btn" onclick="closeDistributorSubscriptions(@data.Id)"><i class="fa fa-times" aria-hidden="true"></i></a>
+                                                            <div class="panel-overlay">
+                                                                <img src="~/Content/Img/infinity3.gif" />
+                                                            </div>
+                                                            <!-- Default panel contents -->
+                                                            <div align="center">
+                                                                <h3>Subscribed Product Lines</h3>
+                                                            </div>
+                                                            <div class="panel-body">
+                                                                <div class="empty-distributor-subs">
+                                                                    <img src="~/Content/Img/no subscription.png" />
+                                                                    <h3>
+                                                                        <strong>@data.Name</strong> is not subscribed to any product line yet.
+                                                                    </h3>
+                                                                </div>
+                                                                <table class="table table-responsive" id="distributorTable_@data.Id"></table>
+
+                                                            </div>
+
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                                }
+                                            }
+                                    </tbody>
+                                </table>
+
+                            </div>
+                        </div>
+                        <!-- end widget content -->
+
+                    </div>
+                    <!-- end widget div -->
+
+                </div>
+                <!-- end widget -->
+
+            </article>
+            <!-- WIDGET END -->
+
+        </div>
+        <!-- end row -->
+        <!-- END ROW -->
+
+    </section>
+</div>
+@section scripts{
+    @Scripts.Render("~/bundles/jqueryval")
+    <script>
+    $(document).ready(function() {
+        $("#MasterDepotId").change(function () {
+            var masterDepotId = $("#MasterDepotId").val();
+            var masterDepot = { id: masterDepotId };
+            $("#ThanaId").empty();
+            $("#ThanaId").append('<option value="" selected>-- Select --</option>');
+            $.ajax({
+                url: '@Url.Action("GetAllThanaByMasterDepot","Distributor")',
+                type: "GET",
+                dataType: 'JSON',
+                contentType: "application/json; charset=utf-8",
+                data: masterDepot,
+                success: function (data) {
+                    $.each(data, function (index, value) {
+                        $("#ThanaId").append('<option value="' + value.Thana.Id + '">' + value.Thana.Name + '</option>');
+                    });
+                },
+                error: function () {
+                    alert("Something went wrong");
+                }
+            });
+        });
+
+    $(function() {
+        setTimeout(function() {
+            $("#flashMessage").hide('blind', {}, 500);
+        }, 5000);
+    });
+
+    $('#distributorIsActive').attr('checked', true);
+ });
+
+        jQuery.validator.addMethod("phone", function (phone_number, element) {
+            phone_number = phone_number.replace(/\s+/g, "");
+            return this.optional(element) || phone_number.length > 10 &&
+                phone_number.match(/\+?(88)?01[567893][0-9]{8}\b/);
+        }, "Invalid phone number");
+        $("#AddDistributorForm").validate({
+
+            rules: {
+                Name: "required",
+                ContactPerson: "required",
+                Phone: {
+                    required: true,
+                    phone: true,
+                    number: true
+                },
+                Email: {
+                    required: true,
+                    email: true
+                },
+                Address: "required",
+                MasterDepotId: "required",
+                ThanaId: "required"
+            },
+            messages: {
+                Name: "Please enter name",
+                ContactPerson: "Please enter contact person",
+                Phone: {
+                    required: "Please enter a mobile no",
+                    phone: "Please enter a valid mobile no. Example - 01xxxxxxxxx",
+                    number: "please enter digits"
+                },
+                Email: {
+                    required: "Please enter email address",
+                    email: "Please enter a valid email address. Example - abc@gmail.com"
+                },
+                Address: "Please enter address",
+                MasterDepotId: "Please add a master depot",
+                ThanaId: "Please add a thana"
+            }
+        });
+        $("#Phone").keydown(function (e) {
+            // Allow: backspace, delete, tab, escape, enter and .
+            if ($.inArray(e.keyCode, [46, 8, 9, 27, 13, 190]) !== -1 ||
+                // Allow: Ctrl+A
+                (e.keyCode === 65 && e.ctrlKey === true) ||
+                // Allow: home, end, left, right
+                (e.keyCode >= 35 && e.keyCode <= 39)) {
+                // let it happen, don't do anything
+                return;
+            }
+            // Ensure that it is a number and stop the keypress
+            if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
+                e.preventDefault();
+            }
+        });
+
+        function changeDistributorFormStateToEdit(distributorId) {
+            $("#AddDistributorForm").validate().resetForm();
+            $("#preloader").css('display', 'block');           
+            $('html, body').animate({
+                scrollTop: $("#addDistributorFormHeading").offset().top
+            },
+            500);            
+            $("#addDistributorFormHeading").text("Update Distributor");
+            $("#distributorAddButton").text("Update");
+            $("#AddDistributorForm").attr("action", "@BaseUrl.subDirectory/Distributor/Edit");
+            $("#distributorId").val(distributorId);
+            var data = { distributorId: distributorId };
+            $.ajax({
+                method: 'POST',
+                url: "@Url.Action("GetDistributorDetailsById", "Distributor")",
+                dataType: "json",
+            contentType: 'application/json',
+            data: JSON.stringify(data),
+            crossDomain: true,
+            success: function (data) {
+                toastr.clear();
+                if (data.Status == "Ok") {
+                    var createdOnFormatedDate = "";
+                    var createdOn = "";
+                    if (data.Distributor.CreatedOn == null) {
+                        createdOnFormatedDate = null;
+                    } else {
+                        createdOn = new Date(parseInt(data.Distributor.CreatedOn.substr(6)));
+                        createdOnFormatedDate = createdOn.getFullYear() + '-' + ('0' + (createdOn.getMonth() + 1)).slice(-2) + '-' + ('0' + createdOn.getDate()).slice(-2) + ' ' + ('0' + createdOn.getHours()).slice(-2) + ':' + ('0' + (createdOn.getMinutes())).slice(-2) + ':' + ('0' + createdOn.getSeconds()).slice(-2);
+                    }
+                    $("#distributorCreatedOn").val(createdOnFormatedDate);
+                    $("#distributorCreatedBy").val(data.Distributor.CreatedBy);
+                    $("#Name").val($.trim(data.Distributor.Name));
+                    $("#ContactPerson").val($.trim(data.Distributor.ContactPerson));
+                    $("#Phone").val($.trim(data.Distributor.Phone));
+                    $("#Email").val($.trim(data.Distributor.Email));
+                    $("#MasterDepotId").val(data.Distributor.MasterDepotId);
+                    $("#Address").val(data.Distributor.Address);
+                    if (data.Distributor.IsActive === true) {
+                        $("#distributorIsActive").prop('checked', true);
+                    } else {
+                        $("#distributorIsActive").prop('checked', false);
+                    }
+                    var masterDepot = { id: data.Distributor.MasterDepotId };
+                    $("#ThanaId").empty();
+                    $("#ThanaId").append('<option value="" selected>-- Select --</option>');
+                    $.ajax({
+                        url: '@Url.Action("GetAllThanaByMasterDepot","Distributor")',
+                        type: "GET",
+                        dataType: 'JSON',
+                        contentType: "application/json; charset=utf-8",
+                        data: masterDepot,
+                        success: function (thanas) {
+                            $.when(
+                            $.each(thanas, function (index, value) {
+                                $("#ThanaId").append('<option value="' + value.Thana.Id + '">' + value.Thana.Name + '</option>');
+                            })).done(function(){
+                                $("#ThanaId").val(data.Distributor.ThanaId);
+                            });                            
+                        }
+                    });                    
+                } else {
+                    toastr.error("Something went wrong");
+                }
+            },
+            error: function () {
+                toastr.error("Something went wrong");
+            }
+        });
+        $("#preloader").css('display', 'none');
+        }
+
+        $("#distributorResetButton").click(function () {
+            $("#addDistributorFormHeading").text("Add Distributor");
+            $("#distributorAddButton").text("Add");
+            $("#AddDistributorForm").attr("action", "@BaseUrl.subDirectory/Distributor/Create");
+            $("#Name").val("");
+            $("#ContactPerson").val("");
+            $("#Phone").val("");
+            $("#Email").val("");
+            $("#MasterDepotId").val("");
+            $("#ThanaId").val("");
+            $("#Address").val("");
+            $("#distributorIsActive").prop('checked', true);
+            $("#AddDistributorForm").validate().resetForm();
+        });
+    </script>
+}

@@ -1,0 +1,387 @@
+﻿@using System.Globalization
+@using System.Web.UI.WebControls
+@using EFreshAdmin.Models
+@using EFreshAdmin.Models.EntityModels
+@using EFreshStore.Models.Context
+@using EFreshStore.Utility
+@model IEnumerable<EFreshAdmin.Models.ViewModels.OrderVsMonthOrYearVm>
+
+@{
+    ViewBag.Title = "Sales Rate Over Time";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    long userTypeId = Convert.ToInt64(Session["UserTypeId"]);
+}
+
+@section style{
+
+    <link href="~/Content/css/jquery-ui.min.css" rel="stylesheet" />
+    <link rel="stylesheet" type="text/css" href="~/Content/css/form-design.css" />
+    <link href="~/Content/css/BarChart.css" rel="stylesheet" />
+    <style>
+        .error {
+            color: red;
+        }
+       #Year.error, #FromMonth.error, #ToMonth.error, #FromYear.error, #ToYear.error {
+                    color: #000;
+                }
+        #chart #bars li .bar:hover:before {
+            color: #000;
+        }
+
+        .ui-datepicker-header {
+            color: #3e9aba !important;
+            background-image: none !important;
+            border-radius: 0;
+        }
+
+        .ui-datepicker {
+            width: 280px;
+            padding: 2px;
+        }
+
+        .ui-datepicker-prev, .ui-datepicker-next {
+            color: #3e9aba !important;
+        }
+
+        .ui-datepicker .ui-datepicker-next span {
+            width: 60px;
+            top: 10px;
+            left: -10px;
+        }
+
+        .ui-datepicker .ui-datepicker-prev span {
+            width: 60px;
+            top: 10px;
+            left: 6px;
+        }
+    </style>
+}
+
+<div id="content" style="margin-bottom: 3%">
+    <section id="widget-grid" class="">
+        <div class="row" style="height: 100%">
+            <article class="col-sm-12 col-md-12 col-lg-12">
+                <div class="jarviswidget" id="wid-id-4" data-widget-editbutton="false" data-widget-custombutton="false">
+                    <header>
+                        <span class="widget-icon"> <i class="fa fa-list-alt"></i> </span>
+                        <h2>Order Rate Over Time</h2>
+                    </header>
+                    <div>
+                        <div class="widget-body no-padding">
+                            @using (Html.BeginForm("OrderRateOverTime", "Report", FormMethod.Get, new { id = "OrderRateOverTimeForm", @class = "smart-form" }))
+                            {
+                                <div class='@TempData["Class"]' id="flashMessage" role="alert">@TempData["Message"]</div>
+                                <fieldset>
+                                    <div class="row" id="ReportTypeGrid">
+
+
+                                        <section class="col col-md-12" style="padding-bottom: 5px; margin-bottom: 5px">
+                                            <p style="font-weight: bold">Report Type</p>
+                                        </section>
+                                        <section class="col col-md-6" style="padding-bottom: 5px; margin-bottom: 5px">
+
+                                            <label class="input">
+                                                <input type="hidden" id="RerportType" />
+                                                <select id="ReportType" name="ReportType" class="form-control">
+                                                    <option value="0" disabled selected hidden>Select report type</option>
+                                                    <option value="1">Yearly</option>
+                                                    <option value="2">Monthly</option>
+                                                </select>
+                                            </label>
+
+                                        </section>
+                                        <section class="col col-md--6" style="padding-bottom: 5px; margin-bottom: 5px">
+                                            <a class="btn btn-primary" id="reportTypebtn" onclick="enableFilterDiv()" style="padding: 5px 20px">Select</a>
+                                        </section>
+                                    </div>
+                                    <div class="row" style="margin-top: 20px">
+
+                                        <div id="yearlyReportGrid" class="col col-md-6">
+                                            <section class="col col-md-12" style="padding-bottom: 5px; margin-bottom: 5px">
+                                                <p style="font-weight: bold">Search By Year</p>
+                                            </section>
+
+                                            <section class="col col-6" style="padding-bottom: 5px; margin-bottom: 5px">
+
+                                                <label class="label">From Year</label>
+
+
+                                                <label class="input">
+                                                    @{
+
+                                                        @Html.DropDownList("FromYear", Enumerable.Range(1990, DateTime.Now.Year).Select(x => new SelectListItem { Text = x.ToString() }), "Select Year", new { @class = "form-control" })
+                                                    }
+                                                </label>
+
+                                            </section>
+                                            <section class="col col-6" style="padding-bottom: 5px; margin-bottom: 5px">
+
+                                                <label class="label">To Year</label>
+
+
+                                                <label class="input">
+                                                    @{
+                                                        var currentYear = DateTime.Now.Year;
+                                                    @Html.DropDownList("ToYear", Enumerable.Range(1990, currentYear).Select(x => new SelectListItem {Text = x.ToString()}), "Select Year", new {@class = "form-control"})
+                                                    }
+                                                </label>
+
+                                            </section>
+                                            <footer style="bottom: 0">
+                                                <button type="submit" class="btn btn-primary">Show</button>
+                                            </footer>
+                                        </div>
+
+                                        <div id="monthlyReportGrid" class="col col-md-6">
+                                            <section class="col col-md-12" style="padding-bottom: 5px; margin-bottom: 5px">
+                                                <p style="font-weight: bold">Search By Month</p>
+                                            </section>
+
+
+                                            <section class="col col-6" style="padding-bottom: 5px; margin-bottom: 5px">
+
+                                                <label class="label">Select Year</label>
+
+
+                                                <label class="input">
+                                                    @{
+
+                                                        @Html.DropDownList("Year", Enumerable.Range(1990, DateTime.Now.Year).Select(x => new SelectListItem { Text = x.ToString() }), "Select Year", new { @class = "form-control" })
+                                                    }
+
+                                                </label>
+
+                                            </section>
+
+                                            <section class="col col-6" style="padding-bottom: 5px; margin-bottom: 5px">
+                                                <label class="label">From Month</label>
+                                                <label class="input">
+
+                                                    @Html.DropDownList("FromMonth", Enumerable.Range(1, 12).Select(x => new SelectListItem { Value = x.ToString(), Text = CultureInfo.InvariantCulture.DateTimeFormat.GetMonthName(x) }), "Select Month", new { @class = "form-control" })
+
+                                                </label>
+
+                                            </section>
+                                            <section class="col col-6" style="padding-bottom: 5px; margin-bottom: 5px">
+                                                <label class="label">To Month</label>
+                                                <label class="input">
+                                                    @Html.DropDownList("ToMonth", Enumerable.Range(1, 12).Select(x => new SelectListItem { Value = x.ToString(), Text = CultureInfo.InvariantCulture.DateTimeFormat.GetMonthName(x) }), "Select Month", new { @class = "form-control" })
+                                                </label>
+
+                                            </section>
+
+                                            <footer style="bottom: 0">
+                                                <button type="submit" class="btn btn-primary">Show</button>
+                                            </footer>
+                                        </div>
+                                    </div>
+
+
+                                </fieldset>
+
+                                                        }
+                        </div>
+                    </div>
+                </div>
+            </article>
+
+        </div>
+        <div class="row" style="height: 100%">
+            <article class="col-sm-12 col-md-12 col-lg-12">
+                <div class="jarviswidget" id="wid-id-4" data-widget-editbutton="false" data-widget-custombutton="false">
+                    <header>
+                        <span class="widget-icon"> <i class="fa fa-list-alt"></i> </span>
+                        <h2>Order Rate</h2>
+                    </header>
+                    <div style="width: 100%">
+
+                        @if (Model != null)
+                        {  <div id="chart">
+                            <ul id="numbers">
+
+                                <li><span>100</span></li>
+                                <li><span>90</span></li>
+                                <li><span>80</span></li>
+                                <li><span>70</span></li>
+                                <li><span>60</span></li>
+                                <li><span>50</span></li>
+                                <li><span>40</span></li>
+                                <li><span>30</span></li>
+                                <li><span>20</span></li>
+                                <li><span>10</span></li>
+                                <li><span>0</span></li>
+                            </ul>
+                            <ul id="bars">
+
+                                @foreach (var item in Model)
+                                {
+                                    var orderRate = String.Format("{0:0.00}", item.OrderRate);
+                                    if (item.Month == 0)
+                                    {
+
+                                        <li>
+
+                                            <div data-percentage="@orderRate" class="bar"></div><span>@item.Year</span>
+                                        </li>
+                                    }
+                                    else
+                                    {
+
+                                        <li>
+                                            <div data-percentage="@orderRate" class="bar"></div><span>@CultureInfo.InvariantCulture.DateTimeFormat.GetAbbreviatedMonthName((int)item.Month)</span>
+                                        </li>
+                                    }
+
+                                }
+
+
+                            </ul>
+                        </div>
+                        }
+                    </div>
+                </div>
+            </article>
+
+        </div>
+
+    </section>
+</div>
+
+
+
+@section scripts
+{
+
+    <script src="~/Content/js/select2.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $(function () {
+                setTimeout(function () {
+                    $("#flashMessage").hide('blind', {}, 500);
+                }, 5000);
+            });
+            $('#yearlyReportGrid *').prop('disabled', true);
+            $("#monthlyReportGrid *").prop("disabled", true);
+            $('#BrandIds').select2({
+                placeholder: {
+                    id: '-1', // the value of the option
+                    text: 'Select brand(s)'
+                }
+            });
+            $('#CategoryIds').select2({
+                placeholder: {
+                    id: '-1', // the value of the option
+                    text: 'Select categories'
+                }
+            });
+            $('#ProductTypeIds').select2({
+                placeholder: {
+                    id: '-1', // the value of the option
+                    text: 'Select product type(s)'
+                }
+            });
+
+            $('#MasterDepotIds').select2({
+                placeholder: {
+                    id: '-1', // the value of the option
+                    text: 'Select master depot(s)'
+                }
+            });
+
+            $('#ThanaIds').select2({
+                placeholder: {
+                    id: '-1', // the value of the option
+                    text: 'Select thana(s)'
+                }
+            });
+
+            $('#DistrictIds').select2({
+                placeholder: {
+                    id: '-1', // the value of the option
+                    text: 'Select district(s)'
+                }
+            });
+
+
+            $(".datepickerMonth").datepicker({
+                dateFormat: 'MM',
+                changeMonth: true,
+                changeYear: true,
+                showButtonPanel: true,
+
+                onClose: function (dateText, inst) {
+                    var month = $("#ui-datepicker-div .ui-datepicker-month :selected").val();
+                    $(this).val($.datepicker.formatDate('MM', new Date(year, 1)));
+                }
+            });
+            $(".datepickerYear").datepicker({
+                changeYear: true,
+                yearRange: "2019:2050",
+                showAnim: "slide",
+                //nextText: '<span class="glyphicon glyphicon-chevron-right"></span>',
+                dateFormat: 'yyyy'
+            });
+            $(function () {
+                $("#bars li .bar").each(function (key, bar) {
+                    var percentage = $(this).data('percentage');
+
+                    $(this).animate({
+                        'height': percentage + '%'
+                    }, 1000);
+                });
+            });
+        });
+        function enableFilterDiv() {
+            var reportType = $("#ReportType").val();
+            if (reportType === null) {
+                $('#yearlyReportGrid *').prop('disabled', true);
+                $("#monthlyReportGrid *").prop("disabled", true);
+            }
+            else if (reportType === "1") {
+                $('#yearlyReportGrid *').prop('disabled', false);
+                $("#monthlyReportGrid *").prop("disabled", true);
+                $('#FromYear').attr("required", "true");
+                $('#ToYear').attr("required", "true");
+                $('#Year').attr("required", "false");
+                $('#ToMonth').attr("required", "false");
+                $('#FromMonth').attr("required", "false");
+                $("#OrderRateOverTimeForm").validate({
+
+                    rules: {
+                        FromYear: "required",
+                        ToYear: "required"
+                    },
+                    messages: {
+                        FromYear: "Please select a year",
+                        ToYear: "Please select a year"
+                    }
+                });
+
+            } else {
+                $("#monthlyReportGrid *").prop("disabled", false);
+                $('#yearlyReportGrid *').prop('disabled', true);
+                $('#FromYear').attr("required", "false");
+                $('#ToYear').attr("required", "false");
+                $('#Year').attr("required", "true");
+                $('#ToMonth').attr("required", "true");
+                $('#FromMonth').attr("required", "true");
+                $("#OrderRateOverTimeForm").validate({
+
+                    rules: {
+                        FromMonth: "required",
+                        ToMonth: "required",
+                        Year: "required"
+
+                    },
+                    messages: {
+                        FromMonth: "Please select a month",
+                        ToMonth: "Please select a month",
+                        Year: "Please select a year" 
+                    }
+                });
+            }
+
+
+        }
+    </script>
+}

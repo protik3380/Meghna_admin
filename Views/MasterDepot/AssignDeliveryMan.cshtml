@@ -1,0 +1,195 @@
+﻿@using EFreshAdmin.Models.EntityModels
+@using EFreshAdmin.Utility.Enums
+@using EFreshStoreCore.Model.Context
+@{
+    ViewBag.Title = "Assign Deliveryman";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    List<OrderState> states = ViewBag.ProductStatus;
+    List<DeliveryMan> deliveryMen = (List<DeliveryMan>)ViewBag.DeliveryMen;
+    Session["DeliveryManList"] = (List<DeliveryMan>)ViewBag.DeliveryMen;
+    int row = 0;
+}
+<div class='@TempData["Class"]' id="flashMessage" role="alert">@TempData["Message"]</div>
+<section id="widget-grid" class="" style="margin-bottom: 5%">
+    <!-- row -->
+    <div class="row">
+        <article class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+            <div class="jarviswidget jarviswidget-color-darken" id="wid-id-0" data-widget-editbutton="false">
+                <header>
+                    <span class="widget-icon"> <i class="fa fa-table"></i> </span>
+                    <h2>Assign Order to Deliveryman </h2>
+                </header>
+                <div>
+                        <div class="widget-body no-padding">
+                            <table id="dt_basic" class="table table-striped table-bordered table-hover" width="100%">
+                                @if (Model != null)
+                                {
+                                    <thead>
+                                    <tr>
+                                        @*<th><input type="checkbox" id="checkall" /></th>*@
+                                        <th>Order No</th>
+                                        <th>Customer Name</th>
+                                        <th>Delivery Address</th>
+                                        <th>Contact</th>
+                                        <th>Order Date</th>
+                                        <th>Action</th>
+                                        <th></th>
+
+                                    </tr>
+                                    </thead>
+
+                                    <tbody>
+                                @using(Html.BeginForm("AssignOrder", "MasterDepot", FormMethod.Post, new {id="assignForm"}))
+                                {
+                                    int i = 0;
+                                    foreach (Order data in Model)
+                                    {
+                                            var orderDate = data.OrderDate.HasValue ? data.OrderDate.Value.ToString("dd/MM/yyyy hh:mm:ss tt") : "";
+                                             <tr>
+                                                 @*<td><input type="checkbox" class="chk" id="chkChiled" name="orders[@row].IsCheck" value="" onclick="changeCheckBox(this)" /></td>*@
+                                                 <td><a data-toggle="modal" data-target="#modalCart" onclick="GetOrderDetails(@data.Id, '@data.OrderNo')" style="cursor: pointer">@data.OrderNo</a></td>
+                                                 <td>@data.CustomerName</td>
+                                                 <td>@data.DeliveryAddress</td>
+                                                 <td>@data.MobileNo</td>
+                                                 <td>@orderDate</td>
+                                                 <td>
+                                                     <label class="select">
+                                                         <input type="hidden" id="DeliveryMan" value="@deliveryMen"/>
+                                                         <input type="hidden" id="MobileNo[@i]" value=""/>
+                                                         @Html.DropDownList("DeliveryManId_" + data.Id, new SelectList(deliveryMen, "Id", "Name"), "----Select delivery man----", new {@class = " form-control", onchange = "ShowDeliveryManInfo("+ data.Id + ")" })<i></i><span style="color: red"> *</span>
+                                                         <p id="errorMessage_@data.Id" style="color: red"></p>
+                                                         <div id="deliveryManInfo">
+                                                            
+                                                         </div>
+                                                     </label>
+
+                                                     @*<input type="submit" id="Confirm" value="Assign" class="buttonDesign btn-md">*@&nbsp;&nbsp;
+                                                 </td>
+                                                 <td>
+                                                     <a class="btn btn-default btn-primary" onclick="AssignOrder(@data.Id)"> Assign </a>
+                                                 </td>
+                                             </tr>
+                                             row++;
+                                        i++;
+                                    }
+                                }
+                                    </tbody>
+                                }
+                            </table>
+                            <br/>
+                            <div class="row">
+                                <div class="col-lg-6">
+
+                                </div>
+                                <div class="col-lg-6" align="right">
+                                </div>
+                            </div>
+                            <br/>
+                        </div>
+                </div>
+            </div>
+        </article>
+    </div>
+</section>
+@section scripts{
+<script src="~/Content/js/jquery-ui-1.12.1.min.js"></script>
+<script src="~/Scripts/jquery.validate.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $(function () {
+                setTimeout(function () {
+                    $("#flashMessage").hide('blind', {}, 500);
+                },
+                    5000);
+            $("#checkall").change(function () {
+                var checked = $(this).is(':checked');
+                if (checked) {
+                    $(".chk").each(function () {
+                        $(this).prop("checked", true);
+                        $('tbody :checkbox').val(true);
+                    });
+                } else {
+                    $(".chk").each(function () {
+                        $(this).prop("checked", false);
+                        $('tbody :checkbox').val(false);
+                    });
+                }
+            });
+
+            // Changing state of CheckAll checkbox
+            $(".chk").click(function () {
+
+                if ($(".chk").length === $(".chk:checked").length) {
+                    $("#checkall").prop("checked", true);
+                } else {
+                    $("#checkall").removeAttr("checked");
+                }
+
+            });
+            //$("table tr th :checkbox").click(function (event) {
+            //    var table = $(event.target).closest('table');
+            //    $('td input:checkbox', table).prop('checked', this.checked);
+            //    //$('tbody :checkbox').trigger('click');
+            //    //$('tbody :checkbox').val(true);
+            //});
+
+        });});
+
+        //function changeCheckBox(event) {
+        //    $(event).val(true);
+        //}
+        //function cancelOrder() {
+        //    var val = $('#OrderStateId').val();
+        //    $('#OrderStateId').val("6");
+        //    val = $('#OrderStateId').val;
+
+        //}
+        function AssignOrder(id) {
+            var orderId = id;
+            var deliveryManId = $("#DeliveryManId_" + id + " option:selected").val();
+            $("#errorMessage_" + id).empty();
+            if (deliveryManId === "") {
+                $("#errorMessage_" + id).append("Please select a delivery man");
+                return false;
+            }
+            var assignOrder = {
+                OrderId: orderId,
+                DeliveryManId: deliveryManId
+            };
+            $.ajax({
+                type:"POST",
+                url:"@Url.Action("AssignOrder","MasterDepot")",
+                data: assignOrder,
+                success: function (data) {
+                    window.location.reload();
+                }
+        });
+        }
+        function ShowDeliveryManInfo(id) {
+            $("#deliveryManInfo").empty();
+            var deliveryManId = $("#DeliveryManId_" + id).val();
+            var name = $("#DeliveryManId_" + id).text();
+            var data = { deliveryManId: deliveryManId };
+            $.ajax({
+                method: 'POST',
+                url: "@Url.Action("GetDeliveryManDetailsById", "DeliveryMan")",
+                dataType: "json",
+                contentType: 'application/json',
+                data: JSON.stringify(data),
+                crossDomain: true,
+                success: function (data) {
+                    var name = data.DeliveryMan.Name;
+                    var mobileNo = data.DeliveryMan.MobileNo;
+                    $("#deliveryManInfo").append("<p>Name: " + name + "</p><p>Mobile: " + mobileNo + "</p>");
+                    $("#errorMessage_" + id).empty();
+                    //var x = data;
+                    //toastr.success("Delivery man has been changed");
+                },
+            error: function () {
+               // toastr.error("Something went wrong");
+            }
+        });
+        }
+    </script>
+}
+

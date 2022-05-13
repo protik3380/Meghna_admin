@@ -1,0 +1,233 @@
+﻿@using EFreshAdmin.Utility
+@using EFreshStore.Models.Context
+@model Thana
+@{
+    ViewBag.Title = "View";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    List<Thana> thanas = ViewBag.Thanas;
+    Session["BreadCrum"] = "Thana";
+}
+@section style{
+    <style>
+        .error {
+            color: red;
+        }
+    </style>
+}
+<div id="content" style="margin-bottom: 3%">
+    <section id="widget-grid" class="">
+        <div class="row" style="height: 100%">
+            <article class="col-sm-12 col-md-12 col-lg-12">
+                <div class="jarviswidget" id="wid-id-4" data-widget-editbutton="false" data-widget-custombutton="false">
+                    <header>
+                        <span class="widget-icon"> <i class="fa fa-edit"></i> </span>
+                        <h2 id="addThanaFormHeading">Add Thana</h2>
+
+                    </header>
+                    <div>
+                        <div class="widget-body no-padding">
+                            @using (Html.BeginForm("Create", "Thana", FormMethod.Post, new { id = "thanaForm", @class = "smart-form" }))
+                            {
+                                @Html.AntiForgeryToken()
+                                <div class='@TempData["Class"]' id="flashMessage" role="alert">@TempData["Message"]</div>
+                                <fieldset>
+                                    <input type="hidden" id="thanaId" name="Id" />
+                                    <input type="hidden" id="thanaCreatedBy" name="CreatedBy" />
+                                    <input type="hidden" id="thanaCreatedOn" name="CreatedOn" />
+                                    <div class="row">
+                                        <section class="col col-6">
+                                            <section class="col col-3">
+                                                <label class="label">Name<span style="color: red"> *</span></label>
+                                            </section>
+                                            <section class="col col-9">
+                                                <label class="input">
+                                                    <input type="text" name="Name" id="Name" placeholder="Thana name">
+                                                </label>
+                                            </section>
+                                        </section>
+                                        <section class="col col-6">
+                                            <section class="col col-3">
+                                                <label class="label">District <span style="color: red"> *</span></label>
+                                            </section>
+                                            <section class="col col-9">
+                                                <label class="select">
+                                                    @Html.DropDownListFor(model => model.DistrictId, new SelectList(ViewBag.Districts, "Id", "Name"), "---Select District---", new { id = "districtId" })
+                                                </label>
+                                            </section>
+                                        </section>
+                                        <section class="col col-6">
+                                            <section class="col col-3"></section>
+                                            <section class="col col-9">
+                                                <label class="checkbox">
+                                                    @Html.CheckBoxFor(model => model.IsActive, new { id = "thanaIsActive" })
+                                                    <i></i>Is Active?
+                                                </label>
+                                            </section>
+                                        </section>
+                                    </div>
+                                </fieldset>
+                                <footer style="bottom: 0">
+                                    <input type="button" value="Reset" id="thanaResetButton" class="btn btn-primary" />
+                                    <button type="submit" id="thanaAddButton" class="btn btn-primary">Add</button>
+                                </footer>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </article>
+        </div>
+        <div class="row">
+            <article class="col-sm-12 col-md-12 col-lg-12">
+                <div class="jarviswidget jarviswidget-color-darken" id="wid-id-3" data-widget-editbutton="false">
+                    <header>
+                        <span class="widget-icon"> <i class="fa fa-table"></i> </span>
+                        <h2>Thana List</h2>
+                    </header>
+                    <div>
+                        <div class="jarviswidget-editbox">
+                        </div>
+                        <div class="widget-body no-padding">
+                            <br />
+                            <form method="post" action="@Url.Action("FilterThana","Thana")">
+                                <div class="row">
+                                    <div class="col-md-2">
+                                        @Html.DropDownList("id", new SelectList(ViewBag.Districts, "Id", "Name"), "Select district", new { @class = "form-control" })
+                                    </div>
+                                    <div class="col-lg-2">
+                                        <input type="submit" class="btn btn-primary" name="Submit" value="Search" />
+                                    </div>
+                                </div>
+                            </form>
+                            <div class="table-responsive">
+                                <table class="table" id="dt_basic">
+                                    <thead>
+                                        <tr>
+                                            <th>SL</th>
+                                            <th>Name</th>
+                                            <th>District</th>
+                                            <th>Is Active?</th>
+                                            <th>Edit</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @if (thanas != null)
+                                        {
+                                            var count = 1;
+                                            foreach (Thana data in thanas)
+                                            {
+                                                <tr>
+                                                    <td>@(count++)</td>
+                                                    <td>@data.Name</td>
+                                                    <td>@data.District.Name</td>
+                                                    @{
+                                                        var status = (bool)data.IsActive ? "Yes" : "No";
+                                                        var color = (bool)data.IsActive ? "green" : "red";
+                                                        <td style="color: @color">@status</td>
+                                                    }
+                                                    <td>
+                                                        <input type="button" class="btn btn-success" onclick="changeAddThanaFormStateToEdit(@data.Id)" value="Edit" />
+                                                    </td>
+                                                </tr>
+                                                            }
+                                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </article>
+        </div>
+    </section>
+</div>
+@section scripts{
+    <script src="~/Scripts/jquery.validate.min.js"></script>
+    @Scripts.Render("~/bundles/jqueryval")
+    <script>
+        $(document).ready(function () {
+            $(function () {
+                setTimeout(function () {
+                    $("#flashMessage").hide('blind', {}, 500);
+                }, 5000);
+            });
+            $('#thanaIsActive').attr('checked', true);
+        });
+        $("#thanaForm").validate({
+
+            rules: {
+                Name: "required",
+                DistrictId: "required"
+            },
+            messages: {
+                Name: "Please enter thana name",
+                DistrictId: "Please select a district"
+            }
+        });
+
+        function changeAddThanaFormStateToEdit(thanaId) {
+            $("#thanaForm").validate().resetForm();
+            $("#preloader").css('display', 'block');
+
+            // Scroll to the top of the form
+            $('html, body').animate({
+                scrollTop: $("#addThanaFormHeading").offset().top
+            },
+                500);
+            // Change form state to editaddDistrictFormHeading
+            $("#addThanaFormHeading").text("Update Thana");
+            $("#thanaAddButton").text("Update");
+            $("#thanaForm").attr("action", "@BaseUrl.subDirectory/Thana/Edit");
+            $("#thanaId").val(thanaId);
+            var data = { thanaId: thanaId };
+            $.ajax({
+                method: 'POST',
+                url: "@Url.Action("GetThanaDetailsById", "Thana")",
+                dataType: "json",
+                contentType: 'application/json',
+                data: JSON.stringify(data),
+                crossDomain: true,
+                success: function (data) {
+                    toastr.clear();
+                    if (data.Status == "Ok") {
+                        var createdOnFormatedDate = "";
+                        var createdOn = "";
+                        if (data.Thana.CreatedOn == null) {
+                            createdOnFormatedDate = null;
+                        } else {
+                            createdOn = new Date(parseInt(data.Thana.CreatedOn.substr(6)));
+                            createdOnFormatedDate = createdOn.getFullYear() + '-' + ('0' + (createdOn.getMonth() + 1)).slice(-2) + '-' + ('0' + createdOn.getDate()).slice(-2) + ' ' + ('0' + createdOn.getHours()).slice(-2) + ':' + ('0' + (createdOn.getMinutes())).slice(-2) + ':' + ('0' + createdOn.getSeconds()).slice(-2);
+                        }
+                        $("#Name").val($.trim(data.Thana.Name));
+                        $("#thanaCreatedOn").val(createdOnFormatedDate);
+                        $("#thanaCreatedBy").val(data.Thana.CreatedBy);
+                        $("#districtId").val(data.Thana.DistrictId);
+                        if (data.Thana.IsActive === true) {
+                            $("#thanaIsActive").prop('checked', true);
+                        }
+                        else {
+                            $("#thanaIsActive").prop('checked', false);
+                        }
+                    } else {
+                        toastr.error("Something went wrong");
+                    }
+
+                },
+                error: function () {
+                    toastr.error("Something went wrong");
+                }
+            });
+            $("#preloader").css('display', 'none');
+        }
+        $("#thanaResetButton").click(function () {
+            $("#addThanaFormHeading").text("Add Thana");
+            $("#thanaAddButton").text("Add");
+            $("#thanaForm").attr("action", "@BaseUrl.subDirectory/Thana/Create");
+            $("#Name").val("");
+            $("#thanaId").val("");
+            $("#thanaCreatedBy").val("");
+            $("#districtId").val("");
+            $("#thanaIsActive").prop('checked', true);
+            $("#thanaForm").validate().resetForm();
+        });
+    </script>
+}

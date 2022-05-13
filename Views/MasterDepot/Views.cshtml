@@ -1,0 +1,73 @@
+﻿@using EFreshStore.Models.Context
+@model IEnumerable<EFreshStore.Models.Context.ThanaWiseMasterDepot>
+
+@{
+    ViewBag.Title = "View";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    Session["BreadCrum"] = "Master Depot & Thana";
+}
+
+                      <div class='@TempData["Class"]' id="flashMessage" role="alert">@TempData["Message"]</div>
+<section id="widget-grid" class="" style="margin-bottom: 20%">
+    <!-- row -->
+    <div class="row">
+        <article class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+            <!-- Widget ID (each widget will need unique ID)-->
+            <div class="jarviswidget jarviswidget-color-darken" id="wid-id-0" data-widget-editbutton="false">
+                <header>
+                    <span class="widget-icon"> <i class="fa fa-table"></i> </span>
+                    <h2>Master Depot & Thana </h2>
+                </header>
+                <!-- widget div-->
+                <div>
+                    <!-- widget content -->
+                    <div class="widget-body no-padding">
+                        <table id="dt_basic" class="table table-striped table-bordered table-hover" width="100%">
+                            <thead>
+                                <tr>
+                                    <th>SL</th>
+                                    <th>Master Depot</th>
+                                    <th>Thana</th>
+                                    @*<th>Edit</th>*@
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (Model != null)
+                                {
+                                    var count = 1;
+                                    foreach (ThanaWiseMasterDepot data in Model)
+                                    {
+                                        <tr>
+                                            <td>@(count++)</td>
+                                            <td>@data.MasterDepot.Name</td>
+                                            <td>@data.Thana.Name</td>
+                                            @*<td>
+                                                <input type="button" class="btn btn-success" onclick="location.href='../masterdepot/editmasterdepotwiththana/@data.Id'" value="Edit" />
+                                            </td>*@
+                                        </tr>
+                                    }
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                    <!-- end widget content -->
+                </div>
+                <!-- end widget div -->
+            </div>
+            <!-- end widget -->
+        </article>
+    </div>
+    <!-- end row -->
+</section>
+
+@section scripts{
+    <script>
+        $(document).ready(function() {
+            $(function() {
+                setTimeout(function() {
+                    $("#flashMessage").hide('blind', {}, 500);
+                }, 5000);
+            });
+        });
+    </script>
+}

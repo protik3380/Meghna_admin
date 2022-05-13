@@ -1,0 +1,221 @@
+﻿
+@using EFreshAdmin.Models.EntityModels
+@using EFreshAdmin.Utility
+@model EFreshAdmin.Models.EntityModels.MeghnaDepartment
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    List<MeghnaDepartment> meghnaDepartments = ViewBag.MeghnaDepartments;
+    Session["BreadCrum"] = "MGI Department";
+}
+<head>
+    <link href="~/Content/css/jquery-ui.min.css" rel="stylesheet" />
+    <link rel="stylesheet" type="text/css" href="~/Content/css/form-design.css" />
+    @*<link href="~/Content/SmartAdmin/css/your_style.css" rel="stylesheet" />*@
+    <style>
+        .error {
+            color: red;
+        }
+    </style>
+</head>
+<section id="widget-grid" class="">
+    <div class="row" style="height: 100%">
+        <article class="col-sm-12 col-md-12 col-lg-12">
+            <div class="jarviswidget" id="wid-id-4" data-widget-editbutton="false" data-widget-custombutton="false">
+                <header>
+                    <span class="widget-icon"> <i class="fa fa-edit"></i> </span>
+                    <h2 id="meghnaDepartmentFormHeading">Add Meghna Department</h2>
+                </header>
+                <div>
+                    <div class="widget-body no-padding">
+                        @using (Html.BeginForm("Create", "MeghnaDepartment", FormMethod.Post, new { id = "addMeghnaDepartmentForm", @class = "smart-form"}))
+                        {
+                            @Html.AntiForgeryToken()
+                            <div class='@TempData["Class"]' id="flashMessage" role="alert">@TempData["Message"]</div>
+                            <fieldset>
+                                <input type="hidden" id="meghnaDepartmentIdHiddenField" name="Id" />
+                                <input type="hidden" id="meghnaDepartmentCreatedOn" name="CreatedOn" />
+                                <input type="hidden" id="meghnaDepartmentCreatedBy" name="CreatedBy" />
+
+                                <div class="row">
+                                    <section class="col col-6" style="padding-bottom: 5px; margin-bottom: 5px">
+                                        <section class="col col-3">
+                                            <label class="label">Name <span style="color: red"> *</span></label>
+                                        </section>
+                                        <section class="col col-9">
+                                            <label class="input">
+                                                <label class="input">
+                                                    @Html.TextBoxFor(model => model.Name, new { id = "meghnaDepartmentName", placeholder = "Department name" })
+                                                    @Html.ValidationMessageFor(model => model.Name, "", new { @class = "error" })
+                                                </label>
+                                            </label>
+                                        </section>
+                                    </section>
+                                    <section class="col col-6" style="padding-bottom: 5px; margin-bottom: 5px">
+                                        <label class="checkbox">
+                                            @Html.CheckBoxFor(model => model.IsActive, new { id = "meghnaDepartmentIsActive" })
+                                            <i></i>Is Active?
+                                        </label>
+                                    </section>                                 
+                                </div>
+                            </fieldset>
+                            <footer style="bottom: 0">
+                                <input type="button" value="Reset" id="meghnaDepartmentResetButton" class="btn btn-primary" />
+                                <button type="submit" id="meghnaDepartmentAddButton" class="btn btn-primary">Add</button>
+                            </footer>
+                        }
+                    </div>
+                </div>
+            </div>
+        </article>
+        <!-- END COL -->
+    </div>
+    <!-- END ROW -->
+</section>    
+<section id="widget-grid" class="" style="margin-bottom: 20px">
+    <!-- row -->
+    <div class="row">
+        <article class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+            <!-- Widget ID (each widget will need unique ID)-->
+            <div class="jarviswidget jarviswidget-color-darken" id="wid-id-0" data-widget-editbutton="false">
+                <header>
+                    <span class="widget-icon"> <i class="fa fa-table"></i> </span>
+                    <h2>Meghna Department Details </h2>
+                </header>
+                <!-- widget div-->
+                <div>
+                    <!-- widget content -->
+                    <div class="widget-body no-padding">
+                        <table id="dt_basic" class="table table-striped table-bordered table-hover" width="100%">
+                            <thead>
+                                <tr>
+                                    <th>SL</th>
+                                    <th>Id</th>
+                                    <th>Name</th>
+                                    <th>Is Active?</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (meghnaDepartments.Count > 0)
+                                {
+                                    var count = 1;
+                                    foreach (var meghnaDepartment in meghnaDepartments)
+                                    {
+                                        var status = meghnaDepartment.IsActive ? "Yes" : "No";
+                                        var color = meghnaDepartment.IsActive ? "green" : "red";
+                                        <tr>
+                                            <td>@(count++)</td>
+                                            <td>@meghnaDepartment.Id</td>
+                                            <td id="meghnaDepartmentName_@meghnaDepartment.Id">@meghnaDepartment.Name</td>
+                                            <td id="meghnaDepartmentStatus_@meghnaDepartment.Id" data-is-active="@meghnaDepartment.IsActive" style="color:@color">@status
+                                                <input type="hidden" id="meghnaDepartmentCreatedOn_@meghnaDepartment.Id" value="@meghnaDepartment.CreatedOn"/>
+                                                <input type="hidden" id="meghnaDepartmentCreatedBy_@meghnaDepartment.Id" value="@meghnaDepartment.CreatedBy"/>
+                                            </td>
+                                            <td>
+                                                <input type="button" class="btn btn-success" id="editMeghnaDepartmentButton_@meghnaDepartment.Id" onclick="changeFormStateSaveToEdit(@meghnaDepartment.Id)" value="Edit" />
+                                                <input type="button" class="btn btn-danger" id="deleteMeghnaDepartmentButton_@meghnaDepartment.Id" onclick="deleteMeghnaDepartment(@meghnaDepartment.Id)" value="Delete" />
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                    <!-- end widget content -->
+                </div>
+                <!-- end widget div -->
+            </div>
+            <!-- end widget -->
+        </article>
+    </div>
+    <!-- end row -->
+</section>
+@section scripts{
+    @Scripts.Render("~/bundles/jqueryval")
+
+    <script>        
+        $(document).ready(function() {            
+            $(function () {
+                setTimeout(function () {
+                        $("#flashMessage").hide('blind', {}, 500);
+                    },
+                    5000);
+                $('#meghnaDepartmentIsActive').attr('checked', true);
+            });
+        });
+
+        function changeFormStateSaveToEdit(meghnaDepartmentId) {
+            $(".field-validation-error").empty();
+            $("#preloader").css('display', 'block');
+            $('html, body').animate({
+                    scrollTop: $("#meghnaDepartmentFormHeading").offset().top
+                },
+                500);
+            $("#meghnaDepartmentFormHeading").text("Update Meghna Department");
+            $("#meghnaDepartmentAddButton").text("Update");
+            $("#addMeghnaDepartmentForm").attr("action", "@BaseUrl.subDirectory/MeghnaDepartment/Edit");
+            $("#meghnaDepartmentIdHiddenField").val(meghnaDepartmentId);
+            var data = { departmentId: meghnaDepartmentId };
+            $.ajax({
+                method: 'POST',
+                url: "@Url.Action("GetDepartmentDetailsById", "MeghnaDepartment")",
+                dataType: "json",
+                contentType: 'application/json',
+                data: JSON.stringify(data),
+                crossDomain: true,
+                success: function (data) {
+                    toastr.clear();
+                    if (data.Status == "Ok") {
+                        var createdOn = new Date(parseInt(data.MeghnaDepartment.CreatedOn.substr(6)));
+                        var createdOnFormatedDate = createdOn.getFullYear() + '-' + ('0' + (createdOn.getMonth() + 1)).slice(-2) + '-' + ('0' + createdOn.getDate()).slice(-2) + ' ' + ('0' + createdOn.getHours()).slice(-2) + ':' + ('0' + (createdOn.getMinutes())).slice(-2) + ':' + ('0' + createdOn.getSeconds()).slice(-2);
+
+                        $("#meghnaDepartmentCreatedOn").val(createdOnFormatedDate);
+                        $("#meghnaDepartmentCreatedBy").val(data.MeghnaDepartment.CreatedBy);
+                        $("#meghnaDepartmentName").val(data.MeghnaDepartment.Name);
+                        if (data.MeghnaDepartment.IsActive === true) {
+                            $("#meghnaDepartmentIsActive").prop('checked', true);
+                        } else {
+                            $("#meghnaDepartmentIsActive").prop('checked', false);
+                        }
+                        
+                    } else {
+                        toastr.error("Something went wrong");
+                    }
+
+                },
+                error: function () {
+                    toastr.error("Something went wrong");
+                }
+            });
+            $("#preloader").css('display', 'none');
+        }
+
+        function deleteMeghnaDepartment(meghnaDepartmentId) {
+            Swal.fire({
+                title: 'Do you want to delete this department ?',
+                type: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#739e73',
+                cancelButtonColor: '#A90329',
+                cancelButtonText: 'No',
+                confirmButtonText: 'Yes',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.value) {
+                    location.href = '/meghnaDepartment/delete/' + meghnaDepartmentId;
+                }
+            });
+        }
+
+        $('#meghnaDepartmentResetButton').click(function() {
+            $("#meghnaDepartmentFormHeading").text("Add Meghna Department");
+            $("#meghnaDepartmentAddButton").text("Add");
+            $("#addMeghnaDepartmentForm").attr("action", "@BaseUrl.subDirectory/MeghnaDepartment/Create");
+            $("#meghnaDepartmentName").val("");
+            $("#meghnaDepartmentIsActive").prop('checked', true);
+            $(".field-validation-error").empty();
+        });
+    </script>
+
+}

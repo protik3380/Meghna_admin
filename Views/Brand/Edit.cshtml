@@ -1,0 +1,122 @@
+﻿@using EFreshAdmin.Utility
+@model EFreshStore.Models.Context.Brand
+
+@{
+    ViewBag.Title = "Edit";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<head>
+    <link rel="stylesheet" type="text/css" href="~/Content/css/form-design.css" />
+</head>
+
+<body>
+<div class="container">
+    <div class="form-horizontal" id="div1">
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { @enctype = "multipart/form-data", id = "EditBrandForm" }))
+        {
+            @Html.AntiForgeryToken()
+        <div class='@TempData["Class"]' id="flashMessage" role="alert">@TempData["Message"]</div>
+            <div class="form-horizontal">
+                <h3>Update Brand</h3>
+                <hr/>
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                @Html.HiddenFor(model => model.Id)
+                @Html.HiddenFor(model => model.CreatedOn)
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.Name, htmlAttributes: new {@class = "control-label col-md-2"})
+                    <div class="col-md-10">
+                        @Html.EditorFor(model => model.Name)
+                        <br/>
+                        @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.Description, htmlAttributes: new {@class = "control-label col-md-2"})
+                    <div class="col-md-10">
+                        @Html.EditorFor(model => model.Description)
+                        <br/>
+                        @Html.ValidationMessageFor(model => model.Description, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+                <div class="form-group">
+                    @Html.Label("BrandImage", "Image", htmlAttributes: new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                       
+                            @if (Model.BrandImage != null)
+                            {
+                                <img src="@BaseUrl.imageUrl\@Model.BrandImage" width="100px" height="100px" style="border-radius: 5px; border: 1px solid #efefef" alt="tab-img">
+                            }
+                        
+                    </div>
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(model => model.ImageLocation,"Brand Image", htmlAttributes: new { @class = "control-label col-md-2" })
+                    <div class="col-md-8">
+                        @Html.TextBoxFor(model=> model.ImageLocation, new { type = "file", @class="UploadFile"})
+                        @Html.ValidationMessageFor(model => model.ImageLocation, "", new {@class = "text-danger"})
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-offset-2 col-md-10">
+                        <input type="submit"  value="Update" class="btn btn-default"/>
+                    </div>
+                </div>
+            </div>
+         
+        }
+
+        <div>
+            @Html.ActionLink("Back to List", "Index", "", htmlAttributes: new { @class = "backLink" })
+        </div>
+        <div style="padding-top: 80px"></div>
+    </div>
+</div>
+</body>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+    <script>
+        $(document).ready(function() {
+            $(function () {
+                setTimeout(function () {
+                    $("#flashMessage").hide('blind', {}, 500);
+                }, 5000);
+            });
+
+        //    $('#editBrandBtn').click(function() {
+        //        var name = $("#Name").val();
+        //        var id = $("#Id").val();
+        //        var description = $("#Description").val();
+        //        var json = { Name: name, Description: description, Id: id };
+        //        $.ajax({
+        //            type: "PUT",
+        //            //url: 'http://localhost:50644/api/Brand/Edit',
+        //            url: 'http://dotnet.nerdcastlebd.com/EFreshStoreApp/api//Brand/Edit',
+        //            contentType: "application/json; charset=utf-8",
+        //            data: JSON.stringify(json),
+        //            //headers: {"Authorization": localStorage.getItem('token')},
+
+        //            //headers: {"Authorization": localStorage.getItem('token')},
+        //            headers: {
+        //                //"User-Agent": "Mozilla/5.0 (Windows NT 6.1; Win64; x64)",
+        //                "ccept-Encoding": "gzip, deflate, br",
+        //                "Accept-Language": "en-US,en;q=0.9",
+        //                "Cache-Control": "no-cache",
+        //                "Upgrade-Insecure-Requests": "1"
+        //                //"Access-Control-Request-Method": "PUT",
+        //                //"Access-Control-Request-Headers": "Content-type",
+        //                //"X-Version": "1",
+        //                //'Origin': 'http://localhost:62452'
+        //            },
+                    
+        //        success: function() {
+        //            alert("Successful");
+        //            //window.Location("http://localhost:50644/api/Brand");
+        //        }
+        //    });
+        //});
+        });
+    </script>
+}

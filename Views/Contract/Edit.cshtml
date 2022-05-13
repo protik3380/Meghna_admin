@@ -1,0 +1,241 @@
+﻿
+@model EFreshStore.Models.Context.CorporateContract
+
+@{
+    ViewBag.Title = "Edit";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<head>
+    <style>
+        .text-danger {
+            color: red;
+        }
+        .error {
+            color: red;
+        }
+    </style>
+</head>
+@*<div class="container">
+    <div class="form-horizontal" id="div1">
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "editCorporateContractform" }))
+        {
+            @Html.AntiForgeryToken()
+            <div class="form-horizontal">
+                <h2>Update Corporate Contract</h2>
+                <hr/>
+                @Html.ValidationSummary(true)
+                <div class='@TempData["Class"]' id="flashMessage" role="alert">@TempData["Message"]</div>
+                
+                @Html.HiddenFor(model => model.Id)
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.CompanyName, "Company Name", htmlAttributes: new {@class = "control-label col-md-4"})
+                    <div class="col-md-8">
+                        @Html.EditorFor(model => model.CompanyName)
+                        <br/>@Html.ValidationMessageFor(model => model.CompanyName, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.DiscountPercentage, "Discount Percentage", htmlAttributes: new {@class = "control-label col-md-4"})
+                    <div class="col-md-8">
+                        @Html.TextBoxFor(model => model.DiscountPercentage, new {placeholder = "Enter discount percentage", type = "number"})
+                        <br/>@Html.ValidationMessageFor(model => model.DiscountPercentage, "", new {@class = "text-danger"})
+                    </div>
+                </div>
+                @{
+                    DateTime validity;
+                    if (Model != null)
+                    {
+                        validity = (DateTime) Model.Validity;
+                    }
+                    else
+                    {
+                        validity = DateTime.Today;
+                    }
+                   
+                }
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.Validity,"Effective Date", htmlAttributes: new {@class = "control-label col-md-4"})
+                    <div class="col-md-8">
+                        <input id="Validity" name="Validity" value="@validity.ToString("dd MMM, yyyy")" class="datepicker" placeholder="Enter effective date" readonly>
+                        <br/>@Html.ValidationMessageFor(model => model.Validity, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.Description, htmlAttributes: new {@class = "control-label col-md-4"})
+                    <div class="col-md-8">
+                        @Html.EditorFor(model => model.Description)
+                        <br/>@Html.ValidationMessageFor(model => model.Description, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+
+                <div class="form-group">
+                    <div class="col-md-offset-4 col-md-8">
+                        <input type="submit" value="Update" class="btn btn-default"/>
+                    </div>
+                </div>
+            </div>
+        }
+
+        <div style="margin-left: 50px; color: red">
+            @Html.ActionLink("Back to List", "Views", "", htmlAttributes: new { @class = "backLink" })
+        </div>
+    </div>
+</div>*@
+    <section id="widget-grid" class="">
+        <div class="row" style="height: 100%">
+            <article class="col-sm-12 col-md-12 col-lg-12">
+                <div class="jarviswidget" id="wid-id-4" data-widget-editbutton="false" data-widget-custombutton="false">
+                    <header>
+                        <span class="widget-icon"> <i class="fa fa-edit"></i> </span>
+                        <h2>Update Corporate Contract</h2>
+
+                    </header>
+                    <div>
+
+                        <div class="widget-body no-padding">
+                           @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "editCorporateContractform", @class = "smart-form" }))
+                           {
+                                @Html.AntiForgeryToken()
+                                <div class='@TempData["Class"]' id="flashMessage" role="alert">@TempData["Message"]</div>
+                                <fieldset>
+                                    <div class="row">
+                                        <section class="col col-2"></section>
+                                        <section class="col col-2">
+                                            <label class="label">Company Name<span style="color: red"> *</span></label>
+                                        </section>
+                                        <section class="col col-6">
+                                            <label class="input">
+                                                @Html.TextBoxFor(model => model.CompanyName, new { placeholder = "Enter company name"})
+                                               @Html.ValidationMessageFor(model => model.CompanyName, "", new {@class = "text-danger" })
+                                            </label>
+                                        </section>
+                                        <section class="col col-2"></section>
+                                    </div>
+
+                                    <div class="row">
+                                        <section class="col col-2"></section>
+                                        <section class="col col-2">
+                                            <label class="label">FMCG Discount Percentage <span style="color: red"> *</span></label>
+                                        </section>
+                                        <section class="col col-6">
+                                            <label class="input">
+                                                @Html.TextBoxFor(model => model.FMCGDiscountPercentage, new {placeholder = "Enter fmcg discount percentage", type = "number"})
+                                                @Html.ValidationMessageFor(model => model.FMCGDiscountPercentage, "", new {@class = "text-danger"})
+                                            </label>
+                                        </section>
+                                        <section class="col col-2"></section>
+                                    </div>
+                                    <div class="row">
+                                        <section class="col col-2"></section>
+                                        <section class="col col-2">
+                                            <label class="label">LPG Discount Percentage</label>
+                                        </section>
+                                        <section class="col col-6">
+                                            <label class="input">
+                                                @Html.TextBoxFor(model => model.LPGDiscountPercentage, new { placeholder = "Enter lpg discount percentage", type = "number" })
+                                                @Html.ValidationMessageFor(model => model.LPGDiscountPercentage, "", new { @class = "text-danger" })
+                                            </label>
+                                        </section>
+                                        <section class="col col-2"></section>
+                                    </div>
+                                    <div class="row">
+                                        @{
+                                            string validity = Model.Validity.HasValue ? ((DateTime) Model.Validity).ToString("dd MMM, yyyy") : "";
+
+                                        }
+                                        <section class="col col-2"></section>
+                                        <section class="col col-2">
+                                            <label class="label">Effective Date</label>
+                                        </section>
+                                        <section class="col col-6">
+                                            <label class="input">
+                                                <i class="icon-append fa fa-calendar"></i>
+                                                <input id="Validity" name="Validity" value="@validity" class="datepicker" placeholder="Enter effective date" readonly>
+                                                @Html.ValidationMessageFor(model => model.Validity, "", new { @class = "text-danger" })
+                                            </label>
+                                        </section>
+                                        <section class="col col-2"></section>
+                                    </div>
+
+                                    <div class="row">
+                                        <section class="col col-2"></section>
+                                        <section class="col col-2">
+                                            <label class="label">Description</label>
+                                        </section>
+                                        <section class="col col-6">
+                                            <label class="textarea">
+                                                @Html.TextAreaFor(model => model.Description)
+                                                @Html.ValidationMessageFor(model => model.Description, "", new { @class = "text-danger" })
+                                            </label>
+                                        </section>
+                                        <section class="col col-2"></section>
+                                    </div>
+                                    <div class="row" style="margin-bottom: 5%">
+
+                                    </div>
+                                </fieldset>
+                                <footer style="bottom: 0">
+                                    <input type="submit" value="Update" class="btn btn-primary" />
+                                </footer>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </article>
+            <!-- END COL -->
+        </div>
+        <!-- END ROW -->
+    </section>
+    @section scripts{
+        @*@Scripts.Render("~/bundles/jqueryval")*@
+<script src="~/Scripts/jquery.validate.min.js"></script>
+        <script>
+        
+        $("#editCorporateContractform").validate({
+
+            rules: {
+                CompanyName: "required",
+                FMCGDiscountPercentage: {
+                    required: true,
+                    range: [0, 100],
+                    number: true
+                },
+                LPGDiscountPercentage: {
+
+                    range: [0, 100],
+                    number: true
+                }
+
+            },
+            messages: {
+                CompanyName: "Please enter company name",
+                FMCGDiscountPercentage: {
+                    required: "Please enter fmcg discount percentage"
+                }
+
+
+            }
+        });
+        $(document).ready(function () {
+            $('#Validity').datepicker({
+                prevText: '<i class="fa fa-chevron-left"></i>',
+                nextText: '<i class="fa fa-chevron-right"></i>',
+                changeMonth: true,
+                changeYear: true,
+                dateFormat: "d MM, yy",
+                showAnim: "slide"
+            });
+
+            $(function () {
+                setTimeout(function () {
+                    $("#flashMessage").hide('blind', {}, 500);
+                }, 5000);
+            });
+        });
+        </script>
+    }

@@ -1,0 +1,111 @@
+﻿@model EFreshStore.Models.Context.ProductLine
+
+@{
+    ViewBag.Title = "Edit";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body {
+            background-color: white;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        #div1 {
+            width: 750px;
+            height: 550px;
+            padding: 50px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        #Validity, #Description, input[type=text] {
+            width: 80%;
+            padding: 12px 15px;
+            margin-bottom: 5px;
+            border: none;
+            background-color: #f1f1f1;
+            /*background-color: #d2d8e0;*/
+        }
+
+
+        input[type=submit] {
+            width: 60%;
+            padding: 15px;
+            color: white;
+            margin: 5px 0 22px 0;
+            display: inline-block;
+            border: none;
+            background: #ffa726;
+        }
+
+            input[type=submit]:hover {
+                background-color: rgb(60, 125, 201);
+            }
+    </style>
+</head>
+
+<body>
+<div class="container">
+    <div class="form-horizontal" id="div1">
+        @using (Html.BeginForm(null, null, FormMethod.Post, new {id = "productLineform"}))
+        {
+            @Html.AntiForgeryToken()
+            <div class="form-horizontal">
+                <h2>Update Product Line</h2>
+                <hr/>
+                @Html.ValidationSummary(true)
+                <div class='@TempData["Class"]' id="flashMessage" role="alert">@TempData["Message"]</div>
+                @Html.HiddenFor(model => model.Id)
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.Name, "Name", htmlAttributes: new {@class = "control-label col-md-4"})
+                    <div class="col-md-8">
+                        @Html.EditorFor(model => model.Name)
+                        <br />@Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.Description, htmlAttributes: new {@class = "control-label col-md-4"})
+                    <div class="col-md-8">
+                        @Html.EditorFor(model => model.Description)
+                        <br />@Html.ValidationMessageFor(model => model.Description, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="col-md-offset-4 col-md-8">
+                        <input type="submit" value="Update" class="btn btn-default"/>
+                    </div>
+                </div>
+            </div>
+        }
+
+        <div style="margin-left: 50px; color: red">
+            @Html.ActionLink("Back to List", "Index", "", htmlAttributes: new { @class = "backLink" })
+        </div>
+    </div>
+</div>
+
+    @section scripts{
+    @Scripts.Render("~/bundles/jqueryval")
+    <script>
+        $(document).ready(function () {
+
+            $(function() {
+                setTimeout(function() {
+                    $("#flashMessage").hide('blind', {}, 500);
+                }, 5000);
+            });
+        });
+    </script>
+    }
+</body>
+</html>

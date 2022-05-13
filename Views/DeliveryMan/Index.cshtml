@@ -1,0 +1,515 @@
+﻿@using EFreshAdmin.Models
+@using EFreshAdmin.Models.EntityModels
+@using EFreshAdmin.Utility
+@using WebGrease.Css.Extensions
+@model EFreshAdmin.Models.EntityModels.DeliveryMan
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    long userTypeId = Convert.ToInt64(Session["UserTypeId"]);
+    List<DeliveryMan> deliveryMan = ViewBag.DeliveryMen;
+}
+
+<head>
+    <link href="~/Content/css/jquery-ui.min.css" rel="stylesheet" />
+    <style>
+        .error {
+            color: red;
+        }
+    </style>
+</head>
+
+<div id="content" style="margin-bottom: 3%">
+    <section id="widget-grid" class="">
+        <div class="row">
+            <article class="col-sm-12 col-md-12 col-lg-12">
+                <!-- Widget ID (each widget will need unique ID)-->
+                <div class="jarviswidget" id="wid-id-8" data-widget-editbutton="false" data-widget-custombutton="false">
+                    <header>
+                        <span class="widget-icon"> <i class="fa fa-edit"></i> </span>
+                        <h2 id="addDeliveryManeFormHeading">Add Delivery Man </h2>
+                    </header>
+                    <!-- widget div-->
+                    <div>
+                        <!-- widget content -->
+                        <div class="widget-body no-padding">
+                            @using (Html.BeginForm("Create", "DeliveryMan", FormMethod.Post, new { autocomplete = "off", id = "deliveryManAddForm", @enctype = "multipart/form-data", @class = "smart-form" }))
+                            {
+
+                                @Html.AntiForgeryToken()
+                                <div class='@TempData["Class"]' id="flashMessage" role="alert">@TempData["Message"]</div>
+
+                                <fieldset>
+                                    <input type="hidden" id="deliveryManId" name="Id" />
+                                    <input type="hidden" id="deliveryManCreatedBy" name="CreatedBy" />
+                                    <input type="hidden" id="deliveryManCreatedOn" name="CreatedOn" />
+                                    <input type="hidden" id="deliveryManImageLocation" name="ImageLocation" />
+                                    <input type="hidden" id="deliveryManImageUrl" name="ImageUrl" />
+                                    <input type="hidden" id="deliveryManUserId" name="UserId" />
+                                    <div class="row" style="padding-bottom: 0; margin-bottom: 0">
+                                        <section class="col col-6" style="padding-bottom: 5px; margin-bottom: 5px">
+                                            <section class="col col-3">
+                                                <label class="label">Name<span style="color: red"> *</span></label>
+                                            </section>
+                                            <section class="col col-9">
+                                                <label class="input">
+                                                    @Html.TextBoxFor(model => model.Name, new { id = "deliveryManName", placeholder = "Name" })
+                                                    @Html.ValidationMessageFor(model => model.Name, "", new { @class = "error" })
+                                                </label>
+                                            </section>
+                                        </section>
+                                        <section class="col col-6" style="padding-bottom: 5px; margin-bottom: 5px">
+                                            <section class="col col-3">
+                                                <label class="label">Mobile No <span style="color: red"> *</span></label>
+                                            </section>
+                                            <section class="col col-9">
+                                                <label class="input">
+                                                    @Html.TextBoxFor(model => model.MobileNo, new { id = "deliveryManMobileNo", placeholder = "Mobile no" })
+                                                    @Html.ValidationMessageFor(model => model.MobileNo, "", new { @class = "error" })
+                                                </label>
+                                            </section>
+                                        </section>
+                                    </div>
+                                    <div class="row" style="padding-bottom: 0; margin-bottom: 0">
+                                        <section class="col col-6" style="padding-bottom: 5px; margin-bottom: 5px">
+                                            <section class="col col-3">
+                                                <label class="label">Email</label>
+                                            </section>
+                                            <section class="col col-9">
+                                                <label class="input">
+                                                    @Html.TextBoxFor(model => model.Email, new { id = "deliveryManEmail", placeholder = "Email" })
+                                                    @Html.ValidationMessageFor(model => model.Email, "", new { @class = "error" })
+                                                </label>
+                                            </section>
+                                        </section>
+                                        <section class="col col-6" style="padding-bottom: 5px; margin-bottom: 5px">
+                                            <section class="col col-3">
+                                                <label class="label">National ID</label>
+                                            </section>
+                                            <section class="col col-9">
+                                                <label class="input">
+                                                    @Html.TextBoxFor(model => model.NID, new { id = "deliveryManNID", placeholder = "National ID" })
+                                                    @Html.ValidationMessageFor(model => model.NID, "", new { @class = "error" })
+                                                </label>
+                                            </section>
+                                        </section>
+                                    </div>
+                                    <div class="row" style="padding-bottom: 0; margin-bottom: 0">
+                                        <section class="col col-6" style="padding-bottom: 5px; margin-bottom: 5px">
+                                            <section class="col col-3">
+                                                <label class="label">District</label>
+                                            </section>
+                                            <section class="col col-9">
+                                                <label class="select">
+                                                    @Html.DropDownList("DistrictId", new SelectList(ViewBag.Districts, "Id", "Name"), "---Select District---", new { id = "deliveryManDistrictId" })<i></i>
+                                                </label>
+                                            </section>
+                                        </section>
+                                        <section class="col col-6" style="padding-bottom: 5px; margin-bottom: 5px">
+                                            <section class="col col-3">
+                                                <label class="label">Thana</label>
+                                            </section>
+                                            <section class="col col-9">
+                                                <label class="select">
+                                                    @Html.DropDownListFor(model => model.ThanaId, new SelectList(ViewBag.Thanas, "Id", "Name"), "---Select Thana---", new { id = "deliveryManThanaId" })<i></i>
+                                                </label>
+                                            </section>
+                                        </section>
+                                    </div>
+                                    <div class="row" style="padding-bottom: 0; margin-bottom: 0">
+                                        <section class="col col-6" style="padding-bottom: 5px; margin-bottom: 5px">
+                                            <section class="col col-3">
+                                                <label class="label">Address</label>
+                                            </section>
+                                            <section class="col col-9">
+                                                <label class="textarea">
+                                                    <textarea rows="4" id="deliveryManAddress" name="Address" placeholder="Address"></textarea>
+                                                </label>
+                                            </section>
+                                        </section>
+                                        <section class="col col-6" style="padding-bottom: 5px; margin-bottom: 5px">
+                                            <section class="col col-3">
+                                                <label class="label">Image</label>
+                                            </section>
+                                            <section class="col col-9">
+                                                <div class="input input-file">
+                                                    <span class="button">Browse @Html.TextBoxFor(model => model.ImageLocation, new { id = "deliveryManImageFile", onchange = "this.parentNode.nextSibling.value = this.value", type = "file", @class = "input input-file" })</span><input type="text" id="placeImage" placeholder="No file choosen" readonly="">
+
+                                                </div>
+                                                @Html.ValidationMessageFor(model => model.ImageUrl, "", new { @class = "error" })
+                                            </section>
+                                        </section>
+
+                                    </div>
+                                    <div class="row">
+                                        <section class="col col-6" style="padding-bottom: 5px; margin-bottom: 5px">
+                                            <section class="col col-3">
+                                                <label class="label" id="passwordLabel">Password <span style="color: red"> *</span></label>
+                                            </section>
+                                            <section class="col col-9">
+                                                <label class="input">
+                                                    @Html.PasswordFor(model => model.User.Password, new { id = "deliveryManPassword", placeholder = "Password" })
+                                                    @Html.ValidationMessageFor(model => model.User.Password, "", new { @class = "error" })
+                                                </label>
+                                            </section>
+                                        </section>
+
+                                        <section class="col col-6" style="padding-bottom: 5px; margin-bottom: 5px">
+                                            <section class="col col-3"></section>
+                                            <section class="col col-9">
+                                                <label class="checkbox">
+                                                    @Html.CheckBoxFor(model => model.IsActive, new { id = "deliveryManIsActive" })
+                                                    <i></i>Is Active?
+                                                </label>
+                                            </section>
+                                        </section>
+
+                                    </div>
+                                    <div class="row" id="masterDepotDropdownRow">
+
+                                        @if (userTypeId != (long)UserTypeEnum.MasterDepotUser)
+                                        {
+                                            <section class="col col-6" style="padding-bottom: 5px; margin-bottom: 5px">
+                                                <section class="col col-3">
+                                                    <label class="label">Master Depots<span style="color: red"> *</span></label>
+                                                </section>
+                                                <section class="col col-9">
+                                                    <label class="select">
+                                                        @Html.ListBoxFor(model => model.MasterDepotIds, new MultiSelectList(ViewBag.MasterDepots, "Id", "Name"), new { id = "deliveryManMasterDepotIds", @class = "js-example-basic-multiple form-control select-multiple", multiple = "multiple" })
+                                                        @Html.ValidationMessageFor(model => model.MasterDepotIds, "", new { @class = "error" })
+                                                    </label>
+                                                </section>
+                                            </section>
+                                        }
+                                    </div>
+                                </fieldset>
+                                <footer>
+                                    <input type="button" value="Reset" id="deliveryManResetButton" class="btn btn-primary" />
+                                    <button type="submit" id="deliveryManAddButton" class="btn btn-primary">Add</button>
+                                </footer>
+                            }
+                        </div>
+                        <!-- end widget content -->
+                    </div>
+                    <!-- end widget div -->
+                </div>
+                <!-- end widget -->
+            </article>
+        </div>
+
+        <div class="row">
+            <article class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                <div class="jarviswidget jarviswidget-color-darken" id="wid-id-0" data-widget-editbutton="false">
+                    <header>
+                        <span class="widget-icon"> <i class="fa fa-table"></i> </span>
+                        <h2>Delivery Man List</h2>
+                    </header>
+                    <div>
+                        <div class="widget-body no-padding">
+                            <table id="dt_basic" class="table table-responsive">
+                                <thead>
+                                    <tr>
+                                        <th>SL</th>
+                                        <th>Name</th>
+                                        <th>Email</th>
+                                        <th>Mobile No</th>
+                                        @if (userTypeId != (long)UserTypeEnum.MasterDepotUser)
+                                        {
+                                            <th>Master Depots</th>
+                                        }
+
+                                        <th>Thana</th>
+                                        <th>District</th>
+                                        <th>Is Active ?</th>
+                                        <th style="text-align: center">Edit</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if (deliveryMan != null)
+                                    {
+                                        var count = 1;
+                                        foreach (var data in deliveryMan)
+                                        {
+                                            <tr>
+                                                <td style="width: 5%">@(count++)</td>
+                                                <td style="width: 18%">@data.Name</td>
+                                                <td style="width: 35%;white-space: pre-line">@(string.IsNullOrEmpty(data.Email) ? "N/A" : data.Email)</td>
+                                                <td style="width: 12%">@data.MobileNo</td>
+                                                @if (userTypeId != (long)UserTypeEnum.MasterDepotUser)
+                                                {
+                                                    var masterDepotNames = data.MasterDepotDeliveryMen.Select(x => x.MasterDepot.Name).ToArray();
+                                                    var names = "";
+                                                    int i = 0;
+                                                    foreach (var name in masterDepotNames)
+                                                    {
+                                                        i++;
+                                                        if (i == masterDepotNames.Count())
+                                                        {
+                                                            names = names + name;
+                                                        }
+                                                        else
+                                                        {
+                                                            names = names + name + ", ";
+                                                        }
+
+                                                    }
+                                                    //names = names.Substring(0, names.Length - 2);
+                                                    <td style="width: 35%"> @names </td>
+                                                }
+                                                @if (data.Thana != null)
+                                                {
+                                                    <td style="width: 12%">@data.Thana.Name</td>
+                                                    <td style="width: 12%">@data.Thana.District.Name</td>
+                                                }
+                                                else
+                                                {
+                                                    <td style="width: 12%">N/A</td>
+                                                    <td style="width: 12%">N/A</td>
+                                                }
+
+                                                @{
+
+                                                    var color = data.IsActive ? "green" : "red";
+                                                    var activeStatus = data.IsActive ? "Yes" : "No";
+                                                    <td style="color: @color; width: 20%">
+                                                        @activeStatus
+                                                    </td>
+                                                }
+                                                <td style="width: 10%;text-align: center">
+                                                    <input type="button" class="btn btn-success" onclick="changeAddDeliveryManFormStateToEdit(@data.Id)" value="Edit" />
+                                                </td>
+                                            </tr>
+                                                        }
+                                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </article>
+        </div>
+
+    </section>
+</div>
+
+@section scripts
+{
+    <script src="~/Scripts/jquery.validate.min.js"></script>
+    @Scripts.Render("~/bundles/jqueryval")
+    <script src="~/Content/js/select2.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $(function () {
+                setTimeout(function () {
+                    $("#flashMessage").hide('blind', {}, 500);
+                },
+                    5000);
+            });
+
+            $('#deliveryManIsActive').attr('checked', true);
+        });
+
+        $("#deliveryManDistrictId").change(function () {
+            loadThanaByDistrictId();
+        });
+
+        function loadThanaByDistrictId() {
+            var vDistrictId = $("#deliveryManDistrictId").val();
+            var district = { districtId: vDistrictId };
+            $("#deliveryManThanaId").empty();
+            $("#deliveryManThanaId").append('<option value="" selected>--Select Thana--</option>');
+
+            $.ajax({
+                url: '../MasterDepot/GetThanaByDistrictId',
+                type: "GET",
+                dataType: 'JSON',
+                contentType: "application/json; charset=utf-8",
+                data: district,
+                success: function (data) {
+                    $.each(data,
+                        function (index, value) {
+                            $("#deliveryManThanaId")
+                                .append('<option value="' + value.Id + '">' + value.Name + '</option>');
+                        });
+                },
+                error: function () {
+                    alert("Something went wrong");
+                }
+            });
+        }
+
+        $('#deliveryManMasterDepotIds').select2({
+            placeholder: {
+                id: '-1', // the value of the option
+                text: 'Select master depot(s)'
+            }
+        });
+
+        function changeAddDeliveryManFormStateToEdit(deliveryManId) {
+            resetForm();
+            $(".field-validation-error").empty();
+
+            $('#deliveryManPassword').rules('remove');
+            $('#passwordLabel > span').remove();
+            $("#preloader").css('display', 'block');
+
+            if ($('#deliveryManImageRow').length) {
+                $("#deliveryManImageRow").remove();
+            }
+
+            // Scroll to the top of the form
+            $('html, body').animate({
+                scrollTop: $("#addDeliveryManeFormHeading").offset().top
+            },
+                500);
+
+            // Change form state to edit
+            $("#addDeliveryManeFormHeading").text("Update Delivery Man");
+            $("#deliveryManAddButton").text("Update");
+            $("#deliveryManAddForm").attr("action", "@BaseUrl.subDirectory/DeliveryMan/Edit");
+            $("#deliveryManId").val(deliveryManId);
+
+            var data = { deliveryManId: deliveryManId };
+            $.ajax({
+                method: 'POST',
+                url: "@Url.Action("GetDeliveryManDetailsById", "DeliveryMan")",
+                dataType: "json",
+                contentType: 'application/json',
+                data: JSON.stringify(data),
+                crossDomain: true,
+                success: function (data) {
+                    toastr.clear();
+                    if (data.Status == "Ok") {
+                        var createdOnFormatedDate = "";
+                        var createdOn = "";
+                        if (data.DeliveryMan.CreatedOn == null) {
+                            createdOnFormatedDate = null;
+                        } else {
+                            createdOn = new Date(parseInt(data.DeliveryMan.CreatedOn.substr(6)));
+                            createdOnFormatedDate = createdOn.getFullYear() +
+                                '-' +
+                                ('0' + (createdOn.getMonth() + 1)).slice(-2) +
+                                '-' +
+                                ('0' + createdOn.getDate()).slice(-2) +
+                                ' ' +
+                                ('0' + createdOn.getHours()).slice(-2) +
+                                ':' +
+                                ('0' + (createdOn.getMinutes())).slice(-2) +
+                                ':' +
+                                ('0' + createdOn.getSeconds()).slice(-2);
+                        }
+                        $("#deliveryManName").val($.trim(data.DeliveryMan.Name));
+                        $("#deliveryManMobileNo").val($.trim(data.DeliveryMan.MobileNo));
+                        $("#deliveryManCreatedOn").val(createdOnFormatedDate);
+                        $("#deliveryManCreatedBy").val(data.DeliveryMan.CreatedBy);
+                        $("#deliveryManAddress").val(data.DeliveryMan.Address);
+                        $("#deliveryManImageLocation").val(data.DeliveryMan.ImageLocation);
+                        $("#deliveryManImageUrl").val(data.DeliveryMan.ImageUrl);
+                        $("#deliveryManNID").val(data.DeliveryMan.NID);
+                        $("#deliveryManUserId").val(data.DeliveryMan.UserId);
+
+                        $("#deliveryManThanaId").empty();
+                        $("#deliveryManThanaId").append('<option value="" selected>--Select Thana--</option>');
+                        if (data.DeliveryMan.ThanaId !== null) {
+                            $("#deliveryManDistrictId").val(data.DeliveryMan.Thana.DistrictId);
+                            var thanaId = data.DeliveryMan.ThanaId;
+
+                            var vDistrictId = $("#deliveryManDistrictId").val();
+                            var district = { districtId: vDistrictId };
+
+
+                            $.ajax({
+                                url: '../MasterDepot/GetThanaByDistrictId',
+                                type: "GET",
+                                dataType: 'JSON',
+                                contentType: "application/json; charset=utf-8",
+                                data: district,
+                                success: function (data) {
+                                    $.each(data,
+                                        function (index, value) {
+                                            $("#deliveryManThanaId")
+                                                .append('<option value="' + value.Id + '">' + value.Name + '</option>');
+                                        });
+                                    $("#deliveryManThanaId").val(thanaId);
+
+                                },
+                                error: function () {
+                                    alert("Something went wrong");
+                                }
+                            });
+                        }
+
+
+                        if ($('#deliveryManMasterDepotIds').length) {
+                            $("#deliveryManMasterDepotIds").val(data.DeliveryMan.MasterDepotIds).trigger('change');
+                        }
+
+                        $("#deliveryManEmail").val(data.DeliveryMan.Email);
+                        if (data.DeliveryMan.IsActive === true) {
+                            $("#deliveryManIsActive").prop('checked', true);
+                        } else {
+                            $("#deliveryManIsActive").prop('checked', false);
+                        }
+                        var imageUrl = '@BaseUrl.imageUrl' + data.DeliveryMan.ImageUrl;
+                        $("#masterDepotDropdownRow").after('<div class="row" id="deliveryManImageRow">' +
+                            '<section class="col col-6"><section class="col col-3">' +
+                            '<label class="label">Image</label></section><section class="col col-9"> ' +
+                            '<img src="' +
+                            imageUrl +
+                            '" width="100px" height="100px" style="border-radius: 5px; border: 1px solid #efefef" alt="tab-img"/>' +
+                            '</section></section></div>');
+
+                    } else {
+                        toastr.error("Something went wrong");
+                    }
+
+                },
+                error: function () {
+                    toastr.error("Something went wrong");
+                }
+            });
+            $("#preloader").css('display', 'none');
+        }
+
+        $("#deliveryManResetButton").click(function () {
+            resetForm();
+
+        });
+
+        function resetForm() {
+            //$("#deliveryManImageRow").fadeOut(300,
+            //    function () {
+
+            //    });
+            $("#deliveryManImageRow").remove();
+            $("#addDeliveryManeFormHeading").text("Add Delivery Man");
+            $("#deliveryManAddButton").text("Add");
+            $("#deliveryManAddForm").attr("action", "@BaseUrl.subDirectory/DeliveryMan/Create");
+            $("#deliveryManId").val("");
+            $("#deliveryManCreatedOn").val("");
+            $("#deliveryManCreatedBy").val("");
+            $("#deliveryManName").val("");
+            $("#deliveryManMobileNo").val("");
+            $("#deliveryManAddress").val("");
+            $("#deliveryManEmail").val("");
+            $("#deliveryManPassword").val("");
+            $("#deliveryManImageLocation").val("");
+            $("#deliveryManImageFile").val("");
+            $("#deliveryManImageUrl").val("");
+            $("#deliveryManNID").val("");
+            $("#deliveryManUserId").val("");
+            $("#deliveryManDistrictId").val("");
+            $("#deliveryManThanaId").empty();
+            $("#deliveryManThanaId").append('<option value="" selected>--Select Thana--</option>');
+            $("#deliveryManIsActive").prop('checked', true);
+            if ($('#deliveryManMasterDepotIds').length) {
+                $("#deliveryManMasterDepotIds").val(null).trigger('change');
+            }
+            $(".field-validation-error").empty();
+        }
+
+    </script>
+
+}
+
+

@@ -1,0 +1,247 @@
+﻿@using EFreshAdmin
+@using EFreshAdmin.Models
+@using EFreshAdmin.Utility
+@{
+    long totalBrand = 0;
+    long totalCategory = 0;
+    long totalProducts = 0;
+    long totalCustomer = 0;
+    long totalMGIUsers = 0;
+    long totalCorporateUsers = 0;
+    long totalMasterDepots = 0;
+    long userTypeId = Convert.ToInt64(Session["UserTypeId"]);
+    if (userTypeId == (long)UserTypeEnum.Admin)
+    {
+        totalBrand = (long)ApiUtility.CountTotalBrand();
+        totalCategory = (long)ApiUtility.CountTotalCategory();
+        totalProducts = (long)ApiUtility.CountTotalProduct();
+        totalCustomer = (long)ApiUtility.CountTotalCustomer();
+        totalMGIUsers = (long)ApiUtility.CountTotalMGIUser();
+        totalCorporateUsers = (long)ApiUtility.CountTotalCorporateUser();
+        totalMasterDepots = (long)ApiUtility.CountTotalMasterDepot();
+        ViewBag.ShowDiv = false;
+    }
+    else
+    {
+        ViewBag.ShowDiv = true;
+    }
+}
+<aside id="left-panel">
+    <!-- User info -->
+    <div class="login-info">
+        <span>
+            <!-- User image size is adjusted inside CSS, it should stay as is -->
+
+            <a href="javascript:void(0);" id="show-shortcut" data-action="toggleShortcut">
+
+                @*<span style="text-transform: none">
+                        @userInfor.Email
+                    </span>*@
+            </a>
+
+        </span>
+    </div>
+    <!-- end user info -->
+    <!-- NAVIGATION : This navigation is also responsive
+
+    To make this navigation dynamic please make sure to link the node
+    (the reference to the nav > ul) after page load. Or the navigation
+    will not initialize.
+    -->
+    <nav>
+        <ul>
+            <li class="@Html.RouteIf("Home", "active")">
+                <a href="@Url.Action("Index", "Home")" title="Home"><i class="fa fa-lg fa-fw fa-home"></i> <span class="menu-item-parent">Dashboard</span></a>
+            </li>
+
+            <li class="@Html.RouteIf("Setup", "active")">
+                <a href="#" title="Setup"><i class="fa fa-lg fa-fw fa-tasks"></i> <span class="menu-item-parent">Setup</span></a>
+                <ul>
+                    <li class="@Html.RouteIf("District", "active")">
+                        <a href="@Url.Action("Views", "District")" title="District"><span class="menu-item-parent">District</span></a>
+                    </li>
+                    <li class="@Html.RouteIf("Thana", "active")">
+                        <a href="@Url.Action("Views", "Thana")" title="Thana"><span class="menu-item-parent">Thana</span></a>
+                    </li>
+                    <li class="@Html.RouteIf("Brand", "active")">
+                        <a href="@Url.Action("Index", "Brand")" title="Brand"><span class="menu-item-parent">Brand</span></a>
+                    </li>
+                    <li class="@Html.RouteIf("Category", "active")">
+                        <a href="@Url.Action("Index", "Category")" title="Category"><span class="menu-item-parent">Category</span></a>
+                    </li>
+                    <li class="@Html.RouteIf("MeghnaDepartment", "active")">
+                        <a href="@Url.Action("Index", "MeghnaDepartment")" title="MeghnaDepartment"><span class="menu-item-parent">MGI Department</span></a>
+                    </li>
+                    <li class="@Html.RouteIf("MeghnaDesignation", "active")">
+                        <a href="@Url.Action("Index", "MeghnaDesignation")" title="MeghnaDesignation"><span class="menu-item-parent">MGI Designation</span></a>
+                    </li>
+                    <li class="@Html.RouteIf("CorporateDepartment", "active")">
+                        <a href="@Url.Action("Index", "CorporateDepartment")" title="CorporateDepartment"><span class="menu-item-parent">Corporate Department</span></a>
+                    </li>
+                    <li class="@Html.RouteIf("CorporateDesignation", "active")">
+                        <a href="@Url.Action("Index", "CorporateDesignation")" title="CorporateDesignation"><span class="menu-item-parent">Corporate Designation</span></a>
+                    </li>
+                    <li class="@Html.RouteIf("Coupon", "active")">
+                        <a href="@Url.Action("Index", "Coupon")" title="Coupon"><span class="menu-item-parent">Coupon</span></a>
+                    </li>
+                    <li class="@Html.RouteIf("Configuration", "active")">
+                        <a href="@Url.Action("Index", "Configuration")" title="Configuration"><span class="menu-item-parent">Configuration</span></a>
+                    </li>
+                    <li class="@Html.RouteIf("FAQ", "active")">
+                        <a href="@Url.Action("Index", "FAQ")" title="FAQ"><span class="menu-item-parent">FAQ</span></a>
+                    </li>
+                    
+        </ul>
+        </li>
+
+
+            <li class="@Html.RouteIf("Distributor", "active")">
+                <a href="#" title="Distributor"><i class="fa fa-lg fa-fw fa-tasks"></i> <span class="menu-item-parent">Distributor</span></a>
+                <ul>
+                    <li class="@Html.RouteIf("Distributor", "active")">
+                        <a href="@Url.Action("Index", "Distributor")" title="Distributor list"><span class="menu-item-parent">Distributor List</span></a>
+                    </li>
+                </ul>
+            </li>
+            
+            <li class="@Html.RouteIf("DeliveryMan", "active")">
+                <a href="#" title="DeliveryMan"><i class="fa fa-lg fa-fw fa-tasks"></i> <span class="menu-item-parent">Delivery Man</span></a>
+                <ul>
+                    <li class="@Html.RouteIf("DeliveryMan", "active")">
+                        <a href="@Url.Action("Index", "DeliveryMan")" title="Delivery Man List"><span class="menu-item-parent">Delivery Man List</span></a>
+                    </li>
+                    <li class="@Html.RouteIf("DeliveryMan", "active")">
+                        <a href="@Url.Action("SearchByMasterDepot", "DeliveryMan")" title="Search By Master Depot"><span class="menu-item-parent">Search By Master Depot</span></a>
+                    </li>
+                </ul>
+            </li>
+
+            <li class="@Html.RouteIf("MasterDepot", "active")">
+            <a href="#" title="Master Depot"><i class="fa fa-lg fa-fw fa-tasks"></i> <span class="menu-item-parent">Master Depot</span></a>
+            <ul>
+                <li class="@Html.RouteIf("MasterDepot", "active")">
+                    <a href="@Url.Action("Index", "MasterDepot")" title="MasterDepot list"><span class="menu-item-parent">Master Depot List</span></a>
+                </li>
+                <li class="@Html.RouteIf("MasterDepot", "active")">
+                    <a href="@Url.Action("LinkMasterDepotWithThana", "MasterDepot")" title="Link MasterDepot"><span class="menu-item-parent">Link MasterDepot With Thana</span></a>
+                </li>
+                <li class="@Html.RouteIf("MasterDepot", "active")">
+                    <a href="@Url.Action("Views", "MasterDepot")" title="MasterDepot, Thana list"><span class="menu-item-parent">Linked Master Depot & Thana List</span></a>
+                </li>
+            </ul>
+        </li>
+
+        <li class="@Html.RouteIf("Product", "active")">
+            <a href="#" title="Products"><i class="fa fa-lg fa-fw fa-tasks"></i> <span class="menu-item-parent">Product</span></a>
+            <ul>
+                <li class="@Html.RouteIf("Product", "active")">
+                    <a href="@Url.Action("Index", "Product")" title="All Products list"><span class="menu-item-parent">Product List</span></a>
+                </li>
+                <li class="@Html.RouteIf("Product", "active")">
+                    <a href="@Url.Action("AddDetails", "Product")" title="Add Product"><span class="menu-item-parent">Add Details</span></a>
+                </li>
+                <li class="@Html.RouteIf("Product", "active")">
+                    <a href="@Url.Action("ViewProductUnit", "Product")" title="Add Product"><span class="menu-item-parent">Product Unit Details</span></a>
+                </li>
+                @*<li class="@Html.RouteIf("Product", "active")">
+                    <a href="@Url.Action("Discount", "Product")" title="Set Discount"><span class="menu-item-parent">Add Discount</span></a>
+                </li>*@
+                <li class="@Html.RouteIf("Product", "active")">
+                    <a href="@Url.Action("ViewProductDiscounts", "Product")" title="Add and View Discounts"><span class="menu-item-parent">Add and View Discounts</span></a>
+                </li>
+            </ul>
+        </li>
+
+
+        <li class="@Html.RouteIf("ProductLine", "active")">
+            <a href="#" title="Product Line"><i class="fa fa-lg fa-fw fa-tasks"></i> <span class="menu-item-parent">Product Line</span></a>
+            <ul>
+                <li class="@Html.RouteIf("ProductLine", "active")">
+                    <a href="@Url.Action("Index", "ProductLine")" title="Product Lines"><span class="menu-item-parent">Product Line List</span></a>
+                </li>
+                @*<li class="@Html.RouteIf("ProductLine", "active")">
+                    <a href="@Url.Action("Create", "ProductLine")" title="Add Product Line"><span class="menu-item-parent">Add New</span></a>
+                </li>*@
+                @*<li class="@Html.RouteIf("ProductLine", "active")">
+                        <a href="@Url.Action("AddDetail", "ProductLine")" title="Create Product Line"><span class="menu-item-parent">Add Line Details</span></a>
+                    </li>
+                    <li class="@Html.RouteIf("ProductLine", "active")">
+                        <a href="@Url.Action("Detail", "ProductLine")" title="Create Product Line"><span class="menu-item-parent">Line Detail List</span></a>
+                    </li>*@
+            </ul>
+        </li>
+
+        <li class="@Html.RouteIf("Contract", "active")">
+            <a href="#" title="Contract"><i class="fa fa-lg fa-fw fa-user"></i> <span class="menu-item-parent">Contract</span></a>
+            <ul>
+                <li class="@Html.RouteIf("Contract", "active")">
+                    <a href="@Url.Action("Views", "Contract")" title="View Contracts"><span class="menu-item-parent">Contract List</span></a>
+                </li>
+                <li class="@Html.RouteIf("Contract", "active")">
+                    <a href="@Url.Action("Create", "Contract")" title="Add Contract"><span class="menu-item-parent">Add New Contract</span></a>
+                </li>
+                <li class="@Html.RouteIf("Contract", "active")">
+                    <a href="@Url.Action("CorporateUser", "Contract")" title="Add Contract"><span class="menu-item-parent">Corporate User List</span></a>
+                </li>
+                <li class="@Html.RouteIf("Contract", "active")">
+                    <a href="@Url.Action("AddUser", "Contract")" title="Add User"><span class="menu-item-parent">Add User</span></a>
+                </li>
+                <li class="@Html.RouteIf("Contract", "active")">
+                    <a href="@Url.Action("AddBulkUser", "Contract")" title="Add Bulk User"><span class="menu-item-parent">Add Bulk User</span></a>
+                </li>
+            </ul>
+        </li>
+        
+        <li class="@Html.RouteIf("MeghnaUser", "active")">
+            <a href="#" title="Meghna User"><i class="fa fa-lg fa-fw fa-user"></i> <span class="menu-item-parent">Meghna User</span></a>
+            <ul>
+                <li class="@Html.RouteIf("MeghnaUser", "active")">
+                    <a href="@Url.Action("Index", "MeghnaUser")" title="Meghna User List"><span class="menu-item-parent">Meghna User List</span></a>
+                </li>
+                <li class="@Html.RouteIf("MeghnaUser", "active")">
+                    <a href="@Url.Action("AddUser", "MeghnaUser")" title="Add Meghna User"><span class="menu-item-parent">Add User</span></a>
+                </li>
+                <li class="@Html.RouteIf("MeghnaUser", "active")">
+                    <a href="@Url.Action("AddMeghnaUser", "MeghnaUser")" title="Add Meghna User"><span class="menu-item-parent">Add Bulk User</span></a>
+                </li>
+                @*<li class="@Html.RouteIf("MeghnaUser", "active")">
+                        <a href="@Url.Action("MeghnaUserDiscount", "MeghnaUser")" title="Add Meghna User Discount"><span class="menu-item-parent">Add Meghna Discount</span></a>
+                    </li>
+                    <li class="@Html.RouteIf("MeghnaUser", "active")">
+                        <a href="@Url.Action("GetAllDiscounts", "MeghnaUser")" title="View Meghna User Discount"><span class="menu-item-parent">View Meghna Discounts</span></a>
+                    </li>*@
+            </ul>
+        </li>
+        <li>
+            <a href="#" title="Meghna User"><i class="fa fa-lg fa-fw fa-file-archive-o"></i> <span class="menu-item-parent">Report</span></a>
+            <ul>
+                <li class="@Html.RouteIf("Report", "active")">
+                    <a href="@Url.Action("Analysis", "Report")" title="Analysis Report"><span class="menu-item-parent">Analysis Report</span></a>
+                </li>
+                <li class="@Html.RouteIf("Report", "active")">
+                    <a href="@Url.Action("SalesByProduct", "Report")" title="Sales by Product Report"><span class="menu-item-parent">Sales by Product Report</span></a>
+                </li>
+                <li class="@Html.RouteIf("Report", "active")">
+                    <a href="@Url.Action("TotalOrders", "Report")" title="Total Orders Report"><span class="menu-item-parent">Total Orders Report</span></a>
+                </li>
+                <li class="@Html.RouteIf("Report", "active")">
+                    <a href="@Url.Action("SalesByLocation", "Report")" title="Sales by Location"><span class="menu-item-parent">Sales by Location</span></a>
+                </li>
+                <li class="@Html.RouteIf("Report", "active")">
+                    <a href="@Url.Action("OrdersByStatus", "Report")" title="Orders by Status"><span class="menu-item-parent">Orders by Status</span></a>
+                </li> 
+                <li class="@Html.RouteIf("Report", "active")">
+                    <a href="@Url.Action("OrderRateOverTime", "Report")" title="Orders by Status"><span class="menu-item-parent">Order Rate Over Time</span></a>
+                </li>
+                <li class="@Html.RouteIf("Report", "active")">
+                    <a href="@Url.Action("OrderGrowthRate", "Report")" title="Order Growth Rate"><span class="menu-item-parent">Order Growth Rate</span></a>
+                </li>
+            </ul>
+        </li>
+        </ul>
+    </nav>
+
+    <span class="minifyme" data-action="minifyMenu"> <i class="fa fa-arrow-circle-left hit"></i> </span>
+
+</aside>
+

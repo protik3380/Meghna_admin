@@ -1,0 +1,221 @@
+﻿@using EFreshAdmin.Utility
+@model EFreshAdmin.Models.EntityModels.LPGComboDiscount
+@{
+    ViewBag.Title = "Create";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section style{
+
+    <link href="~/Content/css/jquery-ui.min.css" rel="stylesheet" />
+    <link rel="stylesheet" type="text/css" href="~/Content/css/form-design.css" />
+    <style>
+        .error {
+            color: red;
+        }
+
+        .ui-datepicker-header {
+            color: #3e9aba !important;
+            background-image: none !important;
+            border-radius: 0;
+        }
+
+        .ui-datepicker {
+            width: 280px;
+            padding: 2px;
+        }
+
+        .ui-datepicker-prev, .ui-datepicker-next {
+            color: #3e9aba !important;
+        }
+
+        .ui-datepicker .ui-datepicker-next span {
+            width: 60px;
+            top: 10px;
+            left: -10px;
+        }
+
+        .ui-datepicker .ui-datepicker-prev span {
+            width: 60px;
+            top: 10px;
+            left: 6px;
+        }
+    </style>
+}
+
+<div id="content" style="margin-bottom: 3%">
+    <section id="widget-grid" class="">
+        <div class="row" style="height: 100%">
+            <article class="col-sm-12 col-md-12 col-lg-12">
+                <div class="jarviswidget" id="wid-id-4" data-widget-editbutton="false" data-widget-custombutton="false">
+                    <header>
+                        <span class="widget-icon"> <i class="fa fa-edit"></i> </span>
+                        <h2>Add LPG Combo Discount</h2>
+                    </header>
+                    <div>
+                        <div class="widget-body no-padding">
+                            @using (Html.BeginForm("Create", "LPGComboDiscount", FormMethod.Post, new { id = "AddLPGComboDiscountForm", @class = "smart-form" }))
+                            {
+                                @Html.AntiForgeryToken()
+                                <div class='@TempData["Class"]' id="flashMessage" role="alert">@TempData["Message"]</div>
+                                <fieldset>
+                                    <div class="row" style="padding-bottom: 0px;margin-bottom: 0px">
+                                        <section class="col col-6" style="padding-bottom: 5px; margin-bottom: 5px">
+                                            <section class="col col-3">
+                                                <label class="label">Start Date <span style="color: red"> *</span></label>
+                                            </section>
+                                            <section class="col col-9">
+                                                <label class="input">
+                                                    @Html.TextBoxFor(model => model.ActiveDate, new { @class = "datepicker", @readonly = "readonly", placeholder = "Start date" })
+                                                    @Html.ValidationMessageFor(model => model.ActiveDate, "", new { @class = "error" })
+                                                </label>
+                                            </section>
+                                        </section>
+                                        <section class="col col-6" style="padding-bottom: 5px; margin-bottom: 5px">
+                                            <section class="col col-3">
+                                                <label class="label">End Date <span style="color: red"> *</span></label>
+                                            </section>
+                                            <section class="col col-9">
+                                                <label class="input">
+                                                    @Html.TextBoxFor(model => model.Validity, new { @class = "datepicker", @readonly = "readonly", placeholder = "End date" })
+                                                    @Html.ValidationMessageFor(model => model.Validity, "", new { @class = "error" })
+                                                </label>
+                                            </section>
+                                        </section>
+                                    </div>
+                                    <div class="row">
+                                        <section class="col col-6" style="padding-bottom: 5px; margin-bottom: 5px">
+                                            <section class="col col-3">
+                                                <label class="label">Discount Type <span style="color: red"> *</span></label>
+                                            </section>
+                                            <section class="col col-9">
+                                                <label class="select">
+                                                    @Html.DropDownListFor(m => m.DiscountType, EnumHelper.GetSelectList(typeof(DiscountTypeEnum)), "Select discount type", new {name = "DiscountType"})
+                                                    @Html.ValidationMessageFor(m => m.DiscountType, "", new {@class = "error"})
+                                                </label>
+                                            </section>
+                                        </section>
+
+                                        <section class="col col-6" style="padding-bottom: 5px; margin-bottom: 5px" id="discountPercentageControl">
+                                            <section class="col col-3">
+                                                <label class="label">Discount Percentage <span style="color: red"> *</span></label>
+                                            </section>
+                                            <section class="col col-9">
+                                                <label class="input">
+                                                    @Html.TextBoxFor(model => model.DiscountPercentage, new { placeholder = "Discount percentage" })
+                                                    @Html.ValidationMessageFor(model => model.DiscountPercentage, "", new { @class = "error" })
+                                                </label>
+                                            </section>
+                                        </section>
+                                    </div>
+
+                                </fieldset>
+                                <footer style="bottom: 0">
+                                    <button type="submit" class="btn btn-primary">Add</button>
+                                </footer>
+
+                            }
+                        </div>
+                    </div>
+                </div>
+            </article>
+
+        </div>
+
+    </section>
+</div>
+
+@section scripts{
+    <script src="~/Scripts/jquery.validate.min.js"></script>
+    <script type="text/javascript">
+
+        $(document).ready(function() {
+            $(".datepicker").datepicker({
+                changeMonth: true,
+                changeYear: true,
+                yearRange: "2019:2050",
+                showAnim: "slide",
+                //nextText: '<span class="glyphicon glyphicon-chevron-right"></span>',
+                dateFormat: 'dd MM, yy',
+                minDate: new Date()
+            });
+
+            $("#discountPercentageControl").hide();
+
+        });
+
+        $(document).on('change keyup',
+            '.required',
+            function(e) {
+                var disabled = true;
+                $(".required").each(function() {
+                    var value = this.value;
+                    if ((value) && (value.trim() != '')) {
+                        disabled = false;
+                    } else {
+                        disabled = true;
+                        return false;
+                    }
+                });
+
+                if (disabled) {
+                    $('.toggle-disabled').prop("disabled", true);
+                } else {
+                    $('.toggle-disabled').prop("disabled", false);
+                }
+            });
+
+        $("#AddLPGComboDiscountForm").validate({
+            rules: {
+                DiscountType: {
+                    required: true,
+                    range: [1, 100]
+                },
+                DiscountPercentage: {
+                    required: true,
+                    range: [0, 100],
+                    number: true
+                },
+                Validity: {
+                    required: true
+                },
+                ActiveDate: {
+                    required: true
+                }
+            },
+            messages: {
+                DiscountPercentage: {
+                    required: "Please enter discount percentage"
+                },
+                Validity: {
+                    required: "Please enter end date"
+                },
+                ActiveDate: {
+                    required: "Please enter start date"
+                },
+                DiscountType: {
+                    required: "Please select discount type",
+                    range: "Please select discount type"
+                }
+            }
+        });
+
+        $("#DiscountType").change(function() {
+            var val = this.value;
+            if (val == 1) {
+                $("#discountPercentageControl").show(100);
+            } else {
+                $("#discountPercentageControl").hide(100);
+                $("#DiscountPercentage").val(null);
+            }
+        });
+
+        $(function () {
+            setTimeout(function () {
+                    $("#flashMessage").hide('blind', {}, 500);
+                },
+                5000);
+        });
+
+    </script>
+}

@@ -1,0 +1,292 @@
+﻿@using System.Globalization
+@using System.Web.UI.WebControls
+@using EFreshAdmin.Models
+@using EFreshAdmin.Models.EntityModels
+@using EFreshStore.Models.Context
+@using EFreshStore.Utility
+@model TotalOrdersVM
+
+@{
+    ViewBag.Title = "Total Orders";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    List<TotalOrdersVM> orders = ViewBag.Orders;
+    long userTypeId = Convert.ToInt64(Session["UserTypeId"]);
+}
+
+
+@section style{
+
+    <link href="~/Content/css/jquery-ui.min.css" rel="stylesheet" />
+    <link rel="stylesheet" type="text/css" href="~/Content/css/form-design.css" />
+    <style>
+        .error {
+            color: red;
+        }
+
+        .ui-datepicker-header {
+            color: #3e9aba !important;
+            background-image: none !important;
+            border-radius: 0;
+        }
+
+        .ui-datepicker {
+            width: 280px;
+            padding: 2px;
+        }
+
+        .ui-datepicker-prev, .ui-datepicker-next {
+            color: #3e9aba !important;
+        }
+
+        .ui-datepicker .ui-datepicker-next span {
+            width: 60px;
+            top: 10px;
+            left: -10px;
+        }
+
+        .ui-datepicker .ui-datepicker-prev span {
+            width: 60px;
+            top: 10px;
+            left: 6px;
+        }
+    </style>
+}
+
+<div id="content" style="margin-bottom: 3%">
+    <section id="widget-grid" class="">
+        <div class="row" style="height: 100%">
+            <article class="col-sm-12 col-md-12 col-lg-12">
+                <div class="jarviswidget" id="wid-id-4" data-widget-editbutton="false" data-widget-custombutton="false">
+                    <header>
+                        <span class="widget-icon"> <i class="fa fa-list-alt"></i> </span>
+                        <h2>Total Orders</h2>
+                    </header>
+                    <div>
+                        <div class="widget-body no-padding">
+                            @using (Html.BeginForm("ShowTotalOrders", "Report", FormMethod.Get, new { @class = "smart-form" }))
+                            {
+                                <div class='@TempData["Class"]' id="flashMessage" role="alert">@TempData["Message"]</div>
+                                <fieldset>
+                                    <div class="row">
+                                        <section class="col col-6" style="padding-bottom: 5px; margin-bottom: 5px">
+                                            <section class="col col-3">
+                                                <label class="label">From Date</label>
+                                            </section>
+                                            <section class="col col-9">
+                                                <label class="input">
+                                                    @Html.TextBoxFor(m => m.FromDate, new { @class = "datepicker", @readonly = "readonly", placeholder = "From date" })
+                                                </label>
+                                            </section>
+                                        </section>
+                                        <section class="col col-6" style="padding-bottom: 5px; margin-bottom: 5px">
+                                            <section class="col col-3">
+                                                <label class="label">To Date</label>
+                                            </section>
+                                            <section class="col col-9">
+                                                <label class="input">
+                                                    @Html.TextBoxFor(m => m.ToDate, new { @class = "datepicker", @readonly = "readonly", placeholder = "To date" })
+                                                </label>
+                                            </section>
+                                        </section>
+                                    </div>
+                                    <div class="row">
+                                        <section class="col col-6" style="padding-bottom: 5px; margin-bottom: 5px">
+                                            <section class="col col-3">
+                                                <label class="label">Brands</label>
+                                            </section>
+                                            <section class="col col-9">
+                                                <label class="select">
+                                                    @Html.ListBoxFor(m => m.BrandIds, new MultiSelectList(Model.Brands, "Id", "Name"), new { @class = "form-control select-multiple", multiple = "multiple" })
+                                                </label>
+                                            </section>
+                                        </section>
+                                        <section class="col col-6" style="padding-bottom: 5px; margin-bottom: 5px">
+                                            <section class="col col-3">
+                                                <label class="label">Categories</label>
+                                            </section>
+                                            <section class="col col-9">
+                                                <label class="select">
+                                                    @Html.ListBoxFor(m => m.CategoryIds, new MultiSelectList(Model.Categories, "Id", "Name"), new { @class = "js-example-basic-multiple form-control select-multiple", multiple = "multiple" })
+                                                </label>
+                                            </section>
+                                        </section>
+                                    </div>
+
+                                    <div class="row">
+                                        <section class="col col-6" style="padding-bottom: 5px; margin-bottom: 5px">
+                                            <section class="col col-3">
+                                                <label class="label">Product Types</label>
+                                            </section>
+                                            <section class="col col-9">
+                                                <label class="select">
+                                                    @Html.ListBoxFor(m => m.ProductTypeIds, new MultiSelectList(Model.ProductTypes, "Id", "Name"), new { @class = "js-example-basic-multiple form-control select-multiple", multiple = "multiple" })
+                                                </label>
+                                            </section>
+                                        </section>
+                                        @if (userTypeId != (long) UserTypeEnum.MasterDepotUser)
+                                        {
+                                            <section class="col col-6" style="padding-bottom: 5px; margin-bottom: 5px">
+                                                <section class="col col-3">
+                                                    <label class="label">Master Depots</label>
+                                                </section>
+                                                <section class="col col-9">
+                                                    <label class="select">
+                                                        @Html.ListBoxFor(m => m.MasterDepotIds, new MultiSelectList(Model.MasterDepots, "Id", "Name"), new { @class = "js-example-basic-multiple form-control select-multiple", multiple = "multiple" })
+                                                    </label>
+                                                </section>
+                                            </section>
+                                        }
+
+                                    </div>
+                                    
+                                </fieldset>
+                                <footer style="bottom: 0">
+                                    <button type="submit" class="btn btn-primary">Show</button>
+                                    @if (orders != null)
+                                    {
+                                        if (orders.Count > 0)
+                                        {
+                                            <a class="btn btn-primary" id="downloadLink" onclick="exportF(this)">Export to excel</a>
+                                        }
+                                    }
+                                </footer>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </article>
+
+        </div>
+        <div class="row">
+            <article class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                <div class="jarviswidget jarviswidget-color-darken" id="wid-id-0" data-widget-editbutton="false">
+                    @if (orders != null)
+                    {
+                       
+                        if (orders.Count > 0)
+                        {
+                            var count = 1;
+                            <header>
+                                <span class="widget-icon"> <i class="fa fa-table"></i> </span>
+                                <h2>Total Orders</h2>
+                            </header>
+                            <div>
+                                <div class="widget-body no-padding">
+                                    <table id="dt_basic" class="table table-striped table-bordered table-hover" width="100%">
+
+                                        <thead>
+                                            <tr style="width: 100%">
+                                                <td ></td>
+                                                <td></td>
+                                                <td id="searchingItems"></td>
+                                                <td></td>
+                                                <td></td>
+                                                <td></td>
+                                                <td></td>
+                                                <td></td>
+                                            </tr>
+                                        <tr>
+                                            <th>SL</th>
+                                            <th>Order No</th>
+                                            <th style="width: 25%">Customer Name</th>
+                                            <th>Thana</th>
+                                            <th>District</th>
+                                            <th>Master Depot</th>
+                                            <th>Order Date</th>
+                                            <th>Total Price</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach (var order in orders)
+                                            {
+                                                <tr>
+                                                    <td>@(count++)</td>
+                                                    <td><a data-toggle="modal" data-target="#modalCart" onclick="GetOrderDetails(@order.OrderId,'@order.OrderNo')" style="cursor: pointer">@order.OrderNo</a></td>
+                                                    <td>@order.CustomerName</td>
+                                                    <td>@order.Thana</td>
+                                                    <td>@order.District</td>
+                                                    <td>@order.MasterDepotName</td>
+                                                    <td>@(order.OrderDate.ToString("dd/MM/yyyy hh:mm:ss tt"))</td>
+                                                    <td style="text-align: right">@Convert.ToDecimal(order.TotalPrice).ToString("N", CultureInfo.CreateSpecificCulture("bn-BD"))</td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        }
+                        else
+                        {
+                            <div>
+                                <p class="text-center"> No records found</p>
+
+                            </div>
+                        }
+                    }
+                </div>
+            </article>
+        </div>
+
+    </section>
+</div>
+
+@section scripts
+{
+
+    <script src="~/Content/js/select2.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('#BrandIds').select2({
+                placeholder: {
+                    id: '-1', // the value of the option
+                    text: 'Select brand(s)'
+                }
+            });
+            $('#CategoryIds').select2({
+                placeholder: {
+                    id: '-1', // the value of the option
+                    text: 'Select categories'
+                }
+            });
+            $('#ProductTypeIds').select2({
+                placeholder: {
+                    id: '-1', // the value of the option
+                    text: 'Select product type(s)'
+                }
+            });
+
+            $('#MasterDepotIds').select2({
+                placeholder: {
+                    id: '-1', // the value of the option
+                    text: 'Select master depot(s)'
+                }
+            });
+
+
+            $(".datepicker").datepicker({
+                changeMonth: true,
+                changeYear: true,
+                yearRange: "2019:2050",
+                showAnim: "slide",
+                //nextText: '<span class="glyphicon glyphicon-chevron-right"></span>',
+                dateFormat: 'dd MM,yy'
+            });
+        });
+        function exportF(elem) {
+            var brandIds = $("#BrandIds :selected").text();
+            var categoryIds = $("#CategoryIds :selected").text();
+            var ProductTypeIds = $("#ProductTypeIds :selected").text();
+            var MasterDepotIds = $("#MasterDepotIds :selected").text();
+            var ToDate = $("#ToDate").val();
+            var FromDate = $("#FromDate").val();
+            $("#searchingItems").append("Brand(s):  " + brandIds + " </br>Categorie(s):  " + categoryIds + " </br>Product Type(s):  " + ProductTypeIds + " </br>Master Depot(s):  " + MasterDepotIds + " </br>From:  " + FromDate + " </br>Date:  " + ToDate);
+            var table = document.getElementById("dt_basic");
+            var html = table.outerHTML;
+            var url = 'data:application/ms-excel,' + escape(html); // Set your html table into url 
+            elem.setAttribute("href", url);
+            elem.setAttribute("download", "Total-Orders.xls"); // Choose the file name
+            $("#searchingItems").empty();
+            return false;
+        }
+    </script>
+}

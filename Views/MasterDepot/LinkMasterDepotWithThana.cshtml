@@ -1,0 +1,184 @@
+﻿@using EFreshStore.Models.Context
+@model EFreshStore.Models.Context.ThanaWiseMasterDepot
+
+@{
+    ViewBag.Title = "Link master depot with thana";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    Session["BreadCrum"] = " Link Master Depot With Thana";
+}
+@section style{
+    <style>
+        .error {
+            color: red;
+        }
+    </style>
+}
+@*<div class="container">
+    <div class="form-horizontal" id="div1">
+        @using (Html.BeginForm(null, null, FormMethod.Post, new {id = "linkMasterDepotThanaform"}))
+        {
+            @Html.AntiForgeryToken()
+            <div class="form-horizontal">
+                <h2>Link Master Depot With Thana</h2>
+                <hr/>
+                @Html.ValidationSummary(true)
+                <div class='@TempData["Class"]' id="flashMessage" role="alert">@TempData["Message"]</div>
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.MasterDepotId, "Master Depot", htmlAttributes: new {@class = "control-label col-md-4"})
+                    <div class="col-md-8">
+                        @Html.DropDownListFor(model => model.MasterDepotId, null, "Select Master Depot", new {@required = "required"})
+                        <br/>
+                        @Html.ValidationMessageFor(model => model.MasterDepotId, "", new {@class = "text-danger"})
+                    </div>
+                </div>
+
+
+                <div class="form-group">
+                    @Html.Label("District", htmlAttributes: new {@class = "control-label col-md-4"})
+                    <div class="col-md-8">
+                        @Html.DropDownList("District", new SelectList(ViewBag.DistrictId, "Id", "Name"), "Select District", new {@required = "required"})
+                        <br/>
+                        @Html.ValidationMessage("District", "", new {@class = "text-danger"})
+                    </div>
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(model => model.ThanaId, "Thana", htmlAttributes: new {@class = "control-label col-md-4"})
+                    <div class="col-md-8">
+                        @Html.DropDownListFor(model => model.ThanaId, new SelectList(Enumerable.Empty<Thana>()), "--Select--")
+                        <br/>
+                        @Html.ValidationMessageFor(model => model.ThanaId, "", new {@class = "text-danger"})
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="col-md-offset-4 col-md-8">
+                        <input type="submit" value="Add" class="btn btn-default"/>
+                    </div>
+                </div>
+            </div>
+        }
+
+        <div>
+            @Html.ActionLink("Back to List", "Views", "", htmlAttributes: new {@class = "backLink"})
+        </div>
+    </div>
+</div>*@
+<section id="widget-grid" class="">
+    <div class="row" style="height: 100%">
+        <article class="col-sm-12 col-md-12 col-lg-12">
+            <div class="jarviswidget" id="wid-id-4" data-widget-editbutton="false" data-widget-custombutton="false">
+                <header>
+                    <span class="widget-icon"> <i class="fa fa-edit"></i> </span>
+                    <h2>Link Master Depot With Thana</h2>
+
+                </header>
+                <div>
+
+                    <div class="widget-body no-padding">
+                        @using (Html.BeginForm(null, null, FormMethod.Post, new {id = "linkMasterDepotThanaform", @class = "smart-form"}))
+                        {
+                            @Html.AntiForgeryToken()
+                            <div class='@TempData["Class"]' id="flashMessage" role="alert">@TempData["Message"]</div>
+                            <fieldset>
+                                <div class="row">
+                                    <section class="col col-2"></section>
+                                    <section class="col col-2">
+                                        <label class="label">Master Depot <span style="color: red"> *</span></label>
+                                    </section>
+                                    <section class="col col-6">
+                                        <label class="select">
+                                            @Html.DropDownListFor(model => model.MasterDepotId, null, "---Select Master Depot---", new { @required = "required" })<i></i>
+                                        </label>
+                                        @Html.ValidationMessageFor(model => model.MasterDepotId, "", new { @class = "error" })
+                                    </section>
+                                    <section class="col col-2"></section>
+                                </div>
+
+                                <div class="row">
+                                    <section class="col col-2"></section>
+                                    <section class="col col-2">
+                                        <label class="label">District <span style="color: red"> *</span></label>
+                                    </section>
+                                    <section class="col col-6">
+                                        <label class="select">
+                                            @Html.DropDownList("District", new SelectList(ViewBag.DistrictId, "Id", "Name"), "---Select District---", new { @required = "required", title = "Please select district" })<i></i>
+                                        </label>
+                                        @Html.ValidationMessage("District", "", new { @class = "error" })
+                                    </section>
+                                    <section class="col col-2"></section>
+                                </div>
+
+                                <div class="row">
+                                    <section class="col col-2"></section>
+                                    <section class="col col-2">
+                                        <label class="label">Thana <span style="color: red"> *</span></label>
+                                    </section>
+                                    <section class="col col-6">
+                                        <label class="select">
+                                            @Html.DropDownListFor(model => model.ThanaId, new SelectList(Enumerable.Empty<Thana>()), "---Select---")<i></i>
+                                        </label>
+                                        @Html.ValidationMessageFor(model => model.ThanaId, "", new { @class = "error" })
+                                    </section>
+                                    <section class="col col-2"></section>
+                                </div>
+
+                                <div class="row" style="margin-bottom: 5%">
+
+                                </div>
+                            </fieldset>
+                            <footer style="bottom: 0">
+                                <button type="submit" class="btn btn-primary">
+                                    Add
+                                </button>
+                            </footer>
+
+                        }
+                    </div>
+
+                </div>
+
+            </div>
+        </article>
+        <!-- END COL -->
+
+    </div>
+
+    <!-- END ROW -->
+
+</section>
+@section scripts{
+    @Scripts.Render("~/bundles/jqueryval")
+    <script>
+        $(document).ready(function() {
+            $("#District").change(function() {
+                var vDistrictId = $("#District").val();
+                var district = { districtId: vDistrictId };
+                $("#ThanaId").empty();
+                $("#ThanaId").append('<option value="" selected>Select Thana</option>');
+
+                $.ajax({
+                    url: '../MasterDepot/GetThanaByDistrictId',
+                    type: "GET",
+                    dataType: 'JSON',
+                    contentType: "application/json; charset=utf-8",
+                    data: district,
+                    success: function(data) {
+                        $.each(data, function(index, value) {
+                            $("#ThanaId").append('<option value="' + value.Id + '">' + value.Name + '</option>');
+                        });
+                    },
+                    error: function() {
+                        alert("Something went wrong");
+                    }
+                });
+            });
+
+            $(function() {
+                setTimeout(function() {
+                    $("#flashMessage").hide('blind', {}, 500);
+                }, 5000);
+            });
+        });
+    </script>
+}

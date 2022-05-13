@@ -1,0 +1,263 @@
+﻿@using EFreshAdmin.Utility
+@using EFreshStore.Models.Context
+@model Category
+
+@{
+    ViewBag.Title = "View";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    List<Category> categories = ViewBag.Categories;
+    Session["BreadCrum"] = "Category";
+}
+
+<head>
+    <link href="~/Content/css/jquery-ui.min.css" rel="stylesheet"/>
+    <link rel="stylesheet" type="text/css" href="~/Content/css/form-design.css"/>
+    <style>
+        .error {
+            color: red;
+        }
+    </style>
+</head>
+<div id="content" style="margin-bottom: 3%">
+    <section id="widget-grid" class="">
+        <div class="row" style="height: 100%">
+            <article class="col-sm-12 col-md-12 col-lg-12">
+                <div class="jarviswidget" id="wid-id-4" data-widget-editbutton="false" data-widget-custombutton="false">
+                    <header>
+                        <span class="widget-icon"> <i class="fa fa-edit"></i> </span>
+                        <h2 id="addCategoryFormHeading">Add Category</h2>
+
+                    </header>
+                    <div>
+
+                        <div class="widget-body no-padding">
+                            @using (Html.BeginForm("Create", "Category", FormMethod.Post, new { @enctype = "multipart/form-data", id = "categoryForm", @class = "smart-form" }))
+                            {
+                                @Html.AntiForgeryToken()
+                                <div class='@TempData["Class"]' id="flashMessage" role="alert">@TempData["Message"]</div>
+                                <fieldset>
+                                    <input type="hidden" id="categoryId" name="Id" />
+                                    <input type="hidden" id="categoryCreatedBy" name="CreatedBy" />
+                                    <input type="hidden" id="categoryCreatedOn" name="CreatedOn" />
+
+                                    <div class="row">
+                                        <section class="col col-6" style="padding-bottom: 5px; margin-bottom: 5px">
+                                            <section class="col col-3">
+                                                <label class="label">Name<span style="color: red"> *</span></label>
+                                            </section>
+                                            <section class="col col-9">
+                                                <label class="input">
+                                                    @Html.TextBoxFor(model => model.Name, new { id = "categoryName", placeholder = "Category name" })
+                                                    @Html.ValidationMessageFor(model => model.Name, "", new { @class = "error" })
+                                                </label>
+                                            </section>
+                                        </section>
+                                        <section class="col col-6" style="padding-bottom: 5px; margin-bottom: 5px">
+                                            <section class="col col-3">
+                                                <label class="label">Product Type <span style="color: red"> *</span></label>
+                                            </section>
+                                            <section class="col col-9">
+                                                <label class="select">
+                                                    @Html.DropDownListFor(model => model.ProductTypeId, new SelectList(ViewBag.ProductTypes, "Id", "Name"), "---Select Product Type---")<i></i>
+                                                    @Html.ValidationMessageFor(model => model.ProductTypeId, "", new { @class = "error" })
+                                                </label>
+                                            </section>
+                                        </section>
+                                    </div>
+                                    <div class="row">
+                                        <section class="col col-6" style="padding-bottom: 5px; margin-bottom: 5px">
+                                            <section class="col col-3">
+                                                <label class="label">Description</label>
+                                            </section>
+                                            <section class="col col-9">
+                                                <label class="textarea">
+                                                    @Html.TextAreaFor(model => model.Description, new { id = "categoryDescription", placeholder = "Category description" })
+                                                </label>
+                                            </section>
+                                        </section>
+                                        <section class="col col-6" style="padding-bottom: 5px; margin-bottom: 5px">
+                                            <section class="col col-3"></section>
+                                            <section class="col col-9">
+                                                <label class="checkbox">
+                                                    @Html.CheckBoxFor(model => model.IsActive, new {id = "categoryIsActive"})
+                                                    <i></i>Is Active?
+                                                </label>
+                                            </section>
+                                        </section>
+                                    </div>
+                                </fieldset>
+                                <footer style="bottom: 0">
+                                    <input type="button" value="Reset" id="categoryResetButton" class="btn btn-primary" />
+                                    <button type="submit" id="categoryAddButton" class="btn btn-primary">Add</button>
+                                </footer>
+                            }
+                        </div>
+
+                    </div>
+
+                </div>
+            </article>
+            <!-- END COL -->
+
+        </div>
+        <!-- row -->
+        <div class="row">
+            <!-- NEW WIDGET START -->
+            <article class="col-sm-12 col-md-12 col-lg-12">
+
+                <!-- Widget ID (each widget will need unique ID)-->
+                <div class="jarviswidget jarviswidget-color-darken" id="wid-id-3" data-widget-editbutton="false">
+                    <header>
+                        <span class="widget-icon"> <i class="fa fa-table"></i> </span>
+                        <h2>Category Details </h2>
+                    </header>
+
+                    <!-- widget div-->
+                    <div>
+                        <!-- widget edit box -->
+                        <div class="jarviswidget-editbox">
+                            <!-- This area used as dropdown edit box -->
+                        </div>
+                        <!-- end widget edit box -->
+                        <!-- widget content -->
+                        <div class="widget-body no-padding">
+                            <div class="table-responsive">
+
+                                <table class="table" id="dt_basic">
+                                    <thead>
+                                        <tr>
+                                            <th>SL</th>
+                                            <th>Name</th>
+                                            <th>Description</th>
+                                            <th>Is Active?</th>
+                                            <th>Edit</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+
+                                        @if (categories != null)
+                                        {
+                                            var count = 1;
+                                            foreach (Category aCategory in categories)
+                                            {
+                                                <tr>
+                                                    <td>@(count++)</td>
+                                                    <td>@aCategory.Name</td>
+                                                    <td>@aCategory.Description</td>
+                                                    @{
+                                                        var color = aCategory.IsActive ? "green" : "red";
+                                                        var activeStatus = aCategory.IsActive ? "Yes" : "No";
+                                                        <td style="color: @color">
+                                                            @activeStatus
+                                                        </td>
+                                                    }
+                                                    <td>
+                                                        <input type="button" class="btn btn-success" onclick="changeAddCategoryFormStateToEdit(@aCategory.Id)" value="Edit" />
+                                                    </td>
+                                                </tr>
+                                                            }
+                                                        }
+                                    </tbody>
+                                </table>
+
+                            </div>
+                        </div>
+                        <!-- end widget content -->
+
+                    </div>
+                    <!-- end widget div -->
+
+                </div>
+                <!-- end widget -->
+
+            </article>
+            <!-- WIDGET END -->
+
+        </div>
+        <!-- end row -->
+        <!-- END ROW -->
+
+    </section>
+</div>
+@section scripts{
+@Scripts.Render("~/bundles/jqueryval")
+        <script>
+            $(document).ready(function () {
+                $(function () {
+                    setTimeout(function () {
+                        $("#flashMessage").hide('blind', {}, 500);
+                    }, 5000);
+                });
+                $('#categoryIsActive').attr('checked', true);
+            });
+
+            function changeAddCategoryFormStateToEdit(categoryId) {
+                $(".field-validation-error").empty();
+                $("#preloader").css('display', 'block');
+
+                // Scroll to the top of the form
+                $('html, body').animate({
+                    scrollTop: $("#addCategoryFormHeading").offset().top
+                },
+                    500);
+
+                // Change form state to edit
+                $("#addCategoryFormHeading").text("Update Category");
+                $("#categoryAddButton").text("Update");
+                $("#categoryForm").attr("action", "@BaseUrl.subDirectory/Category/Edit");
+                $("#categoryId").val(categoryId);
+
+                var data = { categoryId: categoryId };
+                $.ajax({
+                    method: 'POST',
+                    url: "@Url.Action("GetCategoryDetailsById", "Category")",
+                    dataType: "json",
+                contentType: 'application/json',
+                data: JSON.stringify(data),
+                crossDomain: true,
+                success: function (data) {
+                    console.log(data);
+                    toastr.clear();
+                    if (data.Status == "Ok") {
+                        var createdOnFormatedDate = "";
+                        var createdOn = "";
+                        if (data.Category.CreatedOn == null) {
+                            createdOnFormatedDate = null;
+                        } else {
+                            createdOn = new Date(parseInt(data.Category.CreatedOn.substr(6)));
+                            createdOnFormatedDate = createdOn.getFullYear() + '-' + ('0' + (createdOn.getMonth() + 1)).slice(-2) + '-' + ('0' + createdOn.getDate()).slice(-2) + ' ' + ('0' + createdOn.getHours()).slice(-2) + ':' + ('0' + (createdOn.getMinutes())).slice(-2) + ':' + ('0' + createdOn.getSeconds()).slice(-2);
+                        }                        
+                        $("#categoryName").val($.trim(data.Category.Name));
+                        $("#categoryDescription").val($.trim(data.Category.Description));
+                        $("#categoryCreatedOn").val(createdOnFormatedDate);
+                        $("#categoryCreatedBy").val(data.Category.CreatedBy);
+                        $("#ProductTypeId").val(data.Category.ProductTypeId);
+                        if (data.Category.IsActive === true) {
+                            $("#categoryIsActive").prop('checked', true);
+                        } else {
+                            $("#categoryIsActive").prop('checked', false);
+                        }
+                    } else {
+                        toastr.error("Something went wrong");
+                    }
+
+                },
+                error: function () {
+                    toastr.error("Something went wrong");
+                }
+            });
+            $("#preloader").css('display', 'none');
+            }
+
+            $("#categoryResetButton").click(function () {
+                $("#categoryIsActive").prop('checked', true);
+                $("#addCategoryFormHeading").text("Add Category");
+                $("#categoryAddButton").text("Add");
+                $("#categoryForm").attr("action", "@BaseUrl.subDirectory/Category/Create");
+                $("#categoryName").val("");               
+                $("#categoryDescription").val("");
+                $("#ProductTypeId").val("");
+                $(".field-validation-error").empty();
+            });
+        </script>
+    }

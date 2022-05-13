@@ -1,0 +1,90 @@
+﻿@model EFreshStore.Models.Context.District
+
+@{
+    ViewBag.Title = "Create";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<head>
+    <style>
+        .error {
+            color: red;
+        }
+    </style>
+</head>
+<section id="widget-grid" class="">
+    <div class="row" style="height: 100%">
+        <article class="col-sm-12 col-md-12 col-lg-12">
+            <div class="jarviswidget" id="wid-id-4" data-widget-editbutton="false" data-widget-custombutton="false">
+                <header>
+                    <span class="widget-icon"> <i class="fa fa-edit"></i> </span>
+                    <h2>Add District</h2>
+
+                </header>
+                <div>
+
+                    <div class="widget-body no-padding">
+                        @using (Html.BeginForm(null, null, FormMethod.Post, new {id = "AddDistrictForm", @class = "smart-form"}))
+                        {
+                            @Html.AntiForgeryToken()
+                            <div class='@TempData["Class"]' id="flashMessage" role="alert">@TempData["Message"]</div>
+                            <fieldset>
+                                <div class="row">
+                                    <section class="col col-2"></section>
+                                    <section class="col col-2">
+                                        <label class="label">District<span style="color: red"> *</span></label>
+                                    </section>
+                                    <section class="col col-6">
+                                        <label class="input">
+                                            <input type="text" name="Name" id="Name">
+                                        </label>
+                                    </section>
+                                    <section class="col col-2"></section>
+                                </div>
+                                <div class="row" style="margin-bottom: 5%">
+
+                                </div>
+                            </fieldset>
+                            <footer style="bottom: 0">
+                                <button type="submit" class="btn btn-primary">
+                                    Add
+                                </button>
+                            </footer>
+
+                        }
+                    </div>
+
+                </div>
+
+            </div>
+        </article>
+        <!-- END COL -->
+
+    </div>
+
+    <!-- END ROW -->
+
+</section>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+    <script>
+        $(document).ready(function() {
+
+        $(function() {
+            setTimeout(function() {
+                $("#flashMessage").hide('blind', {}, 500);
+            }, 5000);
+        });
+        });
+        $("#AddDistrictForm").validate({
+
+            rules: {
+                Name: "required"
+
+            },
+            messages: {
+                Name: "Please enter district name"
+            }
+        });
+    </script>
+}

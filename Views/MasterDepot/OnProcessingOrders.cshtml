@@ -1,0 +1,139 @@
+﻿@using EFreshAdmin.Utility.Enums
+@using EFreshStoreCore.Model.Context
+@{
+    ViewBag.Title = "Delivering Orders";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    List<OrderState> states = ViewBag.ProductStatus;
+    int row = 0;
+}
+<div class='@TempData["Class"]' id="flashMessage" role="alert">@TempData["Message"]</div>
+<section id="widget-grid" class="">
+    <!-- row -->
+    <div class="row">
+        <article class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+            <div class="jarviswidget jarviswidget-color-darken" id="wid-id-0" data-widget-editbutton="false">
+                <header>
+                    <span class="widget-icon"> <i class="fa fa-table"></i> </span>
+                    <h2>On Processing Orders </h2>
+                </header>
+                <div>
+                    <div class="widget-body no-padding">
+                        @using (Html.BeginForm("UpdateOrderStatus", "MasterDepot", FormMethod.Post, null))
+                        {
+                            <table id="dt_basic" class="table table-striped table-bordered table-hover" width="100%">
+                                @if (Model != null)
+                                {
+                                    <thead>
+                                    <tr>
+                                        <th><input type="checkbox" id="checkall"/></th>
+                                        <th>Order No</th>
+                                        <th>Customer Name</th>
+                                        <th>Delivery Address</th>
+                                        <th>Contact</th>
+                                        <th>Order Date</th>
+                                        @*<th>Order Status</th>*@
+
+                                    </tr>
+                                    </thead>
+
+                                    <tbody>
+
+                                    @foreach (Order data in Model)
+                                    {
+                                        var orderDate = data.OrderDate.HasValue ? data.OrderDate.Value.ToString("dd/MM/yyyy hh:mm:ss tt") : "";
+                                        <tr>
+                                            <td><input type="checkbox" class="chk" id="chkChiled" name="orders[@row].IsCheck" value="" onclick="changeCheckBox(this)"/></td>
+                                            <td><a data-toggle="modal" data-target="#modalCart" onclick="GetOrderDetails(@data.Id, '@data.OrderNo')" style="cursor: pointer">@data.OrderNo</a></td>
+                                            <td>@data.CustomerName</td>
+                                            <td>@data.DeliveryAddress</td>
+                                            <td>@data.MobileNo</td>
+                                            <td>
+                                                @orderDate
+                                                <input name="orders[@row].Id" value="@data.Id" hidden/>
+                                                <input name="orders[@row].UserId" value="@data.UserId" hidden/>
+                                            </td>
+                                        </tr>
+                                        row++;
+                                    }
+                                    </tbody>
+
+                                }
+                            </table>
+                            <br/>
+                            <div class="row">
+                                <div class="col-lg-6">
+
+                                </div>
+                                <div class="col-lg-6" align="right">
+
+                                    @foreach (var state in states)
+                                    {
+                                        if (state.Id == (long) OrderStatusEnum.Shipped)
+                                        {
+                                            <input type="hidden" id="OrderStateId" name="OrderStateId" value="@state.Id"/>
+                                        }
+                                    }
+                                    <input type="submit" id="Confirm" value="Mark as Shipped" class="buttonDesign btn-md">&nbsp;&nbsp;
+                                    <input type="submit" id="Cancel" value="Cancel" onclick="cancelOrder()" class="buttonDesign btn-md">&nbsp;&nbsp;&nbsp;
+
+                                </div>
+                            </div>
+                        }
+                        <br/>
+                    </div>
+                </div>
+            </div>
+        </article>
+    </div>
+</section>
+
+@section scripts{
+    <script>
+        $(document).ready(function () {
+
+            $("#checkall").change(function () {
+                var checked = $(this).is(':checked');
+                if (checked) {
+                    $(".chk").each(function () {
+                        $(this).prop("checked", true);
+                        $('tbody :checkbox').val(true);
+                    });
+                } else {
+                    $(".chk").each(function () {
+                        $(this).prop("checked", false);
+                        $('tbody :checkbox').val(false);
+                    });
+                }
+            });
+
+            // Changing state of CheckAll checkbox
+            $(".chk").click(function () {
+
+                if ($(".chk").length == $(".chk:checked").length) {
+                    $("#checkall").prop("checked", true);
+                } else {
+                    $("#checkall").removeAttr("checked");
+                }
+
+            });
+            //$("table tr th :checkbox").click(function (event) {
+            //    var table = $(event.target).closest('table');
+            //    $('td input:checkbox', table).prop('checked', this.checked);
+            //    //$('tbody :checkbox').trigger('click');
+            //    //$('tbody :checkbox').val(true);
+            //});
+
+        });
+
+        function changeCheckBox(event) {
+            $(event).val(true);
+        }
+        function cancelOrder() {
+            var val = $('#OrderStateId').val();
+            $('#OrderStateId').val("6");
+            val = $('#OrderStateId').val;
+
+        }
+    </script>
+}
+

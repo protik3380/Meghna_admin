@@ -1,0 +1,110 @@
+﻿@model IEnumerable<EFreshAdmin.Models.EntityModels.AssignOrder>
+
+@{
+    ViewBag.Title = "ViewAssignedOrders";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    long userTypeId = Convert.ToInt64(Session["UserTypeId"]);
+    var deliveryMen = ViewBag.DeliveryMen;
+    int row = 0;
+}
+
+<div class="row" style="margin-bottom: 5%">
+    <article class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+        <div class="jarviswidget jarviswidget-color-darken" id="wid-id-0" data-widget-editbutton="false">
+            <header>
+                <span class="widget-icon"> <i class="fa fa-table"></i> </span>
+                <h2>View Assigned Orders</h2>
+            </header>
+            <div>
+                <div class="widget-body no-padding">
+                    <table id="dt_basic" class="table table-responsive">
+                        <thead>
+                        <tr>
+                            @*<th><input type="checkbox" id="checkall" /></th>*@
+                            <th>Order No</th>
+                            <th>Customer Name</th>
+                            <th>Delivery Address</th>
+                            <th>Contact</th>
+                            <th>Order Date</th>
+                            <th>Action</th>
+                            <th></th>
+
+                        </tr>
+                        </thead>
+                        <tbody>
+                        @if (Model != null)
+                        {
+                            var count = 1;
+
+                            foreach (var data in Model)
+                            {
+                                var orderDate = data.Order.OrderDate.HasValue ? data.Order.OrderDate.Value.ToString("dd/MM/yyyy hh:mm:ss tt") : "N/A";
+                                <tr>
+                                    <td><a data-toggle="modal" data-target="#modalCart" onclick="GetOrderDetails(@data.OrderId, '@data.Order.OrderNo')" style="cursor: pointer">@data.Order.OrderNo</a></td>
+                                    <td>@data.Order.CustomerName</td>
+                                    <td>@data.Order.DeliveryAddress</td>
+                                    <td>@data.Order.MobileNo</td>
+                                    <td>@orderDate</td>
+                                    <td>
+                                        <label class="select">
+                                            <select id="DeliveryManId_@data.Id" class="form-control form-control-alternative">
+                                                @*<option selected="selected" id="previousSelectedMonth" value="@data.DeliveryMan.Id" disabled hidden>@data.DeliveryMan.Name</option>*@
+                                                @foreach (var item in deliveryMen)
+                                                {
+                                                    var selected = item.Id == data.DeliveryMan.Id ? "selected" : "";
+
+                                                    <option @selected value="@item.Id">@item.Name</option>
+
+                                                }
+
+                                            </select>
+                                            <p id="errorMessage_@data.Id" style="color: red"></p>
+                                        </label>
+
+                                        @*<input type="submit" id="Confirm" value="Assign" class="buttonDesign btn-md">*@&nbsp;&nbsp;
+                                    </td>
+                                    <td>
+                                        <a class="btn btn-default btn-primary" onclick="ChangeAssignedDeliveryMan(@data.Id, @data.OrderId)"> Edit </a>
+                                    </td>
+                                </tr>
+                                row++;
+                            }
+                        }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </article>
+</div>
+
+@section scripts{
+    <script>
+        function ChangeAssignedDeliveryMan(id, orderId) {
+            var orderIdToUpdate = orderId;
+            var deliveryManId = $("#DeliveryManId_" + id + " option:selected").val();
+            $("#errorMessage_" + id).empty();
+            if (deliveryManId === "") {
+                $("#errorMessage_" + id).append("Please select a delivery man");
+                return false;
+            }
+            var assignOrder = {
+                Id: id,
+                OrderId: orderIdToUpdate,
+                DeliveryManId: deliveryManId
+            };
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("ChangeAssignedDeliveryMan", "MasterDepot")",
+                data: assignOrder,
+                success: function (data) {
+                    toastr.success("Delivery man has been changed");
+                },
+                error: function () {
+                    toastr.error("Something went wrong");
+                }
+            });
+        }
+      
+    </script>
+}
